@@ -35,6 +35,7 @@ if($jwt){
 
     try {
         $key = '__test_secret__';
+        $t = 5 * 60 * 60 ; // 
         // $decoded = JWT::decode($jwt, $secret_key, array('HS256'));
         $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);       
         
@@ -42,7 +43,7 @@ if($jwt){
         $audience_claim = "E29CKG";
         $issuedat_claim = time(); // issued at
         $notbefore_claim = $issuedat_claim + 1; //not before in seconds
-        $expire_claim = $issuedat_claim + 600; // expire time in seconds
+        $expire_claim = $issuedat_claim + $t; // expire time in seconds
         $token = array(
             "iss" => $issuer_claim,
             "aud" => $audience_claim,
@@ -62,7 +63,7 @@ if($jwt){
                 "message" => "Access granted.",
                 // "token" => $jwt,
                 "jwt" => $jwt,
-                "data" => json_encode($decoded->data),
+                "user_data" => $decoded->data,
                 // "email" => $decoded->data->email,
                 // "fullname" => $decoded->data->fullname,
                 "expireAt" => $expire_claim,

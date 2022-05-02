@@ -15,15 +15,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <body class="hold-transition sidebar-mini">
 <div class="wrapper" >
   <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <?php include "./layouts/nav.php";?>
-  </nav>
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">    
+   
       <?php include "./layouts/aside.php"; ?>
-  </aside>
+ 
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" id="appProduct" v-cloak>

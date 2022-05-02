@@ -51,12 +51,13 @@ if($num > 0){
     {
         // This is your client secret
         $key = '__test_secret__';
+        $t = 5 * 60 * 60 ; // 
         // $secret_key = "99299929";
         $issuer_claim = "localhost"; // this can be the servername
         $audience_claim = "E29CKG";
         $issuedat_claim = time(); // issued at
         $notbefore_claim = $issuedat_claim + 1; //not before in seconds
-        $expire_claim = $issuedat_claim + 60; // expire time in seconds
+        $expire_claim = $issuedat_claim + $t; // expire time in seconds
         $token = array(
             "iss" => $issuer_claim,
             "aud" => $audience_claim,
@@ -76,10 +77,11 @@ if($num > 0){
         $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
         echo json_encode(
             array(
-                "status" => "ok",
+                "status" => "success",
                 "message" => "Successful login.",
                 // "token" => $jwt,
                 "jwt" => $jwt,
+                "user_data" => json_encode($row),
                 "email" => $email,
                 "expireAt" => $expire_claim
             ));

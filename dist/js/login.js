@@ -15,17 +15,20 @@ function login() {
       if (this.readyState == 4) {
         const objects = JSON.parse(this.responseText);
         console.log(objects);
-        if (objects['status'] == 'ok') {
-            Swal.fire({
-                text: objects['message'],
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.setItem("jwt", objects['jwt']);
-                    window.location.href = './index.php';
-                }
-          });
+        if (objects['status'] == 'success') {
+            swal.fire({
+              icon: objects['status'],
+              title: objects['message'],
+              showConfirmButton: true,
+              timer: 1000
+            });
+            localStorage.setItem("jwt", objects['jwt']);
+            localStorage.setItem("user_data", objects['user_data']);
+            console.log(objects['user_data']);
+            setTimeout(function() {
+              window.location.href = './index.php';
+            }, 1001);
+            
         } else {
           Swal.fire({
             text: objects['message'],
