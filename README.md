@@ -2,7 +2,6 @@
 
 npm install
 
-# Auth
-# api/auth
+# Auth ./api/auth
 
 composer install
