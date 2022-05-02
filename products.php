@@ -49,10 +49,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div class="content">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Featured</h5>
+                <h5 class="card-title">Products</h5>
                 <div class="card-tools">
                   <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button>                  
                 </div>
@@ -77,7 +77,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           <!-- <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id)">แก้ไขภาพ</button> -->
 
                         </a>
-                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id)" v-else>ใส่ภาพ</button>
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id,index)" v-else>ใส่ภาพ</button>
                       </td>
                       <td>{{data.pro_name}}</td>
                       <td>
@@ -191,26 +191,40 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{pro_img.title}}</h5>
             <button ref="m_img_upload" type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            
-              <img :src="'./uploads/'+ pro_img.img" alt="pro_img.img"  width="450" >
+          <div class="row mb-3" >
+            <div class="col-sm-12" >
+              <img class="img-fluid" :src="'./uploads/'+ pro_img.img" alt="Photo" v-if="pro_img.img">
+            </div>
+          </div>
+              <!-- <img :src="'./uploads/'+ pro_img.img" alt="pro_img.img"  width="450" > -->
                           
-            <form @submit.prevent="onUpload">
+            <form @submit="onUpload">
             <!-- <input type="file" name="file" id="file" @change="previewFiles"> -->
               <input type="hidden" name="pro_id" :value="pro_img.id">
-              <input class="form-control" type="file" ref="myFiles" @change="onChangeInput()" accept="img/*" name="file" id="file">
-              {{pro_img}}
+              <div class="input-group">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="file" name="file" @change="onChangeInput()" ref="myFiles" :value="pro_img.val">
+                  <label class="custom-file-label" for="exampleInputFile" >{{pro_img.label}}</label>
+                </div>
+                <div class="input-group-append">
+                  <!-- <span class="input-group-text" @click.prevent="onUpload">Upload</span> -->
+                  <!-- <button type="submit" class="input-group-text" >Upload</button> -->
+                </div>
+              </div>
+              <!-- <input class="form-control" type="file" ref="myFiles" @change="onChangeInput()" accept="img/*" name="file" id="file" > -->
+              <!-- {{pro_img}} -->
               <!-- <button type="submit">Upload</button> -->
             </form>
           </div>
           <div class="modal-footer">
             <!-- <button type="button" class="btn btn-default" @click="test">Close_test</button> -->
-            <button type="button" class="btn btn-success" @click.prevent="onUpload">Upload</button>
+            <!-- <button type="button" class="btn btn-success" @click.prevent="onUpload">Upload</button> -->
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -250,8 +264,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
         sel_units:'',
         pro_img:{
           id:'',
+          title:'',
           label:'Choose file',
-          img:''
+          img:'',
+          val:''
         }
       }
     },
@@ -420,24 +436,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
         b_pro_img(pro_id,index){
           this.pro_img.id = pro_id;
           this.pro_img.img = this.datas[index].img;
+          this.pro_img.title = this.datas[index].pro_id + ' ' + this.datas[index].pro_name;
           
         },
         onChangeInput(event){
-          // console.log(event.target.files);
-          console.log(this.$refs.myFiles.files.length);
-          var image = this.$refs.myFiles.files
-          if(image.length == 0){
-            this.label = 'Choose file'
-          }
-          else if(image.length == 1){
-            this. label = image[0]['name']
-          }else if(image.length > 1 ){
-            this.label = image.length + 'files'
-          }
+          this.onUpload()
         },
         onUpload(){
           var image = this.$refs.myFiles.files
-          console.log(this.$refs.myFiles.files[0]);
+          // console.log(this.$refs.myFiles.files[0].name);
           if (image.length > 0) {
             if(image[0].type == 'image/jpeg' || image[0].type =='image/png') {
               var formData = new FormData();
@@ -458,8 +465,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         showConfirmButton: true,
                         timer: 1500
                       });
-                      this.$refs.m_img_upload.click();
+                      // this.$refs.m_img_upload.click();
+                      // this.$refs.m_img_upload.value;
+                      // console.log(document.getElementById('file'));
+                      // console.log(this.$refs.myFiles.value);
+                      // document.getElementById('file').value = "";
                       this.get_products();
+                      this.pro_img.img = response.data.img;
+                      // this.pro_img.label = '';
                     }else {
                         swal.fire({
                             icon: 'error',

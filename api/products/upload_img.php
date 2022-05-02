@@ -103,7 +103,7 @@ if(!isset($errorMSG))
         $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
         $query->execute();
 			
-	echo json_encode(array("message" => "Image Uploaded Successfully", "status" => true));	
+	echo json_encode(array("message" => "Image Uploaded Successfully", "status" => true,"img" =>  $fileName));	
 }
 
 ?>

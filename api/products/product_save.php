@@ -94,37 +94,25 @@ try{
         exit;
     }
     if($product->action == 'delete'){
+        $upload_path = '../../uploads/'; // set upload folder path 
+        
+        $sql = "SELECT img FROM products WHERE pro_id=$product->pro_id";
+        $query = $dbcon->prepare($sql);
+        $query->execute();
+        $result = $query->fetchAll(PDO::FETCH_OBJ);
+        if($result){
+            $pro_img = $result[0]->img;
+            if($pro_img != '' && file_exists($upload_path .  $pro_img)){
+                unlink($upload_path . $pro_img);
+            }
+        }
     
         $sql = "DELETE FROM products WHERE pro_id = $product->pro_id";
         $dbcon->exec($sql);
         http_response_code(200);
         echo json_encode(array('status' => true, 'massege' => 'Record deleted successfully'));  
         exit;
-    }
-    /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    // $sql = "SELECT products.pro_name, products.pro_id, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
-    // $query = $dbcon->prepare($sql);
-    // $query->execute();
-    // $result = $query->fetchAll(PDO::FETCH_OBJ);
-    // $data = array();
-
-    // foreach($result as $res){
-    //     array_push($data,array(
-    //         "pro_id" => $res->pro_id,
-    //         "pro_name" => $res->pro_name,
-    //         "unit_name" => $res->unit_name,
-    //         "cat_name" => $res->cat_name
-    //     ));
-    // }
-    // http_response_code(200);
-    // echo json_encode(array(
-    //     'status' => true, 
-    //     'massege' =>  'Ok', 
-    //     // 'massege' =>  $result, 
-    //     // 'respJSON' => $data->fullname
-    //     'respJSON' => $pro_id
-    // ));
+    }    
 
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
