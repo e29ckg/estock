@@ -66,6 +66,9 @@ Vue.createApp({
             })
             .catch(function (error) {
                 console.log(error);
+                localStorage.removeItem("jwt");
+                  localStorage.removeItem("user_data"); 
+                  window.location.href = './login.php';
             });
 
 

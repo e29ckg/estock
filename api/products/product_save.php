@@ -43,13 +43,13 @@ try{
             exit;
         }
 
-        $sql = "INSERT INTO products(pro_name, pro_detail, cat_id, unit_id, locat, lower, min, st, own) 
-                              VALUE(:pro_name, :pro_detail, :cat_id, :unit_id, :locat, :lower, :min, :st, :own);";        
+        $sql = "INSERT INTO products(pro_name, pro_detail, cat_name, unit_name, locat, lower, min, st, own) 
+                              VALUE(:pro_name, :pro_detail, :cat_name, :unit_name, :locat, :lower, :min, :st, :own);";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':pro_name',$product->pro_name, PDO::PARAM_STR);
         $query->bindParam(':pro_detail',$product->pro_detail, PDO::PARAM_STR);
-        $query->bindParam(':cat_id',$product->cat_id, PDO::PARAM_INT);
-        $query->bindParam(':unit_id',$product->unit_id, PDO::PARAM_INT);
+        $query->bindParam(':cat_name',$product->cat_name, PDO::PARAM_STR);
+        $query->bindParam(':unit_name',$product->unit_name, PDO::PARAM_STR);
         $query->bindParam(':locat',$product->locat, PDO::PARAM_STR);
         $query->bindParam(':lower',$product->lower, PDO::PARAM_INT);
         $query->bindParam(':min',$product->min, PDO::PARAM_INT);
@@ -68,13 +68,13 @@ try{
         exit;
     }
     if($product->action == 'update'){
-        $sql = "UPDATE products SET pro_name =:pro_name, pro_detail =:pro_detail, cat_id =:cat_id, unit_id =:unit_id, locat =:locat, lower =:lower,
+        $sql = "UPDATE products SET pro_name =:pro_name, pro_detail =:pro_detail, cat_name =:cat_name, unit_name =:unit_name, locat =:locat, lower =:lower,
         min=:min, st =:st, own =:own WHERE pro_id = :pro_id ";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':pro_name',$product->pro_name, PDO::PARAM_STR);
         $query->bindParam(':pro_detail',$product->pro_detail, PDO::PARAM_STR);
-        $query->bindParam(':cat_id',$product->cat_id, PDO::PARAM_INT);
-        $query->bindParam(':unit_id',$product->unit_id, PDO::PARAM_INT);
+        $query->bindParam(':cat_name',$product->cat_name, PDO::PARAM_STR);
+        $query->bindParam(':unit_name',$product->unit_name, PDO::PARAM_STR);
         $query->bindParam(':locat',$product->locat, PDO::PARAM_STR);
         $query->bindParam(':lower',$product->lower, PDO::PARAM_INT);
         $query->bindParam(':min',$product->min, PDO::PARAM_INT);

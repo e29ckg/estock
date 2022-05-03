@@ -8,32 +8,30 @@ header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
 
+$data = json_decode(file_get_contents("php://input"));
+// $product = $data;
+
+// http_response_code(200);
+//     echo json_encode(array(
+//         'status' => true, 
+//         'massege' =>  'Ok', 
+//         'respJSON' => $data->pro_id
+//     ));
+//     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    // $sql = "SELECT products.pro_name, products.pro_id, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
+    $sql = "SELECT * FROM `units` WHERE unit_id = $data->unit_id LIMIT 0,1;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $data = array();
+    $datas = array();
 
-    foreach($result as $res){
-        array_push($data,array(
-            "pro_id" => $res->pro_id,
-            "pro_name" => $res->pro_name,
-            // "unit_id" => $res->unit_id,
-            "unit_name" => $res->unit_name,
-            // "cat_id" => $res->cat_id,
-            "cat_name" => $res->cat_name,
-            "img" => $res->img
-        ));
-    }
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
         'massege' =>  'Ok', 
-        // 'massege' =>  $result, 
-        'respJSON' => $data
+        'respJSON' =>  $result, 
+        // 'respJSON' => $datas
     ));
 
 }catch(PDOException $e){
@@ -41,5 +39,3 @@ try{
     http_response_code(400);
     echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
-
-

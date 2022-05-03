@@ -123,16 +123,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>ประเภทสินค้า</label>
-                  <select class="form-control" v-model="product[0].cat_id" required>
-                    <option v-for="sc in sel_cats" :value="sc.cat_id">{{sc.cat_name}}</option>
+                  <select class="form-control" v-model="product[0].cat_name" required>
+                    <option v-for="sc in sel_cats" :value="sc.cat_name">{{sc.cat_name}}</option>
                   </select>
                 </div>
               </div>
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>หน่วยนับ</label>
-                  <select class="form-control" v-model="product[0].unit_id" required>
-                    <option v-for="sn in sel_units" :value="sn.unit_id">{{sn.unit_name}}</option>                    
+                  <select class="form-control" v-model="product[0].unit_name" required>
+                    <option v-for="sn in sel_units" :value="sn.unit_name">{{sn.unit_name}}</option>                    
                   </select>
                 </div>
               </div>
@@ -249,8 +249,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           pro_id:'',
           pro_name:'',
           pro_detail:'',
-          cat_id:'',
-          unit_id:'',
+          cat_name:'',
+          unit_name:'',
           locat:'',
           lower:1,
           min:1,
@@ -351,8 +351,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                               pro_id:'',
                               pro_name:'',
                               pro_detail:'',
-                              cat_id:'',
-                              unit_id:'',
+                              cat_name:'',
+                              unit_name:'',
                               locat:'',
                               lower:1,
                               min:1,
@@ -422,8 +422,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                               pro_id:'',
                               pro_name:'',
                               pro_detail:'',
-                              cat_id:'',
-                              unit_id:'',
+                              cat_name:'',
+                              unit_name:'',
                               locat:'',
                               lower:1,
                               min:1,

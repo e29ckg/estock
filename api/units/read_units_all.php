@@ -10,8 +10,8 @@ include "../dbconfig.php";
 
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    // $sql = "SELECT products.pro_name, products.pro_id, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
+    // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
+    $sql = "SELECT * FROM units ;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
@@ -19,13 +19,8 @@ try{
 
     foreach($result as $res){
         array_push($data,array(
-            "pro_id" => $res->pro_id,
-            "pro_name" => $res->pro_name,
-            // "unit_id" => $res->unit_id,
-            "unit_name" => $res->unit_name,
-            // "cat_id" => $res->cat_id,
-            "cat_name" => $res->cat_name,
-            "img" => $res->img
+            "unit_id" => $res->unit_id,
+            "unit_name" => $res->unit_name
         ));
     }
     http_response_code(200);

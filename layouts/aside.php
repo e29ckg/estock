@@ -20,19 +20,19 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="./catalogs.php" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
-                Simple Link
-                <span class="right badge badge-danger">New</span>
+                ประเภทสินค้า
+                <!-- <span class="right badge badge-danger">ประเภทสินค้า</span> -->
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="./products.php" class="nav-link">
+            <a href="./units.php" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
-                รายงาน
+                หน่วยนับ
                 <span class="right badge badge-danger">New</span>
               </p>
             </a>
