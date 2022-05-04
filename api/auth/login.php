@@ -70,16 +70,14 @@ if($num > 0){
                 "role" => $role,
                 "email" => $email
         ));
-
-        http_response_code(200);
-
+        
         // $jwt = JWT::encode($token, $secret_key, 'RS256');
+        http_response_code(200);
         $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
         echo json_encode(
             array(
                 "status" => "success",
                 "message" => "Successful login.",
-                // "token" => $jwt,
                 "jwt" => $jwt,
                 "user_data" => json_encode($row),
                 "email" => $email,

@@ -12,7 +12,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 date_default_timezone_set("Asia/Bangkok");
 // This is your client secret
 
-$secret_key = "__test_secret__";
+// $secret_key = "__test_secret__";
 $jwt = null;
 $databaseService = new DatabaseService();
 $conn = $databaseService->getConnection();
@@ -34,9 +34,7 @@ $jwt = $arr[1];
 if($jwt){
 
     try {
-        $key = '__test_secret__';
         $t = 5 * 60 * 60 ; // 
-        // $decoded = JWT::decode($jwt, $secret_key, array('HS256'));
         $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);       
         
         $issuer_claim = "localhost"; // this can be the servername
@@ -53,31 +51,19 @@ if($jwt){
             "data" => $decoded->data
         );
 
-        http_response_code(200);
-
         // $jwt = JWT::encode($token, $secret_key, 'RS256');
         $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
+        
+        http_response_code(200);
         echo json_encode(
             array(
                 "status" => "ok",
                 "message" => "Access granted.",
-                // "token" => $jwt,
                 "jwt" => $jwt,
                 "user_data" => $decoded->data,
-                // "email" => $decoded->data->email,
-                // "fullname" => $decoded->data->fullname,
                 "expireAt" => $expire_claim,
                 "ts"=> time()
-            ));
-
-        // Access is granted. Add code of the operation here 
-        // http_response_code(200);
-        // echo json_encode(array(
-        //     "status" => "ok",
-        //     "message" => "Access granted.",
-        //     "decoded" => $decoded->data->user_id,
-        //     "ts"=> time()
-        // ));
+            ));        
 
     }catch (Exception $e){
 

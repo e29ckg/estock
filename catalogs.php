@@ -97,7 +97,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="row">   
               <div class="col-sm-12">
                 <div class="form-group">
-                  <label>ชื่อสินค้า</label>
+                  <label>ชื่อประเภทสินค้า</label>
                   <input type="text" class="form-control" v-model="catalog[0].cat_name" required>
                 </div>
               </div>

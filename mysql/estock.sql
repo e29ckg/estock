@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 01, 2022 at 05:32 PM
+-- Generation Time: May 04, 2022 at 04:32 PM
 -- Server version: 10.4.20-MariaDB
 -- PHP Version: 7.3.29
 
@@ -34,14 +34,6 @@ CREATE TABLE `catalogs` (
   `cat_sort` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `catalogs`
---
-
-INSERT INTO `catalogs` (`cat_id`, `cat_name`, `cat_detail`, `cat_sort`) VALUES
-(100, 'สำนักงาน', '', 1),
-(200, 'คอมพิวเตอร์', '', 2);
-
 -- --------------------------------------------------------
 
 --
@@ -52,8 +44,8 @@ CREATE TABLE `products` (
   `pro_id` int(13) NOT NULL,
   `pro_name` varchar(250) NOT NULL,
   `pro_detail` text DEFAULT NULL,
-  `cat_id` int(13) DEFAULT NULL,
-  `unit_id` int(13) DEFAULT NULL,
+  `cat_name` varchar(250) DEFAULT NULL,
+  `unit_name` varchar(250) DEFAULT NULL,
   `instrok` int(10) DEFAULT NULL,
   `locat` varchar(250) DEFAULT NULL,
   `lower` int(10) DEFAULT NULL,
@@ -64,19 +56,6 @@ CREATE TABLE `products` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `update_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `products`
---
-
-INSERT INTO `products` (`pro_id`, `pro_name`, `pro_detail`, `cat_id`, `unit_id`, `instrok`, `locat`, `lower`, `min`, `st`, `img`, `own`, `created_at`, `update_at`) VALUES
-(1, 'sss', '', 100, 2, NULL, 'sss1', 1, 1, 0, '1651418476.jpg', 'phayao sonplai', '2022-05-01 14:01:35', '2022-05-01 22:29:19'),
-(2, 'd2222', '', 100, 2, NULL, '2222', 1, 1, 1, '1651418972.png', 'phayao sonplai', '2022-05-01 17:58:58', '2022-05-01 22:29:32'),
-(3, 'dd3333', '', 100, 1, NULL, '', 1, 1, 1, '3.jpg', 'phayao sonplai', '2022-05-01 18:00:53', '2022-05-01 21:42:14'),
-(4, 's44444', '', 100, 1, NULL, '', 1, 1, 1, '4.png', 'phayao sonplai', '2022-05-01 18:02:29', '2022-05-01 21:37:05'),
-(5, 's444445', '', 200, 1, NULL, '', 1, 1, 1, '1651418460.png', 'phayao sonplai', '2022-05-01 18:02:48', '2022-05-01 22:21:00'),
-(6, 'd5555', '', 100, 1, NULL, '', 1, 1, 1, '1651418502.jpg', 'phayao sonplai', '2022-05-01 18:03:51', '2022-05-01 22:21:42'),
-(7, 'www', '', 100, 1, NULL, 'ww', 1, 1, 1, '', 'phayao sonplai', '2022-05-01 22:29:46', '2022-05-01 22:29:46');
 
 -- --------------------------------------------------------
 
@@ -91,14 +70,6 @@ CREATE TABLE `units` (
   `to_unit_id` int(13) DEFAULT NULL,
   `to_unit_ratio` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `units`
---
-
-INSERT INTO `units` (`unit_id`, `unit_name`, `unit_detail`, `to_unit_id`, `to_unit_ratio`) VALUES
-(1, 'ม้วน', NULL, NULL, NULL),
-(2, 'รีม', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -125,9 +96,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `fullname`, `dep`, `phone`, `created_at`, `updated_at`) VALUES
 (1, 'e29ckg', '$2y$10$37GMNcQApVM7OUuLxkbFB.LKPLpIxf6etEtYe6v2eWb.CT69LMG8e', 'e29ckg@gmail.com', '', 'phayao sonplai', '', '', '0000-00-00 00:00:00', '2022-04-30 03:41:48'),
-(2, 'user', '$2y$10$9G0.cEbyLt89jAoE7v8CTeMMe0L6ruj8PlG/.NuG7jmQLLwXtKpHu', '1234@gmail.com', '', 'phayao sonplai222', '', '', '2022-04-30 00:00:00', '2022-04-30 06:09:05'),
-(3, '', '$2y$10$bVaB2iqfMDuyHBGAEanMiuP/xQms3EsrPksfbNJbWF5PUyHKMAQHe', 'rrr@gmail.com', '', 'rrr', '', '', '0000-00-00 00:00:00', '2022-04-30 15:35:39'),
-(4, '', '$2y$10$3TFhL9DyO/OxFDYjJuvhnuyhcC1UqmDoCOlGtyqas7RLt.akLkBzy', 'ddd@ss.c', '', 'dd', '', '', '0000-00-00 00:00:00', '2022-04-30 15:36:57');
+(7, 'user', '$2y$10$K8ZiyMr9.lBeCnwhVwAoo.Nt9Kyr/UlXZ4AWiZqLUDqAnMZajZbHu', 'd', '', 'test', '', '', '0000-00-00 00:00:00', '2022-05-04 21:26:42');
 
 --
 -- Indexes for dumped tables
@@ -165,25 +134,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `catalogs`
 --
 ALTER TABLE `catalogs`
-  MODIFY `cat_id` int(13) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=202;
+  MODIFY `cat_id` int(13) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `pro_id` int(13) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `pro_id` int(13) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `units`
 --
 ALTER TABLE `units`
-  MODIFY `unit_id` int(13) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `unit_id` int(13) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(13) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(13) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

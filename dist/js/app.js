@@ -1,4 +1,4 @@
-var url_base = window.location.protocol + '//' + window.location.host;
+var url_base = window.location.protocol + '//' + window.location.host + '/estock/'
 
 var jwt = localStorage.getItem("jwt");
 if (jwt == null) {
@@ -25,8 +25,8 @@ Vue.createApp({
     },
 
     ck_protect(){
-      var t = 6 * 60 * 1000
-      // var t = 1000
+      var t = 1 * 60 * 1000
+      // var t = 3000
       setInterval(()=> {
         var jwt = localStorage.getItem("jwt");
         this.protected(jwt);
@@ -35,8 +35,7 @@ Vue.createApp({
     },
 
     protected(jwt) {
-
-      axios.post(url_base + '/estock/api/auth/protected.php',{},{ 
+      axios.post(url_base + '/api/auth/protected.php',{},{ 
         headers: {
             "Access-Control-Allow-Origin" : "*",
             "Content-type": "Application/json",
@@ -97,16 +96,64 @@ Vue.createApp({
 Vue.createApp({
   data() {
     return {
-      user:'',
-      url_img:'./node_modules/admin-lte/dist/img/user2-160x160.jpg',
+      datas:'',
+      url:'',
+      url_base:'',
+      menus:[
+        {          
+          menu_name:'Home',
+          menu_class:'',
+          menu_url:'index.php',
+          menu_icon_class:'nav-icon fas fa-tachometer-alt',
+          menu_badge:'',
+        },
+        {          
+          menu_name:'Products',
+          menu_class:'',
+          menu_url:'products.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'251',
+        },
+        {          
+          menu_name:'ประเภทสินค้า',
+          menu_class:'',
+          menu_url:'catalogs.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'251',
+        },
+        {          
+          menu_name:'หน่วยนับ',
+          menu_class:'',
+          menu_url:'units.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'251',
+        },
+        {          
+          menu_name:'สมาชิก',
+          menu_class:'',
+          menu_url:'users.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'251',
+        },
+      ]
     }
   },
   mounted(){
-    // this.get_fullname()
+    this.url = window.location.href
+    this.url_base = url_base
+    this.set_menu()
   },
   methods: {
-  get_fullname() {
-    // this.user = JSON.parse(localStorage.getItem("user_data"));
-  }
-},
+    set_menu(){
+      for (let i = 0; i < this.menus.length; i++) {
+        my_url = this.url_base + this.menus[i].menu_url
+        // console.log(my_url)
+        if(this.url == my_url){
+          this.menus[i].menu_class = 'active'
+        }else{
+          this.menus[i].menu_class = ''
+        }
+      }
+    }
+  },
 }).mount('#aside')

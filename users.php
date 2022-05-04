@@ -19,18 +19,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <?php include "./layouts/aside.php"; ?>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" id="appUnits" v-cloak>
+  <div class="content-wrapper" id="appUsers" v-cloak>
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Units</h1>
+            <h1 class="m-0">Users</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="./index.php">Home</a></li>
-              <li class="breadcrumb-item active">Units</li>
+              <li class="breadcrumb-item active">Users</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -45,9 +45,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Units</h5>
+                <h5 class="card-title">Users</h5>
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_unit_insert()" ref="m_show">เพิ่มหน่วยนับ</button>                  
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_user_insert()" ref="m_show">เพิ่มสมาชิก</button>                  
                 </div>
               </div>
               <div class="card-body">
@@ -55,20 +55,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <thead>
                     <tr>
                       <th style="width: 10px">#</th>
-                      <th>ชื่อหน่วยนับ</th>
+                      <th>ชื่อ</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
                      
-                      <td>{{data.unit_id}}</td>
+                      <td>{{data.user_id}}</td>
                       <td>
-                          {{data.unit_name}}
+                       {{data.username}} {{data.dep}} {{data.phone}}
                       </td>
                       <td>
-                        <button @click="b_unit_update(data.unit_id)" >Update</button>  
-                        <button @click="destroy_unit(data.unit_id)">Delete</button>  
+                        <button @click="b_user_update(data.user_id)" >Update</button>  
+                        <button @click="destroy_user(data.user_id)">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -83,13 +83,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <form @submit.prevent="b_unit_save()">
+          <form @submit.prevent="b_user_save()">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_unit_close()">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_user_close()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -97,8 +96,40 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="row">   
               <div class="col-sm-12">
                 <div class="form-group">
-                  <label>ชื่อหน่วยนับ</label>
-                  <input type="text" class="form-control" v-model="unit[0].unit_name" required>
+                  <label>ชื่อ</label>
+                  <input type="text" class="form-control" v-model="user[0].fullname" required>
+                </div>
+              </div>
+            </div>   
+            <div class="row">   
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>username</label>
+                  <input type="text" class="form-control" v-model="user[0].username" required>
+                </div>
+              </div>
+            </div>   
+            <div class="row">   
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>E-mail</label>
+                  <input type="e-mail" class="form-control" v-model="user[0].email" required>
+                </div>
+              </div>
+            </div>   
+            <div class="row">   
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>dep</label>
+                  <input type="text" class="form-control" v-model="user[0].dep" >
+                </div>
+              </div>
+            </div>   
+            <div class="row">   
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <label>phone</label>
+                  <input type="text" class="form-control" v-model="user[0].phone" >
                 </div>
               </div>
             </div>   
@@ -106,7 +137,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_unit_close()">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_user_close()">Close</button>
             <button type="submit" class="btn btn-primary" >Save changes</button>
           </div>
             <!-- {{catatlog}} -->
@@ -124,27 +155,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host;
+  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
 
   Vue.createApp({
     data() {
       return {
         datas:'',
         message: 'Hello Vue!',
-        unit:[{
-          unit_id:'',
-          unit_name:'',          
+        user:[{
+          user_id:'',
+          fullname:'',          
+          username:'',          
+          password:'',          
+          email:'',          
+          dep:'',          
+          phone:'',          
+          fullname:'',          
           action:'insert'        
         }],
         
       }
     },
     mounted(){
-      this.get_Units();
+      this.get_Users();
     },
     methods: {      
-      get_Units(){
-        axios.post(url_base + '/estock/api/units/read_units_all.php')
+      get_Users(){
+        axios.post(url_base + 'api/users/get_users.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -155,46 +192,47 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-      b_unit_insert(){
-        this.b_unit_close();
+      b_user_insert(){
+        this.b_user_close();
       },  
-      b_unit_update(unit_id){
+      b_user_update(user_id){
         this.$refs.m_show.click();
-        axios.post(url_base + '/estock/api/units/get_unit.php',{unit_id:unit_id})
+        axios.post(url_base + 'api/users/get_user.php',{user_id:user_id})
             .then(response => {
-                // console.log(response.data);
                 if (response.data.status) {
-                    this.unit = response.data.respJSON;
-                    this.unit[0].action = 'update'; 
-                    console.log(this.unit);                   
+                  this.user = response.data.respJSON;
+                  this.user[0].action = 'update';              
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       },  
-      b_unit_save(){
+      b_user_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
-                // console.log(response.data);
-                if (response.data.status ) {
+                if (response.data.status == 'success') {
                   Swal.fire({
-                    icon: 'success',
+                    icon: response.data.status,
                     title: response.data.massege,
                     showConfirmButton: false,
                     timer: 1500
                   });
                   this.$refs['m_close'].click();
-                  this.get_Units();  
-                  this.unit = [{
-                              unit_id:'',
-                              unit_name:'',
+                  this.get_Users();  
+                  this.user = [{
+                              user_id:'',
+                              fullname:'',
+                              username:'',
+                              email:'',
+                              dep:'',
+                              phone:'',
                               action:'insert'        
                             }];     
                 }else{
                   Swal.fire({
-                    icon: 'error',
+                    icon: response.data.status,
                     title: response.data.massege,
                     showConfirmButton: false,
                     timer: 1500
@@ -205,7 +243,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-      destroy_unit(unit_id){
+      destroy_user(user_id){
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -217,23 +255,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
               }).then((result) => {
                 if (result.isConfirmed) {
                   var jwt = localStorage.getItem("jwt");
-                  this.unit[0].action = 'delete';  
-                  this.unit[0].unit_id = unit_id;  
-                  axios.post(url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  this.user[0].action = 'delete';  
+                  this.user[0].user_id = user_id;  
+                  axios.post(url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
-                        // console.log(response.data);
-                        if (response.data.status ) {
+                        if (response.data.status == 'success') {
                           Swal.fire({
-                            icon: 'success',
+                            icon: response.data.status,
                             title: response.data.massege,
                             showConfirmButton: false,
                             timer: 1500
                           })
-                          this.get_Units(); 
+                          this.get_Users(); 
                              
                         }else{
                           Swal.fire({
-                            icon: 'error',
+                            icon: response.data.status,
                             title: response.data.massege,
                             showConfirmButton: false,
                             timer: 1500
@@ -247,15 +284,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }
               });            
         },
-        b_unit_close(){
-          this.unit = [{
-                              unit_id:'',
-                              unit_name:'',
+        b_user_close(){
+          this.user = [{
+                              user_id:'',
+                              username:'',
+                              email:'',
+                              dep:'',
+                              phone:'',
                               action:'insert'        
                             }];     
         }        
       },
-  }).mount('#appUnits');
+  }).mount('#appUsers');
 </script>
 </body>
 </html>

@@ -52,6 +52,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header">
                 <h5 class="card-title">Products</h5>
                 <div class="card-tools">
+                  <input type="text" @blur="handleBlurSearch" v-model="q" @keyup="search" ref="search" placeholder="Search.">
                   <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button>                  
                 </div>
               </div>
@@ -266,7 +267,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           label:'Choose file',
           img:'',
           val:''
-        }
+        },
+        q:''
       }
     },
     mounted(){
@@ -434,8 +436,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         b_pro_img(pro_id,index){
           this.pro_img.id = pro_id;
           this.pro_img.img = this.datas[index].img;
-          this.pro_img.title = this.datas[index].pro_id + ' ' + this.datas[index].pro_name;
-          
+          this.pro_img.title = this.datas[index].pro_id + ' ' + this.datas[index].pro_name;          
         },
         onChangeInput(event){
           this.onUpload()
@@ -493,6 +494,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
         } ,
         test(){
           this.$refs.m_img_upload.click();
+        },
+        /** 
+         * ต้นหา
+         */
+        search(){
+          console.log(this.q)
+          if(this.q.length > 0){
+            axios.post(url_base + '/estock/api/products/product_search.php',{q:this.q})
+              .then(response => {
+                  if (response.data.status){
+                    this.datas = response.data.respJSON;
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              });
+          }else{
+            this.get_products()
+          }
+        },
+        reset_search(){
+          this.q=''
+        },
+        handleBlurSearch(e) {
+          this.q = ''
+          this.get_products()
+          // console.log('blur', e.target.placeholder)
         }
     },
   }).mount('#appProduct')

@@ -3,6 +3,7 @@ $servername = "localhost";
 $username = "root";
 $userpass = "";
 $dbname = "estock";
+$key = "__test_secret__";
 
 try{
     $dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $userpass);

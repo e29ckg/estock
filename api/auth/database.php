@@ -1,4 +1,6 @@
 <?php
+$key = "__test_secret__";
+
 // used to get mysql database connection
 class DatabaseService{
 
