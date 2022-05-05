@@ -25,7 +25,7 @@ Vue.createApp({
     },
 
     ck_protect(){
-      var t = 1 * 60 * 1000
+      var t = 6 * 60 * 1000
       // var t = 3000
       setInterval(()=> {
         var jwt = localStorage.getItem("jwt");
@@ -108,6 +108,13 @@ Vue.createApp({
           menu_badge:'',
         },
         {          
+          menu_name:'ใบรับของ',
+          menu_class:'',
+          menu_url:'recs.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'251',
+        },
+        {          
           menu_name:'Products',
           menu_class:'',
           menu_url:'products.php',
@@ -127,6 +134,13 @@ Vue.createApp({
           menu_url:'units.php',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'251',
+        },
+        {          
+          menu_name:'ร้านค้า',
+          menu_class:'',
+          menu_url:'store.php',
+          menu_icon_class:'nav-icon fas fa-th',
+          menu_badge:'',
         },
         {          
           menu_name:'สมาชิก',
