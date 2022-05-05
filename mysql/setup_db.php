@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -9,11 +11,29 @@ try{
     // set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    $sql = "DROP DATABASE $dbname;";
-    $conn->exec($sql);
-    echo "Database DROP $dbname successfully<br>";
-    
-    
+    $stmt = $conn->query('SHOW DATABASES');
+    $databases = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $dbAll = array();
+    foreach($databases as $database){
+        //$database will contain the database name
+        //in a string format
+        if($database == $dbname){
+            echo "พบฐานข้อมูล $dbname <br>";
+            $sql = "DROP DATABASE $dbname;";
+            $conn->exec($sql);
+            echo "DROP Database $dbname successfully<br>";
+        }
+        // echo $database, '<br>';
+        array_push($dbAll,$database);
+    }
+    // if(in_array($dbname,$dbAll)){
+    //     $sql = "DROP DATABASE $dbname;";
+    //     $conn->exec($sql);
+    //     echo "Database DROP $dbname successfully<br>";
+    //     echo 'ok <br>';
+    // }    
+    // die;
+
     $sql = "CREATE DATABASE $dbname CHARACTER SET utf8 COLLATE utf8_general_ci;";
     // use exec() because no results are returned
     $conn->exec($sql);
