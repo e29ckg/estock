@@ -162,7 +162,9 @@ try{
         rec_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         rec_own VARCHAR(250) NULL,
         rec_app VARCHAR(250) NULL,
+        rec_receive DATETIME NULL,
         str_id INT(13) NOT NULL,
+        comment VARCHAR(250) NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -180,6 +182,7 @@ try{
         qua INT(10) NOT NULL,
         price VARCHAR(250) NOT NULL,
         rec_list_instock INT(13) NOT NULL,
+        rec_own VARCHAR(250) NOT NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -193,6 +196,9 @@ try{
         ord_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         ord_own VARCHAR(250) NULL,
         ord_app VARCHAR(250) NULL,
+        ord_pay DATETIME NULL,
+        ord_pay_own VARCHAR NULL,
+        comment VARCHAR(250) NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
