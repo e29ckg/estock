@@ -48,6 +48,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <h5 class="card-title">Recs</h5>
                 <div class="card-tools">
                   <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_Recs_insert()" ref="m_show">เพิ่มใบรับของ</button>                  
+                              
                 </div>
               </div>
               <div class="card-body">
@@ -101,11 +102,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
               </div>
             </div>    -->
+            <div class="form-group">
+              <label>เลือกชื่อร้าน</label>
+              <select class="form-control" v-model="Recs[0].str_id" required>
+                <option v-for="str in stores" :value="str.str_id">{{str.str_name}}</option>                    
+              </select>
+              <!-- {{stores}} -->
+            </div>
             <div class="row">   
               <div class="col-sm-12">
                 <div class="form-group">
-                  <label>ชื่อร้านค้า</label>
-                  <input type="text" class="form-control" v-model="Recs[0].rec_own" required>
+                  <label>วันที่รับ</label>
+                  <input type="text" class="form-control" v-model="Recs[0].date_receive" required>
                 </div>
               </div>
             </div>   
@@ -124,7 +132,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <input type="text" class="form-control" v-model="Recs[0].str_phone" >
                 </div>
               </div>
-            </div>    
+            </div>  
+            <button class="btn btn-success" @click="test()">test</button>      
+            <div class="row" v-for="rls,index in Rec_lists">
+              <div class="col-sm-3">
+                {{index}}{{rls.pro_id}}</div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="rls.unit_name">
+                </div>
+                {{rls.unit_name}}</div>
+              <div class="col-sm-2">{{rls.qua}}</div>
+              <div class="col-sm-2">{{rls.price_one}}</div>
+              <div class="col-sm-3">{{rls.price}}</div>
+            </div> 
+            {{Rec_lists}}
+
             
           </div>
           <div class="modal-footer">
@@ -153,18 +176,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
       return {
         datas:'',
         message: 'Hello Vue!',
+        stores:'',
         Recs:[{
           rec_id:'',
           rec_own:'',          
           rec_app:'',          
+          date_receive:'',          
           str_id:'',          
+          comment:'',          
           action:'insert'        
         }],
+        Rec_lists:[{pro_id:'test proid', unit_name:'unit', qua:'', price_one:'', price:''}]
         
       }
     },
     mounted(){
-      this.get_Recs();
+      this.get_Recs()
+      this.get_Stores()
     },
     methods: {      
       get_Recs(){
@@ -172,6 +200,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
+      get_Stores(){
+        axios.post(url_base + 'api/store/get_stores.php')
+            .then(response => {
+                if (response.data.status) {
+                    this.stores = response.data.respJSON;  
+                    console.log(this.stores)       
                 }
             })
             .catch(function (error) {
@@ -276,7 +316,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         str_id:'',
                         action:'insert'        
                       }];     
-        }        
+        },
+        test(){
+          this.Rec_lists.push(
+            {
+              pro_id:'test proid',
+              unit_name:'unit',
+              qua:'',
+              price_one:'',
+              price:''     
+            }
+            );
+            console.log("trsss")
+        }     
       },
   }).mount('#appRecs');
 </script>
