@@ -276,7 +276,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     methods: {      
       get_products(){
-        axios.post(url_base + '/estock/api/products/read_product_all.php')
+        axios.post(url_base + '/estock/api/products/get_products.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
