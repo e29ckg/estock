@@ -10,6 +10,57 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <title>E-Stock</title>
   
   <?php include "./layouts/head.php";?>
+  <style>
+    * { box-sizing: border-box; }
+body {
+  font: 16px Arial;
+}
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+input[type=submit] {
+  background-color: DodgerBlue;
+  color: #fff;
+}
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #e9e9e9;
+}
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}
+  </style>
   
 </head>
 <body class="hold-transition sidebar-mini">
@@ -83,34 +134,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </div>
     
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+    <div class="modal fade" id="exampleModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
-          <form @submit.prevent="b_Recs_save()">
+          <!-- <form @submit.prevent="b_Recs_save()"> -->
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_Recs_close()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">  
-            <!-- <div class="row">   
-              <div class="col-sm-12">
+          <div class="modal-body">             
+            <div class="row"> 
+              <div class="col-sm-6">
                 <div class="form-group">
-                  <label>ชื่อ</label>
-                  <input type="text" class="form-control" v-model="Recs[0].rec_id" required>
-                </div>
+                <label>เลือกชื่อร้าน</label>
+                <select class="form-control" v-model="Recs[0].str_id" required>
+                  <option v-for="str in stores" :value="str.str_id">{{str.str_name}}</option>                    
+                </select>
+                <!-- {{stores}} -->
               </div>
-            </div>    -->
-            <div class="form-group">
-              <label>เลือกชื่อร้าน</label>
-              <select class="form-control" v-model="Recs[0].str_id" required>
-                <option v-for="str in stores" :value="str.str_id">{{str.str_name}}</option>                    
-              </select>
-              <!-- {{stores}} -->
-            </div>
-            <div class="row">   
-              <div class="col-sm-12">
+              </div>  
+              <div class="col-sm-6">
                 <div class="form-group">
                   <label>วันที่รับ</label>
                   <input type="text" class="form-control" v-model="Recs[0].date_receive" required>
@@ -124,28 +169,68 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <input type="e-mail" class="form-control" v-model="Recs[0].rec_app" required>
                 </div>
               </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-12">
+            </div> 
+
+            <table class="table">
+              <tr>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2</td>
+                <td>2</td>
+              </tr>
+            </table>
+            <!-- <div class="row" v-for="rls,index in Rec_lists">
+              <div class="col-sm-1">
                 <div class="form-group">
-                  <label>โทรศัพท์</label>
-                  <input type="text" class="form-control" v-model="Recs[0].str_phone" >
+                  {{index+1}}
                 </div>
               </div>
-            </div>  
-            <button class="btn btn-success" @click="test()">test</button>      
-            <div class="row" v-for="rls,index in Rec_lists">
-              <div class="col-sm-3">
-                {{index}}{{rls.pro_id}}</div>
+              <div class="col-sm-3">                
+                <div class="input-group mb-3">
+                  <input type="text" class="form-control" v-model="rls.pro_id" hidden>
+                  <input type="text" class="form-control" v-model="rls.pro_name" >
+                  <div class="input-group-append">
+                    <button class="input-group-text" data-toggle="modal" data-target="#exampleModal2" @click="b_pro_show(index)" ><i class="fas fa-check"></i></button>
+                  </div>
+                </div>                
+              </div>
               <div class="col-sm-2">
                 <div class="form-group">
                   <input type="text" class="form-control" v-model="rls.unit_name">
                 </div>
-                {{rls.unit_name}}</div>
-              <div class="col-sm-2">{{rls.qua}}</div>
-              <div class="col-sm-2">{{rls.price_one}}</div>
-              <div class="col-sm-3">{{rls.price}}</div>
-            </div> 
+              </div>
+              <div class="col-sm-1">
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="rls.qua">
+                </div>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="rls.price_one">
+                </div>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <input type="text" class="form-control" v-model="rls.price">
+                </div>
+              </div>
+              <div class="col-sm-1">
+                <div class="form-group">
+                  <button v-if="index +1  == Rec_lists.length && index > 0" @click="b_rls_del(index)">ลบ</button>
+                </div>
+              </div>
+            </div>  -->
+            <button class="btn btn-success" @click="b_rls_plus()">เพิ่ม</button>   
+            
             {{Rec_lists}}
 
             
@@ -153,13 +238,51 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_Recs_close()">Close</button>
             <button type="submit" class="btn btn-primary" >Save changes</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal2" >modal2</button>                  
+                  
           </div>
             <!-- {{Recs}} -->
             
-          </form>
+          <!-- </form> -->
         </div>
       </div>
     </div>
+
+
+    <!-- /**** */ -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal2" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog "  role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary">
+            <h5 class="modal-title" id="exampleModalLabel2">เลือกร้านค้า</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m2_close" >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+          <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search.">
+          <div class="callout callout-danger" v-for="dp in products">
+            <h5>
+              <button class="btn btn-success" @click="select_pro(dp.pro_id,dp.pro_name)">เลือก</button>
+              {{dp.pro_name}}
+            </h5>
+          </div>
+
+          {{products}}
+......
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
+            <button type="submit" class="btn btn-primary" >Save changes</button>
+          </div>
+            <!-- {{Recs}} -->
+            
+        </div>
+      </div>
+    </div>
+    <!-- //****************************** */ -->
     
 
 
@@ -169,14 +292,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
+
+
+</script>
+<script>
+ 
+
   var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
 
   Vue.createApp({
     data() {
       return {
         datas:'',
+        q:'',
         message: 'Hello Vue!',
         stores:'',
+        products:'',
         Recs:[{
           rec_id:'',
           rec_own:'',          
@@ -186,13 +317,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
           comment:'',          
           action:'insert'        
         }],
-        Rec_lists:[{pro_id:'test proid', unit_name:'unit', qua:'', price_one:'', price:''}]
+        Rec_lists:[],
+        select_pro_index:''
         
       }
     },
     mounted(){
       this.get_Recs()
       this.get_Stores()
+      this.get_Products()
     },
     methods: {      
       get_Recs(){
@@ -210,8 +343,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
         axios.post(url_base + 'api/store/get_stores.php')
             .then(response => {
                 if (response.data.status) {
-                    this.stores = response.data.respJSON;  
-                    console.log(this.stores)       
+                    this.stores = response.data.respJSON; 
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
+      get_Products(){
+        axios.post(url_base + 'api/products/get_products.php')
+            .then(response => {
+                if (response.data.status) {
+                    this.products = response.data.respJSON;  
                 }
             })
             .catch(function (error) {
@@ -317,18 +460,47 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         action:'insert'        
                       }];     
         },
-        test(){
-          this.Rec_lists.push(
-            {
-              pro_id:'test proid',
-              unit_name:'unit',
-              qua:'',
-              price_one:'',
-              price:''     
-            }
-            );
-            console.log("trsss")
-        }     
+        b_rls_plus(){
+          this.Rec_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:''})
+        },
+        b_rls_del(index){
+          this.Rec_lists.pop()
+          console.log(index)
+        } ,
+        b_pro_show(index){
+          console.log(index)
+          this.select_pro_index = index
+        },
+        ch_search_pro(){
+          console.log(this.q)
+          if(this.q.length > 0){
+            axios.post(url_base + 'api/products/product_search.php',{q:this.q})
+              .then(response => {
+                  if (response.data.status){
+                    this.products = response.data.respJSON;
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              });
+          }else{
+            this.get_Products()
+          }
+        },
+        reset_search(){
+          this.q=''
+        },
+        handleBlurSearch(e) {
+          this.q = ''
+          this.get_Products()
+          // console.log('blur', e.target.placeholder)
+        },
+        select_pro(pro_id,pro_name){
+          this.Rec_lists[this.select_pro_index].pro_id = pro_id
+          this.Rec_lists[this.select_pro_index].pro_name = pro_name
+          this.$refs['m2_close'].click();
+          console.log(pro_id)
+        }
       },
   }).mount('#appRecs');
 </script>
