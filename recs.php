@@ -45,9 +45,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Recs</h5>
+                <h5 class="card-title">Recs </h5>
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_Recs_insert()" ref="m_show">เพิ่มใบรับของ</button>                  
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Recs_insert()" ref="m_show">เพิ่มใบรับของ</button>                  
                               
                 </div>
               </div>
@@ -56,6 +56,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <thead>
                     <tr>
                       <th style="width: 10px">#</th>
+                      <th></th>
                       <th></th>
                       <th></th>
                     </tr>
@@ -68,8 +69,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                        {{data.rec_own}} {{data.rec_app}} {{data.str_id}}
                       </td>
                       <td>
-                        <button @click="b_Recs_update(data.rec_id)" >Update</button>  
-                        <button @click="destroy_Recs(data.rec_id)">Delete</button>  
+                        <button v-if="data.st == null || data.st == ''" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">ตรวจสอบ</button>
+                        <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
+                      </td>
+                      <td>
+                        <button @click.prevent="b_Recs_update(data.rec_id)" >Update</button>  
+                        <button @click.prevent="destroy_Recs(data.rec_id)">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -84,16 +89,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+        <form @submit.prevent="b_Recs_save()">            
         <div class="modal-content">
-          <!-- <form @submit.prevent="b_Recs_save()"> -->
+         
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_Recs_close()">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Recs_close()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">             
+          <div class="modal-body"> 
             <div class="row"> 
               <div class="col-sm-6">
                 <div class="form-group">
@@ -107,7 +113,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>วันที่รับ</label>
-                  <input type="text" class="form-control" v-model="Recs[0].date_receive" required>
+                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Recs[0].rec_date" required>
                 </div>
               </div>
             </div>   
@@ -115,84 +121,82 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>รายละเอียด</label>
-                  <input type="e-mail" class="form-control" v-model="Recs[0].rec_app" required>
+                  <input type="text" class="form-control" v-model="Recs[0].comment" required>
                 </div>
               </div>
             </div> 
-
+            <!-- {{Recs}} -->
             <table class="table">
-              <tr>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>2</td>
-                <td>2</td>
-              </tr>
+              <thead class="text-center bg-lime">
+                <tr>
+                  <td >#</td>
+                  <td width="30%">สินค้า</td>
+                  <td>หน่วยนับ</td>
+                  <td>จำนวน</td>
+                  <td>ราคาต่อหน่วย</td>
+                  <td></td>
+                  <td></td>
+
+                </tr>
+              </thead>
+              <tbody>
+
+                <tr v-for="rls,index in Rec_lists">
+                  <td>{{index + 1}}</td>
+                  <td>
+                    <div class="input-group">
+                      <input type="text" class="form-control" v-model="rls.pro_id" hidden>
+                      <input type="text" class="form-control" v-model="rls.pro_name" disabled>
+                      <div class="input-group-append">
+                        <button class="input-group-text" data-toggle="modal" data-target="#exampleModal2" @click.prevent="b_pro_show(index)" ><i class="fas fa-search"></i></button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control text-center" v-model="rls.unit_name" placeholder="หน่วยนับ" disabled>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control text-center" v-model="rls.qua" @keyup="keyup_qua(index)" @change="keyup_qua(index)" placeholder="จำนวน" v-if="rls.pro_name">
+                    <input type="number" class="form-control text-center" v-model="rls.qua"  placeholder="จำนวน" v-else disabled>
+                  </td>
+                  <td> 
+                    <input type="number" class="form-control text-right" v-model="rls.price_one" @keyup="keyup_price(index)"  @change="keyup_qua(index)" placeholder="ราตาต่อหน่วย" v-if="rls.pro_name">
+                    <input type="number" class="form-control text-right" v-model="rls.price_one" placeholder="ราตาต่อหน่วย" v-else disabled>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control text-right" v-model="rls.price" placeholder="ราคารวม" disabled>
+                  </td>
+                  <td>
+                    <button v-if="index +1  == Rec_lists.length && index > 0" @click.prevent="b_rls_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i>ลบ</button></td>
+                </tr>  
+              </tbody>
+              <tfoot class="">
+                <tr>
+                  <td colspan="5">
+                    <button class="btn btn-success" @click.prevent="b_rls_plus()">
+                      <i class="fas fa-plus"></i> เพิ่ม
+                    </button>  
+                  </td>
+                  <td class="bg-green text-right">
+                    <h5>
+                      {{Recs[0].price_total}}
+                    </h5>
+                  </td>
+                  <td></td>
+
+                </tr>            
+              </tfoot>
             </table>
-            <!-- <div class="row" v-for="rls,index in Rec_lists">
-              <div class="col-sm-1">
-                <div class="form-group">
-                  {{index+1}}
-                </div>
-              </div>
-              <div class="col-sm-3">                
-                <div class="input-group mb-3">
-                  <input type="text" class="form-control" v-model="rls.pro_id" hidden>
-                  <input type="text" class="form-control" v-model="rls.pro_name" >
-                  <div class="input-group-append">
-                    <button class="input-group-text" data-toggle="modal" data-target="#exampleModal2" @click="b_pro_show(index)" ><i class="fas fa-check"></i></button>
-                  </div>
-                </div>                
-              </div>
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <input type="text" class="form-control" v-model="rls.unit_name">
-                </div>
-              </div>
-              <div class="col-sm-1">
-                <div class="form-group">
-                  <input type="text" class="form-control" v-model="rls.qua">
-                </div>
-              </div>
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <input type="text" class="form-control" v-model="rls.price_one">
-                </div>
-              </div>
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <input type="text" class="form-control" v-model="rls.price">
-                </div>
-              </div>
-              <div class="col-sm-1">
-                <div class="form-group">
-                  <button v-if="index +1  == Rec_lists.length && index > 0" @click="b_rls_del(index)">ลบ</button>
-                </div>
-              </div>
-            </div>  -->
-            <button class="btn btn-success" @click="b_rls_plus()">เพิ่ม</button>   
-            
-            {{Rec_lists}}
+            <!-- {{Rec_lists}} -->
 
             
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_Recs_close()">Close</button>
-            <button type="submit" class="btn btn-primary" >Save changes</button>
-            <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal2" >modal2</button>                  
-                  
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Recs_close()">Close</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="b_Recs_save()">Save changes</button>     
           </div>
-            <!-- {{Recs}} -->
-            
-          <!-- </form> -->
+          </form>
+            <!-- {{Recs}} -->            
         </div>
       </div>
     </div>
@@ -200,9 +204,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- /**** */ -->
 
-    <!-- Modal -->
+    <!-- Modal2 Products -->
     <div class="modal fade" id="exampleModal2" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog "  role="document">
+      <div class="modal-dialog modal-dialog-scrollable"  role="document">
         <div class="modal-content">
           <div class="modal-header bg-primary">
             <h5 class="modal-title" id="exampleModalLabel2">เลือกร้านค้า</h5>
@@ -214,20 +218,104 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search.">
           <div class="callout callout-danger" v-for="dp in products">
             <h5>
-              <button class="btn btn-success" @click="select_pro(dp.pro_id,dp.pro_name)">เลือก</button>
-              {{dp.pro_name}}
+              <button class="btn btn-success" @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name)">เลือก</button>
+              {{dp.pro_name}} ({{dp.unit_name}})
             </h5>
           </div>
-
-          {{products}}
-......
+          <!-- {{products}} -->
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-            <button type="submit" class="btn btn-primary" >Save changes</button>
           </div>
+            <!-- {{Recs}} -->            
+        </div>
+      </div>
+    </div>
+    <!-- //****************************** */ -->
+
+    <!-- Modal3 ตรวจสอบ -->
+    <div class="modal fade" id="exampleModal3" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl"  role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m3_close" @click.prevent="b_Recs_close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"> 
+          <div class="invoice p-3 mb-3">
             <!-- {{Recs}} -->
-            
+            <div class="row">
+              <div class="col-12">
+              <h4>
+                <i class="fas fa-globe"></i> ใบรับของเข้า.
+                <small class="float-right">Date: {{Recs[0].rec_date}}</small>
+              </h4>
+              </div>
+            </div>
+            <div class="row invoice-info">
+              <div class="col-sm-4 invoice-col">
+                From
+                <address>
+                  <strong>{{Recs[0].str_name}}</strong><br>
+                </address>
+            </div>
+
+            <div class="col-sm-4 invoice-col">
+              <!-- To
+              <address>
+              <strong>...</strong><br>
+              </address> -->
+            </div>
+
+            <div class="col-sm-4 invoice-col">
+              <b>CODE #{{Recs[0].rec_id}}</b><br>
+              <b>ผู้บันทึก:</b> {{Recs[0].rec_own}}
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-12 table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>หน่วยนับ</th>
+                    <th>จำนวน</th>
+                    <th>ราคาต่อหน่วย</th>
+                    <th>ราคา</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="rls,index in Rec_lists">
+                    <td>{{index + 1 }}</td>
+                    <td>{{rls.pro_name}}</td>
+                    <td>{{rls.unit_name}}</td>
+                    <td>{{rls.qua}}</td>
+                    <td>{{rls.price_one}}</td>
+                    <td class="text-right">{{rls.price}}</td>
+                  </tr>            
+                  <tr>
+                    <td colspan="5"></td>
+                    <td class="bg-gray text-right">{{Recs[0].price_total}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row no-print">
+            <div class="col-12">
+              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == null || Recs[0].st == ''"><i class="far fa-credit-card"></i>
+                อนุมัติ
+              </button>            
+            </div>
+          </div>
+          </div>
+        </div>
+                      
         </div>
       </div>
     </div>
@@ -241,7 +329,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-
 
 </script>
 <script>
@@ -261,12 +348,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
           rec_id:'',
           rec_own:'',          
           rec_app:'',          
-          date_receive:'',          
+          rec_date:'',          
           str_id:'',          
+          price_total:'',          
           comment:'',          
           action:'insert'        
         }],
-        Rec_lists:[],
+        Rec_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}],
         select_pro_index:''
         
       }
@@ -299,6 +387,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
+      get_Store(str_id){
+        axios.post(url_base + 'api/store/get_store.php',{str_id:str_id})
+            .then(response => {
+                if (response.data.status) {
+                  // console.log(response.data.respJSON)
+                    this.Recs[0].str_name = response.data.respJSON[0].str_name; 
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
       get_Products(){
         axios.post(url_base + 'api/products/get_products.php')
             .then(response => {
@@ -310,11 +410,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-      b_Recs_insert(){
-        this.b_Recs_close();
-      },  
-      b_Recs_update(rec_id){
-        this.$refs.m_show.click();
+      get_rec(rec_id){
         axios.post(url_base + 'api/recs/get_rec.php',{rec_id:rec_id})
             .then(response => {
                 if (response.data.status) {
@@ -325,39 +421,70 @@ scratch. This page gets rid of all links and provides the needed markup only.
             .catch(function (error) {
                 console.log(error);
             });
-      },  
-      b_Recs_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+      },
+      get_rec_list(rec_id){
+        axios.post(url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
             .then(response => {
-                if (response.data.status == 'success') {
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.massege,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  this.$refs['m_close'].click();
-                  this.get_Recs();  
-                  this.Recs = [{
-                              rec_id:'',
-                              rec_own:'',
-                              rec_app:'',
-                              str_id:'',
-                              action:'insert'        
-                            }];     
-                }else{
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.massege,
-                    showConfirmButton: false,
-                    timer: 1500
-                  })
+                if (response.data.status) {
+                  this.Rec_lists = response.data.respJSON;    
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
+      },
+      b_Recs_insert(){
+        this.b_Recs_close();
+      },  
+      b_Recs_update(rec_id){
+        this.$refs['m_show'].click();
+        this.get_rec(rec_id)
+        this.get_rec_list(rec_id)
+      },
+      async b_Check(rec_id,str_id){
+        await this.get_rec(rec_id)
+        await this.get_rec_list(rec_id)
+        await this.get_Store(str_id)
+        console.log(str_id)
+      },
+        
+      b_Recs_save(){
+        if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
+          var jwt = localStorage.getItem("jwt");
+          axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+              .then(response => {
+                  if (response.data.status == 'success') {
+                    Swal.fire({
+                      icon: response.data.status,
+                      title: response.data.massege,
+                      showConfirmButton: false,
+                      timer: 1500
+                    });
+                    this.$refs['m_close'].click();
+                    this.get_Recs();  
+                    this.Recs = [{rec_id:'', rec_own:'', rec_app:'', str_id:'', action:'insert'}]
+                    this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]
+                  }else{
+                    Swal.fire({
+                      icon: response.data.status,
+                      title: response.data.massege,
+                      showConfirmButton: false,
+                      timer: 1500
+                    })
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              });
+        }else{
+          Swal.fire({
+                      icon: 'error',
+                      title: 'กรุณาตรวจสอบการป้อนข้อมูล',
+                      showConfirmButton: false,
+                      timer: 1500
+                    });
+        }
+
       },
       destroy_Recs(rec_id){
             Swal.fire({
@@ -401,23 +528,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });            
         },
         b_Recs_close(){
-          this.Recs = [{
-                        rec_id:'',
-                        rec_own:'',
-                        rec_app:'',
-                        str_id:'',
-                        action:'insert'        
-                      }];     
+          this.Recs = [{rec_id:'',rec_own:'',rec_app:'', rec_date:'',str_id:'',price_total:0, comment:'',action:'insert'}]  
+          this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]   
         },
         b_rls_plus(){
-          this.Rec_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:''})
+          this.Rec_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0})
         },
         b_rls_del(index){
           this.Rec_lists.pop()
-          console.log(index)
+          this.count_price_total()
+          // console.log(index)
         } ,
         b_pro_show(index){
-          console.log(index)
+          // console.log(index)
+          this.q = ''
+          this.get_Products()
           this.select_pro_index = index
         },
         ch_search_pro(){
@@ -426,7 +551,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             axios.post(url_base + 'api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
-                    this.products = response.data.respJSON;
+                    this.products = response.data.respJSON;                    
                   }
               })
               .catch(function (error) {
@@ -437,18 +562,37 @@ scratch. This page gets rid of all links and provides the needed markup only.
           }
         },
         reset_search(){
-          this.q=''
+          this.q = ''
         },
         handleBlurSearch(e) {
-          this.q = ''
           this.get_Products()
           // console.log('blur', e.target.placeholder)
         },
-        select_pro(pro_id,pro_name){
+        select_pro(pro_id,pro_name,unit_name){
           this.Rec_lists[this.select_pro_index].pro_id = pro_id
           this.Rec_lists[this.select_pro_index].pro_name = pro_name
+          this.Rec_lists[this.select_pro_index].unit_name = unit_name
           this.$refs['m2_close'].click();
-          console.log(pro_id)
+          this.reset_search()
+          // console.log(pro_id)
+        },
+        keyup_price(index){
+          this.Rec_lists[index].price = this.Rec_lists[index].price_one * this.Rec_lists[index].qua
+          this.count_price_total()
+        },
+        keyup_qua(index){
+          this.Rec_lists[index].price = this.Rec_lists[index].price_one * this.Rec_lists[index].qua
+          this.count_price_total()
+        },
+        count_price_total(){    
+          this.Recs[0].price_total = 0      
+          for (let i = 0; i < this.Rec_lists.length; i++) {
+            this.Recs[0].price_total = Number(this.Recs[0].price_total) + Number(this.Rec_lists[i].price)
+            // console.log(this.Rec_lists.length + ' ' + parseInt(this.Rec_lists[i].price))
+          }
+        },
+        test(num){
+          console.log(num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'))
         }
       },
   }).mount('#appRecs');
