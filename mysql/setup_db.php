@@ -88,6 +88,14 @@ try{
     )";
     $conn->exec($sql);
     echo "Table Products created successfully<br>";
+
+    $sql = "INSERT INTO products(pro_name, cat_name, unit_name)
+            VALUES  ('กระดาษ A4', 'วัสดุสำนักงาน', 'รีม'),
+                    ('ปากกาน้ำเงิน', 'วัสดุสำนักงาน', 'แท่ง'),
+                    ('ปากกาแดง', 'วัสดุสำนักงาน', 'แท่ง')
+                    ";
+    $conn->exec($sql);
+    echo "ADD catalogs New record created successfully<br>";
     //** ------------------ */
 
     //** TABLE Catalogs */
@@ -137,6 +145,12 @@ try{
     )";
     $conn->exec($sql);
     echo "Table Units created successfully<br>";
+
+    $sql = "INSERT INTO store(str_name)
+            VALUES  ('ร้าน A'),('ร้าน B'),('ร้าน c'),('ร้าน D')";
+    // use exec() because no results are returned
+    $conn->exec($sql);
+    echo "ADD store New record created successfully<br>";
     //** ------------------ */
     
     //** TABLE Stock */
@@ -162,8 +176,9 @@ try{
         rec_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         rec_own VARCHAR(250) NULL,
         rec_app VARCHAR(250) NULL,
-        rec_receive DATETIME NULL,
+        rec_date DATE NULL,
         str_id INT(13) NOT NULL,
+        price_total VARCHAR(250) NULL,
         comment VARCHAR(250) NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -178,10 +193,11 @@ try{
         rec_list_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         rec_id INT(13) NOT NULL,
         pro_id INT(13) NOT NULL,
+        pro_name VARCHAR(250) NULL,
         unit_name VARCHAR(250) NOT NULL,
         qua INT(10) NOT NULL,
+        price_one VARCHAR(250) NOT NULL,
         price VARCHAR(250) NOT NULL,
-        rec_list_instock INT(13) NOT NULL,
         rec_own VARCHAR(250) NOT NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -197,7 +213,7 @@ try{
         ord_own VARCHAR(250) NULL,
         ord_app VARCHAR(250) NULL,
         ord_pay DATETIME NULL,
-        ord_pay_own VARCHAR NULL,
+        ord_pay_own VARCHAR(250) NULL,
         comment VARCHAR(250) NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -219,7 +235,7 @@ try{
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";
     $conn->exec($sql);
-    echo "Table Recs created successfully<br>";
+    echo "Table Ord_lists created successfully<br>";
     //** ------------------ */
 
     //** TABLE STA */
@@ -228,7 +244,7 @@ try{
         st_name VARCHAR(250) NOT NULL        
     )";
     $conn->exec($sql);
-    echo "Table Recs created successfully<br>";
+    echo "Table STA created successfully<br>";
     //** ------------------ */
 
 }
