@@ -36,7 +36,7 @@ try{
     $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
     $data_auth = $decoded->data;
     
-    
+    $rec_own = $data_auth->fullname;    
     
     if($Recs->action == 'insert'){
         $dbcon->beginTransaction();
@@ -113,14 +113,104 @@ try{
                 
             }
             $i++ ;
-        }
-        
+        }        
         // echo "เพิ่มข้อมูลเรียบร้อย ok";
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $Recs));
+        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
         $dbcon->commit();
         exit;
     }
+
+    if($Recs->action == 'active'){
+        $dbcon->beginTransaction();
+        
+        $sql = "UPDATE recs SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id ;"; 
+        $query = $dbcon->prepare($sql);
+        $query->bindParam(':rec_app',$rec_own, PDO::PARAM_STR);
+        $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_STR);
+        $query->execute();  
+        
+        // $i = 0;
+        $Rec_lists = $data->Rec_lists;
+        foreach($Rec_lists as $rls){            
+                
+            $sql = "UPDATE rec_lists SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id ;"; 
+            $query = $dbcon->prepare($sql);           
+            $query->bindParam(':rec_app', $rec_own, PDO::PARAM_STR);
+            $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_INT);
+            $query->execute(); 
+            
+
+            /** save stock newrrc ดึงข้อมูลสอนค้าในสตอก created_at last  
+            /**
+             *  stck_id INT(13) AUTO_INCREMENT PRIMARY KEY,
+             *   pro_id INT(13) NOT NULL,
+             * price_one VARCHAR(100) NULL,
+            *    bf INT(10) NOT NULL,
+            *    stck_in INT(10) NULL,
+            *    stck_out INT(10) NULL,
+            *    bal INT(10) NOT NULL,
+            *    rec_ord_id INT(10) NULL,
+            *    rec_ord_list_id INT(10) NULL,
+            *    comment VARCHAR(250) NULL,
+             * 
+             */
+            $sql = "SELECT * FROM `stock` WHERE pro_id =:pro_id ORDER BY created_at DESC LIMIT 0,1;";
+            $query = $dbcon->prepare($sql);
+            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
+            $query->execute();
+            $result = $query->fetchAll(PDO::FETCH_OBJ);
+
+            /** ckeck row */
+            if(count($result) == 0){
+                $bf = 0;
+                $stck_in = $rls->qua;
+                $stck_out = 0;
+                $bal = 0;                
+            }else{
+                $bf = $result[0]->bal;
+                $stck_in = $rls->qua;
+                $stck_out = 0;
+                $bal = (integer)$result[0]->bal + (integer)$rls->qua;
+            }
+
+            $sql = "INSERT INTO stock(pro_id, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
+                $query = $dbcon->prepare($sql); 
+                $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
+                $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_INT);
+                $query->bindParam(':bf',$bf);
+                $query->bindParam(':stck_in',$stck_in, PDO::PARAM_INT);
+                $query->bindParam(':stck_out',$stck_out);
+                $query->bindParam(':bal',$bal, PDO::PARAM_INT);
+                $query->bindParam(':rec_ord_id',$rls->rec_id, PDO::PARAM_INT);
+                $query->bindParam(':rec_ord_list_id',$rls->rec_list_id, PDO::PARAM_INT);
+                $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
+                $query->execute();
+
+            /** set products->insock */
+            $sql = "SELECT * FROM `products` WHERE pro_id =:pro_id LIMIT 0,1;";
+            $query = $dbcon->prepare($sql);
+            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
+            $query->execute();
+            $result = $query->fetchAll(PDO::FETCH_OBJ);
+
+            if(count($result) > 0){
+                $instock = $bal;
+                $sql = "UPDATE products SET instock=:instock WHERE pro_id =:pro_id;";
+                $query = $dbcon->prepare($sql);
+                $query->bindParam(':instock',$instock, PDO::PARAM_INT);
+                $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
+                $query->execute();
+            }
+            
+        //     $i++ ;
+        }        
+        http_response_code(200);
+        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $result));
+        $dbcon->commit();
+        exit;
+    }
+
     if($Recs->action == 'delete'){    
         $dbcon->beginTransaction();
         $sql = "DELETE FROM recs WHERE rec_id = $Recs->rec_id";
