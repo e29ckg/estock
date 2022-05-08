@@ -47,6 +47,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header">
                 <h5 class="card-title">Recs </h5>
                 <div class="card-tools">
+                  <!-- <button @click="test_action()">test</button> -->
                   <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Recs_insert()" ref="m_show">เพิ่มใบรับของ</button>                  
                               
                 </div>
@@ -56,7 +57,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <thead>
                     <tr>
                       <th style="width: 10px">#</th>
-                      <th></th>
+                      <th>วันที่รับ</th>
+                      <th>รับจาก</th>
                       <th></th>
                       <th></th>
                     </tr>
@@ -65,9 +67,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="data,index in datas">
                      
                       <td>{{data.rec_id}}</td>
-                      <td>
-                       {{data.rec_own}} {{data.rec_app}} {{data.str_id}}
-                      </td>
+                      <td>{{data.rec_date}}</td>
+                      <td>{{data.str_id}} {{data.str_name}}</td>
                       <td>
                         <button v-if="data.st == null || data.st == ''" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">ตรวจสอบ</button>
                         <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
@@ -239,7 +240,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m3_close" @click.prevent="b_Recs_close()">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m3_close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -273,7 +274,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <b>CODE #{{Recs[0].rec_id}}</b><br>
               <b>ผู้บันทึก:</b> {{Recs[0].rec_own}}
             </div>
-
           </div>
 
           <div class="row">
@@ -308,7 +308,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <div class="row no-print">
             <div class="col-12">
-              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == null || Recs[0].st == ''"><i class="far fa-credit-card"></i>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
+              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == null || Recs[0].st == ''" @click="b_active()"><i class="far fa-credit-card"></i>
                 อนุมัติ
               </button>            
             </div>
@@ -447,7 +448,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
         await this.get_Store(str_id)
         console.log(str_id)
       },
-        
+      b_active(){
+        this.Recs[0].action='active'
+        axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+              .then(response => {
+                  if (response.data.status == 'success'){
+                    Swal.fire({
+                      icon: response.data.status,
+                      title: response.data.massege,
+                      showConfirmButton: false,
+                      timer: 1500
+                    });
+                    this.get_Recs();
+                    this.$refs['m3_close'].click();                    
+                  }else{
+                    Swal.fire({
+                      icon: response.data.status,
+                      title: response.data.massege,
+                      showConfirmButton: false,
+                      timer: 1500
+                    })
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              });
+        }, 
+
       b_Recs_save(){
         if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
           var jwt = localStorage.getItem("jwt");
@@ -591,6 +618,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             // console.log(this.Rec_lists.length + ' ' + parseInt(this.Rec_lists[i].price))
           }
         },
+        
         test(num){
           console.log(num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'))
         }
