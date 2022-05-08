@@ -84,6 +84,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.unit_name}}
                       </td>
                       <td>
+                        <button @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</button>  
                         <button @click="b_product_update(data.pro_id)" >Update</button>  
                         <button @click="destroy_pro(data.pro_id)">Delete</button>  
                       </td>
@@ -230,6 +231,59 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
       </div>
     </div>
+
+    <!-- Modal Detail -->
+    <div  class="modal fade" id="myModalDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel2"></h5>
+            <button ref="m_product_stock" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12 table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <td>date</td>
+                      <td>product</td>
+                      <td>code</td>
+                      <td>price_one</td>
+                      <td>ยกมา</td>
+                      <td>รับ</td>
+                      <td>ออก</td>
+                      <td>คงเหลือ</td>
+                      <td>หมายเหตุ</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="prst in pro_stock">
+                      <td>{{prst.created_at}}</td>
+                      <td>{{prst.pro_name}}</td>
+                      <td>{{prst.unit_name}}</td>
+                      <td>{{prst.price_one}}</td>
+                      <td>{{prst.bf}}</td>
+                      <td>{{prst.stck_in}}</td>
+                      <td>{{prst.stck_out}}</td>
+                      <td>{{prst.bal}}</td>
+                      <td>{{prst.comment}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   
 
 
@@ -246,19 +300,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       return {
         datas:'',
         message: 'Hello Vue!',
-        product:[{
-          pro_id:'',
-          pro_name:'',
-          pro_detail:'',
-          cat_name:'',
-          unit_name:'',
-          locat:'',
-          lower:1,
-          min:1,
-          st:'1',
-          img:'',
-          action:'insert'        
-        }],
+        product:[{pro_id:'', pro_name:'', pro_detail:'', cat_name:'', unit_name:'', locat:'',lower:1,min:1,st:'1',img:'',action:'insert'}],
         sel_cats:'',
         sel_units:'',
         pro_img:{
@@ -268,7 +310,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           img:'',
           val:''
         },
-        q:''
+        q:'',
+        pro_stock:''
       }
     },
     mounted(){
@@ -349,21 +392,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   });
                   this.$refs['m_close'].click();
                   this.get_products();  
-                  this.product = [{
-                              pro_id:'',
-                              pro_name:'',
-                              pro_detail:'',
-                              cat_name:'',
-                              unit_name:'',
-                              locat:'',
-                              lower:1,
-                              min:1,
-                              st:'1',
-                              action:'insert'        
-                            }];     
+                  this.product = [{pro_id:'',pro_name:'',pro_detail:'',cat_name:'',nit_name:'',locat:'',lower:1,min:1,st:'1',action:'insert' }];     
                 }else{
                   Swal.fire({
                     // position: 'top-end',
+                    icon: 'error',
+                    title: response.data.massege,
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
+      b_product_strock(pro_id){
+        var jwt = localStorage.getItem("jwt");
+        axios.post(url_base + '/estock/api/products/get_product_stock.php',{pro_id:pro_id})
+            .then(response => {
+                // console.log(response.data);
+                if (response.data.status == 'success' ) {                  
+                  this.pro_stock = response.data.respJSON   
+                }else{
+                  Swal.fire({
                     icon: 'error',
                     title: response.data.massege,
                     showConfirmButton: false,
