@@ -157,6 +157,7 @@ try{
     $sql = "CREATE TABLE stock(
         stck_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         pro_id INT(13) NOT NULL,
+        price_one VARCHAR(100) NULL,
         bf INT(10) NOT NULL,
         stck_in INT(10) NULL,
         stck_out INT(10) NULL,
@@ -199,6 +200,7 @@ try{
         price_one VARCHAR(250) NOT NULL,
         price VARCHAR(250) NOT NULL,
         rec_own VARCHAR(250) NOT NULL,
+        rec_app VARCHAR(250) NOT NULL,
         st INT(10) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
