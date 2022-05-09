@@ -50,13 +50,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Products</h5>
+                <h3 class="card-title">Products</h3>                
                 <div class="card-tools">
-                  <input type="text" @blur="handleBlurSearch" v-model="q" @keyup="search" ref="search" placeholder="Search.">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button>                  
+                  <!-- <input type="text" @blur="handleBlurSearch" v-model="q" @keyup="search" ref="search" placeholder="Search."> -->
+
+<!--                   
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button>   -->
                 </div>
               </div>
               <div class="card-body">
+                <div class="row">
+                <div class="col-sm-6">
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button> 
+                </div>
+                  <div class="col-sm-6 ">
+                    <div class="input-group mb-3 w-50 float-right">
+                      <input type="text" class="form-control text-center" placeholder="ค้นหา." v-model="q" @keyup="search" ref="search">
+                      <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                      </div>
+                    </div>
+
+                  </div>  
+                </div>        
+
                 <table class="table table-bordered">
                   <thead>
                     <tr>
