@@ -28,7 +28,7 @@ $arr = explode(" ", $authHeader);
 // http_response_code(200);
 // echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Ord->str_id ));
 // die; 
-
+empty($Ord->ord_date) ? $ord_date = date("Y-m-d h:s:i") : $ord_date = $Ord->ord_date;
 try{
     $jwt = $arr[1];
     $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
@@ -43,7 +43,7 @@ try{
         $sql = "INSERT INTO ords(ord_id, ord_date, ord_own, comment) VALUE(:ord_id, :ord_date, :ord_own, :comment);";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':ord_id', $ord_id,PDO::PARAM_INT);
-        $query->bindParam(':ord_date', $Ord->ord_date);
+        $query->bindParam(':ord_date', $ord_date);
         $query->bindParam(':ord_own',$ord_own, PDO::PARAM_STR);
         $query->bindParam(':comment',$Ord->comment, PDO::PARAM_STR);
         $query->execute();  
@@ -76,7 +76,7 @@ try{
         
         $sql = "UPDATE ords SET ord_date=:ord_date, comment=:comment, ord_own=:ord_own WHERE ord_id = :ord_id ;"; 
         $query = $dbcon->prepare($sql);
-        $query->bindParam(':ord_date', $Ord->ord_date);
+        $query->bindParam(':ord_date', $ord_date);
         $query->bindParam(':comment',$Ord->comment, PDO::PARAM_STR);
         $query->bindParam(':ord_own',$ord_own, PDO::PARAM_STR);
         $query->bindParam(':ord_id', $Ord->ord_id, PDO::PARAM_STR);
@@ -137,7 +137,7 @@ try{
 
             if($qua > 0 ){
                 /** rec_lists  หาลอดตัด */
-                $sql = "SELECT * FROM `rec_lists` WHERE pro_id =:pro_id AND qua_for_ord > 0 ORDER BY created_at ASC ";
+                $sql = "SELECT * FROM `rec_lists` WHERE pro_id =:pro_id AND qua_for_ord > 0 ORDER BY rec_list_id ASC ";
                 $query = $dbcon->prepare($sql);
                 $query->bindParam(':pro_id', $pro_id, PDO::PARAM_INT);
                 $query->execute();
@@ -148,83 +148,88 @@ try{
 
 
                 foreach($rep_rec_lists as $rrl){
-                    
-                    $rec_list_id = $rrl->rec_list_id;
-                    /** เลือก stock pro_id ล่าสุด */
-                    $sql = "SELECT * FROM stock WHERE pro_id = :pro_id ORDER BY created_at DESC LIMIT 0,1;"; 
-                    $query = $dbcon->prepare($sql);           
-                    $query->bindParam(':pro_id', $pro_id, PDO::PARAM_INT);
-                    $query->execute(); 
-                    $rep_stck_desc = $query->fetchAll(PDO::FETCH_OBJ);
+                    $instock = $instock + $rrl->qua_for_ord; 
 
-                    $bf     = $rep_stck_desc[0]->bal;
-                    $qua_for_ord = $rrl->qua_for_ord;
-                    $instock = $instock + $rrl->qua_for_ord;        // หน้าจำนวนรวมที่สามารถเบิกได้ ใน rec_list 
+                    if($qua > 0){
 
-                    if($qua_for_ord < $qua  ){                      //  qf 1   3     3 - 1  ออก  1  เหลือ 2
-                        $stck_out   = $rrl->qua_for_ord;            //  1
-                        $qua        = $qua - $rrl->qua_for_ord ;     //  Q = 2   เหลือต้องเบิกอีก 3-1
-
-                        $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
-                        $rec_id     = $rrl->rec_id;
-
-                        $stck_in    = 0;
-                        $stck_out   = $stck_out;
-                        $bal        = $bf - $stck_out;              // 
-                        $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
+                        $rec_list_id = $rrl->rec_list_id;
+                        /** เลือก stock pro_id ล่าสุด */
+                        $sql = "SELECT * FROM stock WHERE pro_id = :pro_id ORDER BY stck_id DESC LIMIT 0,1;"; 
+                        $query = $dbcon->prepare($sql);           
+                        $query->bindParam(':pro_id', $pro_id, PDO::PARAM_INT);
+                        $query->execute(); 
+                        $rep_stck_desc = $query->fetchAll(PDO::FETCH_OBJ);
+    
+                        $bf     = $rep_stck_desc[0]->bal;
+                        $qua_for_ord = $rrl->qua_for_ord;
+                               // หน้าจำนวนรวมที่สามารถเบิกได้ ใน rec_list 
+    
+                        if($qua_for_ord < $qua  ){                      //  qf 1   3     3 - 1  ออก  1  เหลือ 2
+                            $stck_out   = $rrl->qua_for_ord;            //  1
+                            $qua        = $qua - $rrl->qua_for_ord ;     //  Q = 2   เหลือต้องเบิกอีก 3-1
+    
+                            $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                            $rec_id     = $rrl->rec_id;
+    
+                            $stck_in    = 0;
+                            $stck_out   = $stck_out;
+                            $bal        = $bf - $stck_out;              // 
+                            $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
+                            
+    
+                        }elseif($qua_for_ord > $qua){                   //  10   Q 8   
+                            $stck_out   =   $qua;                       //  8
+                            $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
+    
+                            $price_one  =   $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                            $rec_id     =   $rrl->rec_id;
+    
+                            $stck_in    =   0;
+                            $stck_out   =   $stck_out;
+                            $bal        =   $bf - $stck_out;             //  2
+                            $qua_for_ord =  $qua_for_ord - $stck_out;   //  2   เหลือ rec_list
+                            
+    
+                        }elseif($qua_for_ord == $qua){                  // 3    3   ออก     3   เหลือ    0
+                            $stck_out   =   $qua;                       //  ออก 3
+                            $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
+    
+                            $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                            $rec_id     = $rrl->rec_id;
+    
+                            $stck_in    = 0;
+                            $stck_out   = $stck_out;
+                            $bal        = $bf - $stck_out;              // 
+                            $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
+                            
+    
+                        }
+                        /** บันทึกรายการ ลง stock */
+                        $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
+                        $query = $dbcon->prepare($sql); 
+                        $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
+                        $query->bindParam(':unit_name',$unit_name, PDO::PARAM_STR);
+                        $query->bindParam(':price_one',$price_one, PDO::PARAM_STR);
+                        $query->bindParam(':bf',$bf, PDO::PARAM_INT);
+                        $query->bindParam(':stck_in', $stck_in,PDO::PARAM_INT);
+                        $query->bindParam(':stck_out',$stck_out,PDO::PARAM_INT);
+                        $query->bindParam(':bal',$bal, PDO::PARAM_INT);
+                        $query->bindParam(':rec_ord_id',$rec_ord_id, PDO::PARAM_INT);
+                        $query->bindParam(':rec_ord_list_id',$rec_ord_list_id, PDO::PARAM_INT);
+                        $query->bindParam(':comment',$comment, PDO::PARAM_STR);
+                        $query->execute();
                         
-
-                    }elseif($qua_for_ord > $qua){                   //  10   Q 8   
-                        $stck_out   =   $qua;                       //  8
-                        $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
-
-                        $price_one  =   $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
-                        $rec_id     =   $rrl->rec_id;
-
-                        $stck_in    =   0;
-                        $stck_out   =   $stck_out;
-                        $bal        =   $bf - $stck_out;             //  2
-                        $qua_for_ord =  $qua_for_ord - $stck_out;   //  2   เหลือ rec_list
-                        
-
-                    }elseif($qua_for_ord == $qua){                  // 3    3   ออก     3   เหลือ    0
-                        $stck_out   =   $qua;                       //  ออก 3
-                        $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
-
-                        $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
-                        $rec_id     = $rrl->rec_id;
-
-                        $stck_in    = 0;
-                        $stck_out   = $stck_out;
-                        $bal        = $bf - $stck_out;              // 
-                        $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
-                        
-
+                        /** ตัด rec_list ที่หัก */
+                        $sql = "UPDATE rec_lists SET qua_for_ord=:qua_for_ord WHERE rec_list_id = :rec_list_id;"; 
+                        $query = $dbcon->prepare($sql); 
+                        $query->bindParam(':qua_for_ord',$qua_for_ord, PDO::PARAM_INT);
+                        $query->bindParam(':rec_list_id',$rec_list_id, PDO::PARAM_INT);
+                        $query->execute();
+    
+                        $bf = $bal;     //bal -> fb ยอดยกไป รอบต่อไป  
                     }
-                    /** บันทึกรายการ ลง stock */
-                    $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
-                    $query = $dbcon->prepare($sql); 
-                    $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
-                    $query->bindParam(':unit_name',$unit_name, PDO::PARAM_STR);
-                    $query->bindParam(':price_one',$price_one, PDO::PARAM_STR);
-                    $query->bindParam(':bf',$bf,PDO::PARAM_INT);
-                    $query->bindParam(':stck_in', $stck_in,PDO::PARAM_INT);
-                    $query->bindParam(':stck_out',$stck_out,PDO::PARAM_INT);
-                    $query->bindParam(':bal',$bal, PDO::PARAM_INT);
-                    $query->bindParam(':rec_ord_id',$rec_ord_id, PDO::PARAM_INT);
-                    $query->bindParam(':rec_ord_list_id',$rec_ord_list_id, PDO::PARAM_INT);
-                    $query->bindParam(':comment',$comment, PDO::PARAM_STR);
-                    $query->execute();
                     
-                    /** ตัด rec_list ที่หัก */
-                    $sql = "UPDATE rec_lists SET qua_for_ord=:qua_for_ord WHERE rec_list_id = :rec_list_id;"; 
-                    $query = $dbcon->prepare($sql); 
-                    $query->bindParam(':qua_for_ord',$qua_for_ord, PDO::PARAM_INT);
-                    $query->bindParam(':rec_list_id',$rec_list_id, PDO::PARAM_INT);
-                    $query->execute();
 
-                    $bf = $bal;     //bal -> fb ยอดยกไป รอบต่อไป  
-                    
                 }
 
                 $instock = $instock - $instock_qua;
