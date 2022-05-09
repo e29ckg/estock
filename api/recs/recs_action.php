@@ -159,7 +159,7 @@ try{
             *    comment VARCHAR(250) NULL,
              * 
              */
-            $sql = "SELECT * FROM `stock` WHERE pro_id =:pro_id ORDER BY created_at DESC LIMIT 0,1;";
+            $sql = "SELECT * FROM `stock` WHERE pro_id =:pro_id ORDER BY stck_id DESC LIMIT 0,1;";
             $query = $dbcon->prepare($sql);
             $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
             $query->execute();
@@ -168,29 +168,29 @@ try{
             /** ckeck row */
             if(count($result) == 0){
                 $bf = 0;
-                $stck_in = (integer)$rls->qua;
+                $stck_in = $rls->qua;
                 $stck_out = 0;
-                $bal = (integer)$rls->qua;                
+                $bal = $rls->qua;                
             }else{
                 $bf = $result[0]->bal;
                 $stck_in = $rls->qua;
                 $stck_out = 0;
-                $bal = (integer)$result[0]->bal + (integer)$rls->qua;
+                $bal = $result[0]->bal + $rls->qua;
             }
 
             $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
-                $query = $dbcon->prepare($sql); 
-                $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
-                $query->bindParam(':unit_name',$rls->unit_name, PDO::PARAM_STR);
-                $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_STR);
-                $query->bindParam(':bf',$bf);
-                $query->bindParam(':stck_in',$stck_in, PDO::PARAM_INT);
-                $query->bindParam(':stck_out',$stck_out);
-                $query->bindParam(':bal',$bal, PDO::PARAM_INT);
-                $query->bindParam(':rec_ord_id',$rls->rec_id, PDO::PARAM_INT);
-                $query->bindParam(':rec_ord_list_id',$rls->rec_list_id, PDO::PARAM_INT);
-                $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
-                $query->execute();
+            $query = $dbcon->prepare($sql); 
+            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
+            $query->bindParam(':unit_name',$rls->unit_name, PDO::PARAM_STR);
+            $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_STR);
+            $query->bindParam(':bf',$bf);
+            $query->bindParam(':stck_in',$stck_in, PDO::PARAM_INT);
+            $query->bindParam(':stck_out',$stck_out);
+            $query->bindParam(':bal',$bal, PDO::PARAM_INT);
+            $query->bindParam(':rec_ord_id',$rls->rec_id, PDO::PARAM_INT);
+            $query->bindParam(':rec_ord_list_id',$rls->rec_list_id, PDO::PARAM_INT);
+            $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
+            $query->execute();
 
             /** set products->insock */
             $sql = "SELECT * FROM `products` WHERE pro_id =:pro_id LIMIT 0,1;";
@@ -200,6 +200,8 @@ try{
             $result = $query->fetchAll(PDO::FETCH_OBJ);
 
             if(count($result) > 0){
+
+
                 $instock = $bal;
                 $sql = "UPDATE products SET instock=:instock WHERE pro_id =:pro_id;";
                 $query = $dbcon->prepare($sql);
