@@ -68,7 +68,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.ord_date}}</td>
                       <td>{{data.ord_id}}</td>
                       <td>{{data.ord_own}}</td>
-                      <td>{{data.st}}{{data.ord_pay}}</td>
+                      <td>
+                        <span v-if="data.st == 0">รอการตรวจสอบ</span>
+                        <span v-if="data.st == 1">อนุมัติแล้ว</span>
+                      </td>
                       <td>{{data.st}}</td>
                       <td>
                         <button v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">ตรวจสอบ</button>
@@ -91,22 +94,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
-        <form @submit.prevent="b_Order_save()">            
+        <!-- <form @submit.prevent="b_Order_save()">             -->
         <div class="modal-content">         
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ใบเบิก</h5>
+            <h5 class="modal-title" id="exampleModalLabel">ผู้เบิก : {{Ord[0].ord_own}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Order_close()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <div class="row"> 
+            <!-- <div class="row"> 
               <div class="col-sm-6">
                 <div class="form-group">
-                <label>ผู้เบิก</label>
-                <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own" disabled>
-                <!-- {{stores}} -->
-              </div>
+                  <label>ผู้เบิก</label>
+                  <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own" disabled>
+                  {{stores}}
+                </div>
               </div>  
               <div class="col-sm-6">
                 <div class="form-group">
@@ -114,16 +117,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord[0].ord_date" required>
                 </div>
               </div>
-            </div>   
+            </div>    -->
             <div class="row">   
-              <div class="col-sm-12">
+              <!-- <div class="col-sm-12">
                 <div class="form-group">
                   <label>รายละเอียด</label>
                   <input type="text" class="form-control" v-model="Ord[0].comment" required>
-                </div>
-              </div>
+                </div> -->
+              <!-- </div> -->
             </div> 
-            {{Ord}}
+            <!-- {{Ord}} -->
             <table class="table">
               <thead class="text-center bg-lime">
                 <tr>
@@ -143,7 +146,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <td>
                     <div class="input-group">
                       <input type="text" class="form-control" v-model="orl.pro_id" hidden>
-                      <input type="text" class="form-control" v-model="orl.pro_name" disabled>
+                      <input type="text" class="form-control text-right" v-model="orl.pro_name" placeholder="เลือกสินค้า-->" disabled>
                       <div class="input-group-append">
                         <button class="input-group-text" data-toggle="modal" data-target="#exampleModal2" @click.prevent="b_pro_show(index)" ><i class="fas fa-search"></i></button>
                       </div>
@@ -156,20 +159,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
                      <input type="number" class="form-control text-center" :value="orl.instock" disabled>
                   </td>
                   <td>
-                     <input type="number" class="form-control text-center" v-model="orl.qua"  placeholder="จำนวน" >
+                     <input type="number" class="form-control text-center" v-model="orl.qua"  placeholder="จำนวน" v-if="orl.instock > 0" @keyup="keyup_qua(index)" @change="keyup_qua(index)" >
+                     <input type="number" class="form-control text-center" v-model="orl.qua"  placeholder="จำนวน" v-else disabled>
                   </td>                  
                   <td>
                      
                   </td>                  
                   
-                  <td>
-                    <button v-if="index +1  == Ord_lists.length && index > 0" @click.prevent="b_orl_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i>ลบ</button>
+                  <td >
+                    <button v-if="index +1  == Ord_lists.length && index > 0" @click.prevent="b_orl_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
                   </td>
                 </tr>  
               </tbody>
               <tfoot class="">
                 <tr>
-                  <td colspan="4">
+                  <td colspan="6">
                     <button class="btn btn-success" @click.prevent="b_orl_plus()">
                       <i class="fas fa-plus"></i> เพิ่ม
                     </button>  
@@ -178,21 +182,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </tr>            
               </tfoot>
             </table>
-            {{Ord_lists}}
-
+            <!-- {{Ord_lists}} -->
             
           </div>
           <div class="modal-footer">
+            {{Ord[0].ord_own}} 
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Order_close()">Close</button>
             <button type="submit" class="btn btn-primary" @click.prevent="b_Order_save()">Save changes</button>     
           </div>
-          </form>
+          <!-- </form> -->
             <!-- {{Order}} -->            
         </div>
       </div>
     </div>
-
-
     <!-- /**** */ -->
 
     <!-- Modal2 Products -->
@@ -206,13 +208,31 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </button>
           </div>
           <div class="modal-body">
-          <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search.">
-          <div class="callout callout-danger" v-for="dp in products">
-            <h5>
-              <button class="btn btn-success" @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock,dp.min)">เลือก</button>
-              {{dp.pro_name}} มี {{dp.instock}} {{dp.unit_name}} {{dp.min}}
-            </h5>
+          <!-- <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search."> -->
+          <div class="row mb-3">
+            <div class="col-sm-12">
+              <div class="input-group">
+                <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" class="form-control text-center" placeholder="Search..">
+                <div class="input-group-append">
+                  <button class="input-group-text">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
+
+          <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock,dp.min)">
+            <div class="info-box">
+              <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{dp.pro_name}}</span>
+                <span class="info-box-number">{{dp.instock}} {{dp.unit_name}}</span>
+              </div>
+            </div>
+          </div>
+          
           <!-- {{products}} -->
           </div>
           <div class="modal-footer">
@@ -285,7 +305,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <td>{{orl.unit_name}}</td>
                     <td>{{orl.instock}}</td>
                     <td>{{orl.qua}}</td>
-                    <td>{{orl.comment}}</td>
+                    <td>
+                      <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button>
+                      {{orl.comment}}
+
+                    </td>
                   </tr>            
                   
                 </tbody>
@@ -295,7 +319,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="row no-print">
             <div class="col-12">
               <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-              <button type="button" class="btn btn-success float-right"  v-if="Ord[0].st == null || Ord[0].st == ''" @click="b_active()"><i class="far fa-credit-card"></i>
+              <button type="button" class="btn btn-success float-right"  v-if="Ord[0].st == 0" @click="b_active()"><i class="far fa-credit-card"></i>
                 อนุมัติการเบิก
               </button>            
             </div>
@@ -354,7 +378,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Products(){
-        axios.post(url_base + 'api/products/get_products.php')
+        axios.post(url_base + 'api/orders/get_products.php')
             .then(response => {
                 if (response.data.status) {
                     this.products = response.data.respJSON;  
@@ -403,31 +427,43 @@ scratch. This page gets rid of all links and provides the needed markup only.
         this.get_Ord_list(ord_id)
       },
       b_active(){
-        this.Ord[0].action='active'
-        axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-              .then(response => {
-                  if (response.data.status == 'success'){
-                    Swal.fire({
-                      icon: response.data.status,
-                      title: response.data.massege,
-                      showConfirmButton: false,
-                      timer: 1500
+        Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, it!'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  var jwt = localStorage.getItem("jwt");
+                  this.Ord[0].action='active'
+                  axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                    .then(response => {
+                      if (response.data.status == 'success'){
+                        Swal.fire({
+                          icon: response.data.status,
+                          title: response.data.massege,
+                          showConfirmButton: false,
+                          timer: 1500
+                        });
+                        this.get_Orders();
+                        this.$refs['m3_close'].click();                    
+                      }else{
+                        Swal.fire({
+                          icon: response.data.status,
+                          title: response.data.massege,
+                          showConfirmButton: false,
+                          timer: 1500
+                        })
+                       }
+                  }).catch(function (error) {
+                      console.log(error);
                     });
-                    this.get_Orders();
-                    this.$refs['m3_close'].click();                    
-                  }else{
-                    Swal.fire({
-                      icon: response.data.status,
-                      title: response.data.massege,
-                      showConfirmButton: false,
-                      timer: 1500
-                    })
-                  }
-              })
-              .catch(function (error) {
-                  console.log(error);
+                }
               });
-        }, 
+      }, 
 
       b_Order_save(){
         if(this.Ord[0].ord_own != '' && this.Ord[0].rec_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
@@ -558,12 +594,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
           // console.log(pro_id)
         },
         keyup_price(index){
-          this.Ord_lists[index].price = this.Ord_lists[index].price_one * this.Ord_lists[index].qua
-          this.count_price_total()
+          
         },
         keyup_qua(index){
-          this.Ord_lists[index].price = this.Ord_lists[index].price_one * this.Ord_lists[index].qua
-          this.count_price_total()
+          if(this.Ord_lists[index].qua > this.Ord_lists[index].instock){
+            this.Ord_lists[index].qua = this.Ord_lists[index].instock
+          }
+          if(this.Ord_lists[index].qua < 0){
+            this.Ord_lists[index].qua = 0
+          }
+          console.log(this.Ord_lists[index].qua)
+          // this.Ord_lists[index].price = this.Ord_lists[index].price_one * this.Ord_lists[index].qua
+          // this.count_price_total()
         },
         count_price_total(){    
           this.Ord[0].price_total = 0      
