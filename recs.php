@@ -94,7 +94,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="modal-content">
          
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
+            <h5 class="modal-title" id="exampleModalLabel">ใบรับของเข้า</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Recs_close()">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -215,13 +215,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </button>
           </div>
           <div class="modal-body">
-          <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search.">
-          <div class="callout callout-danger" v-for="dp in products">
-            <h5>
-              <button class="btn btn-success" @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name)">เลือก</button>
-              {{dp.pro_name}} ({{dp.unit_name}})
-            </h5>
-          </div>
+            <div class="row mb-3">
+              <div class="col-sm-12">
+                <div class="input-group">
+                  <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" class="form-control text-center" placeholder="Search..">
+                  <div class="input-group-append">
+                    <button class="input-group-text">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name)">
+              <div class="info-box">
+                <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">{{dp.pro_name}}</span>
+                  <span class="info-box-number">{{dp.instock}} {{dp.unit_name}}</span>
+                </div>
+              </div>
+            </div>
+          
           <!-- {{products}} -->
           </div>
           <div class="modal-footer">
@@ -308,7 +325,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="row no-print">
             <div class="col-12">
               <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == null || Recs[0].st == ''" @click="b_active()"><i class="far fa-credit-card"></i>
+              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == 0" @click="b_active()"><i class="far fa-credit-card"></i>
                 อนุมัติ
               </button>            
             </div>
@@ -448,8 +465,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
         console.log(str_id)
       },
       b_active(){
-        this.Recs[0].action='active'
-        axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            var jwt = localStorage.getItem("jwt");
+            this.Recs[0].action='active'
+            axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
               .then(response => {
                   if (response.data.status == 'success'){
                     Swal.fire({
@@ -472,9 +500,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               .catch(function (error) {
                   console.log(error);
               });
+              
+          }
+        });
+        
         }, 
 
       b_Recs_save(){
+
         if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
           var jwt = localStorage.getItem("jwt");
           axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
