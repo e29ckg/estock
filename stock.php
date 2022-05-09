@@ -54,7 +54,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <table class="table table-bordered">
                   <thead>
                     <tr>
-                      <th style="width: 10px">วันที่</th>
+                      <th>วันที่</th>
                       <th>รายการ</th>
                       <th>เลขเอกสาร</th>
                       <th>หน่วยนับ</th>
