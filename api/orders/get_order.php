@@ -2,33 +2,34 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-// header("'Access-Control-Allow-Credentials', 'true'");
-// header('Content-Type: application/javascript');
 header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
 
+$data = json_decode(file_get_contents("php://input"));
+// $product = $data;
+
+// http_response_code(200);
+//     echo json_encode(array(
+//         'status' => true, 
+//         'massege' =>  'Ok', 
+//         'respJSON' => $data->pro_id
+//     ));
+//     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT recs.*, store.str_name  FROM recs LEFT JOIN store ON recs.str_id = store.str_id ORDER BY recs.rec_date DESC;";
+    $sql = "SELECT * FROM `ords` WHERE ord_id = $data->ord_id LIMIT 0,1;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
-    // $data = array();
+    $datas = array();
 
-    // foreach($result as $res){
-    //     array_push($data,array(
-    //         "unit_id" => $res->unit_id,
-    //         "unit_name" => $res->unit_name
-    //     ));
-    // }
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
         'massege' =>  'Ok', 
         'respJSON' =>  $result, 
-        // 'respJSON' => $data
+        // 'respJSON' => $datas
     ));
 
 }catch(PDOException $e){
@@ -36,5 +37,3 @@ try{
     http_response_code(400);
     echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
-
-

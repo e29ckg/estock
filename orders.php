@@ -19,18 +19,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <?php include "./layouts/aside.php"; ?>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" id="appRecs" v-cloak>
+  <div class="content-wrapper" id="appOrder" v-cloak>
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">รับของเข้า Store</h1>
+            <h1 class="m-0">ใบเบิก</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="./index.php">Home</a></li>
-              <li class="breadcrumb-item active">Recs</li>
+              <li class="breadcrumb-item active">Order</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -45,10 +45,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Recs </h5>
+                <h5 class="card-title">Order </h5>
                 <div class="card-tools">
                   <!-- <button @click="test_action()">test</button> -->
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Recs_insert()" ref="m_show">เพิ่มใบรับของ</button>                  
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Order_insert()" ref="m_show">เพิ่มใบเบิกของ</button>                  
                               
                 </div>
               </div>
@@ -56,25 +56,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <table class="table table-bordered">
                   <thead>
                     <tr>
-                      <th style="width: 10px">#</th>
-                      <th>วันที่รับ</th>
-                      <th>รับจาก</th>
-                      <th>ราคารวม</th>
+                      <th>วันที่เบิก</th>
+                      <th>code</th>
+                      <th>ผู้เบิก</th>
+                      <th>สถานะ/วันที่ส่งมอบ</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
-                     
-                      <td>{{data.rec_id}}</td>
-                      <td>{{data.rec_date}}</td>
-                      <td>{{data.str_name}}</td>
-                      <td>{{data.price_total}}</td>
+                      <td>{{data.ord_date}}</td>
+                      <td>{{data.ord_id}}</td>
+                      <td>{{data.ord_own}}</td>
+                      <td>{{data.st}}{{data.ord_pay}}</td>
+                      <td>{{data.st}}</td>
                       <td>
-                        <button v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">ตรวจสอบ</button>
-                        <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
+                        <button v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">ตรวจสอบ</button>
+                        <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">รายละเอียด</button>
                       
-                        <button @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >Update</button>  
-                        <button @click.prevent="destroy_Recs(data.rec_id)" v-if="data.st == 0">Delete</button>  
+                        <button @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
+                        <button @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -90,30 +91,27 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
-        <form @submit.prevent="b_Recs_save()">            
-        <div class="modal-content">
-         
+        <form @submit.prevent="b_Order_save()">            
+        <div class="modal-content">         
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Recs_close()">
+            <h5 class="modal-title" id="exampleModalLabel">ใบเบิก</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Order_close()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body"> 
+          <div class="modal-body">
             <div class="row"> 
               <div class="col-sm-6">
                 <div class="form-group">
-                <label>เลือกชื่อร้าน</label>
-                <select class="form-control" v-model="Recs[0].str_id" required>
-                  <option v-for="str in stores" :value="str.str_id">{{str.str_name}}</option>                    
-                </select>
+                <label>ผู้เบิก</label>
+                <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own" disabled>
                 <!-- {{stores}} -->
               </div>
               </div>  
               <div class="col-sm-6">
                 <div class="form-group">
-                  <label>วันที่รับ</label>
-                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Recs[0].rec_date" required>
+                  <label>วันที่เบิก</label>
+                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord[0].ord_date" required>
                 </div>
               </div>
             </div>   
@@ -121,82 +119,75 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>รายละเอียด</label>
-                  <input type="text" class="form-control" v-model="Recs[0].comment" required>
+                  <input type="text" class="form-control" v-model="Ord[0].comment" required>
                 </div>
               </div>
             </div> 
-            <!-- {{Recs}} -->
+            {{Ord}}
             <table class="table">
               <thead class="text-center bg-lime">
                 <tr>
                   <td >#</td>
                   <td width="30%">สินค้า</td>
                   <td>หน่วยนับ</td>
-                  <td>จำนวน</td>
-                  <td>ราคาต่อหน่วย</td>
-                  <td></td>
+                  <td>จำนวนที่มี</td>
+                  <td>จำนวนที่ขอเบิก</td>
+                  <td>หมายเหตุ</td>
                   <td></td>
 
                 </tr>
               </thead>
               <tbody>
-
-                <tr v-for="rls,index in Rec_lists">
+                <tr v-for="orl,index in Ord_lists">
                   <td>{{index + 1}}</td>
                   <td>
                     <div class="input-group">
-                      <input type="text" class="form-control" v-model="rls.pro_id" hidden>
-                      <input type="text" class="form-control" v-model="rls.pro_name" disabled>
+                      <input type="text" class="form-control" v-model="orl.pro_id" hidden>
+                      <input type="text" class="form-control" v-model="orl.pro_name" disabled>
                       <div class="input-group-append">
                         <button class="input-group-text" data-toggle="modal" data-target="#exampleModal2" @click.prevent="b_pro_show(index)" ><i class="fas fa-search"></i></button>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <input type="text" class="form-control text-center" v-model="rls.unit_name" placeholder="หน่วยนับ" disabled>
+                    <input type="text" class="form-control text-center" v-model="orl.unit_name" placeholder="หน่วยนับ" disabled>
                   </td>
                   <td>
-                    <input type="number" class="form-control text-center" v-model="rls.qua" @keyup="keyup_qua(index)" @change="keyup_qua(index)" placeholder="จำนวน" v-if="rls.pro_name">
-                    <input type="number" class="form-control text-center" v-model="rls.qua"  placeholder="จำนวน" v-else disabled>
-                  </td>
-                  <td> 
-                    <input type="number" class="form-control text-right" v-model="rls.price_one" @keyup="keyup_price(index)"  @change="keyup_qua(index)" placeholder="ราตาต่อหน่วย" v-if="rls.pro_name">
-                    <input type="number" class="form-control text-right" v-model="rls.price_one" placeholder="ราตาต่อหน่วย" v-else disabled>
+                     <input type="number" class="form-control text-center" :value="orl.instock" disabled>
                   </td>
                   <td>
-                    <input type="text" class="form-control text-right" v-model="rls.price" placeholder="ราคารวม" disabled>
-                  </td>
+                     <input type="number" class="form-control text-center" v-model="orl.qua"  placeholder="จำนวน" >
+                  </td>                  
                   <td>
-                    <button v-if="index +1  == Rec_lists.length && index > 0" @click.prevent="b_rls_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i>ลบ</button></td>
+                     
+                  </td>                  
+                  
+                  <td>
+                    <button v-if="index +1  == Ord_lists.length && index > 0" @click.prevent="b_orl_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i>ลบ</button>
+                  </td>
                 </tr>  
               </tbody>
               <tfoot class="">
                 <tr>
-                  <td colspan="5">
-                    <button class="btn btn-success" @click.prevent="b_rls_plus()">
+                  <td colspan="4">
+                    <button class="btn btn-success" @click.prevent="b_orl_plus()">
                       <i class="fas fa-plus"></i> เพิ่ม
                     </button>  
-                  </td>
-                  <td class="bg-green text-right">
-                    <h5>
-                      {{Recs[0].price_total}}
-                    </h5>
-                  </td>
-                  <td></td>
+                  </td>                 
 
                 </tr>            
               </tfoot>
             </table>
-            <!-- {{Rec_lists}} -->
+            {{Ord_lists}}
 
             
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Recs_close()">Close</button>
-            <button type="submit" class="btn btn-primary" @click.prevent="b_Recs_save()">Save changes</button>     
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Order_close()">Close</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="b_Order_save()">Save changes</button>     
           </div>
           </form>
-            <!-- {{Recs}} -->            
+            <!-- {{Order}} -->            
         </div>
       </div>
     </div>
@@ -218,8 +209,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <input type="text" v-model="q" @keyup="ch_search_pro" ref="search" placeholder="Search.">
           <div class="callout callout-danger" v-for="dp in products">
             <h5>
-              <button class="btn btn-success" @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name)">เลือก</button>
-              {{dp.pro_name}} ({{dp.unit_name}})
+              <button class="btn btn-success" @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock,dp.min)">เลือก</button>
+              {{dp.pro_name}} มี {{dp.instock}} {{dp.unit_name}} {{dp.min}}
             </h5>
           </div>
           <!-- {{products}} -->
@@ -227,7 +218,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
           </div>
-            <!-- {{Recs}} -->            
+            <!-- {{Order}} -->            
         </div>
       </div>
     </div>
@@ -245,20 +236,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <div class="modal-body"> 
           <div class="invoice p-3 mb-3">
-            <!-- {{Recs}} -->
+            <!-- {{Order}} -->
             <div class="row">
               <div class="col-12">
               <h4>
-                <i class="fas fa-globe"></i> ใบรับของเข้า.
-                <small class="float-right">Date: {{Recs[0].rec_date}}</small>
+                <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
+                <small class="float-right">Date: {{Ord[0].ord_date}}</small>
               </h4>
               </div>
             </div>
             <div class="row invoice-info">
               <div class="col-sm-4 invoice-col">
-                From
+                ผู้เบิก
                 <address>
-                  <strong>{{Recs[0].str_name}}</strong><br>
+                  <strong>{{Ord[0].ord_own}}</strong><br>
                 </address>
             </div>
 
@@ -270,8 +261,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
 
             <div class="col-sm-4 invoice-col">
-              <b>CODE #{{Recs[0].rec_id}}</b><br>
-              <b>ผู้บันทึก:</b> {{Recs[0].rec_own}}
+              <b>CODE #{{Ord[0].ord_id}}</b><br>
             </div>
           </div>
 
@@ -283,24 +273,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <th>#</th>
                     <th>Product</th>
                     <th>หน่วยนับ</th>
-                    <th>จำนวน</th>
-                    <th>ราคาต่อหน่วย</th>
-                    <th>ราคา</th>
+                    <th>จำนวนที่มี</th>
+                    <th>จำนวนที่ขอเบิก</th>
+                    <th>หมายเหตุ</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="rls,index in Rec_lists">
+                  <tr v-for="orl,index in Ord_lists">
                     <td>{{index + 1 }}</td>
-                    <td>{{rls.pro_name}}</td>
-                    <td>{{rls.unit_name}}</td>
-                    <td>{{rls.qua}}</td>
-                    <td>{{rls.price_one}}</td>
-                    <td class="text-right">{{rls.price}}</td>
+                    <td>{{orl.pro_name}}</td>
+                    <td>{{orl.unit_name}}</td>
+                    <td>{{orl.instock}}</td>
+                    <td>{{orl.qua}}</td>
+                    <td>{{orl.comment}}</td>
                   </tr>            
-                  <tr>
-                    <td colspan="5"></td>
-                    <td class="bg-gray text-right">{{Recs[0].price_total}}</td>
-                  </tr>
+                  
                 </tbody>
               </table>
             </div>
@@ -308,8 +295,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="row no-print">
             <div class="col-12">
               <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == null || Recs[0].st == ''" @click="b_active()"><i class="far fa-credit-card"></i>
-                อนุมัติ
+              <button type="button" class="btn btn-success float-right"  v-if="Ord[0].st == null || Ord[0].st == ''" @click="b_active()"><i class="far fa-credit-card"></i>
+                อนุมัติการเบิก
               </button>            
             </div>
           </div>
@@ -344,55 +331,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
         message: 'Hello Vue!',
         stores:'',
         products:'',
-        Recs:[{
-          rec_id:'',
-          rec_own:'',          
-          rec_app:'',          
-          rec_date:'',          
-          str_id:'',          
-          price_total:'',          
-          comment:'',          
-          action:'insert'        
-        }],
-        Rec_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}],
+        Ord:[{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}],
+        Ord_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:''}],
         select_pro_index:''
         
       }
     },
     mounted(){
-      this.get_Recs()
-      this.get_Stores()
+      this.get_Orders()
       this.get_Products()
     },
     methods: {      
-      get_Recs(){
-        axios.post(url_base + 'api/recs/get_recs.php')
+      get_Orders(){
+        axios.post(url_base + 'api/orders/get_orders.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
-      get_Stores(){
-        axios.post(url_base + 'api/store/get_stores.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.stores = response.data.respJSON; 
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
-      get_Store(str_id){
-        axios.post(url_base + 'api/store/get_store.php',{str_id:str_id})
-            .then(response => {
-                if (response.data.status) {
-                  // console.log(response.data.respJSON)
-                    this.Recs[0].str_name = response.data.respJSON[0].str_name; 
                 }
             })
             .catch(function (error) {
@@ -410,46 +364,47 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-      get_rec(rec_id){
-        axios.post(url_base + 'api/recs/get_rec.php',{rec_id:rec_id})
+      get_Order(ord_id){
+        axios.post(url_base + 'api/orders/get_order.php',{ord_id:ord_id})
             .then(response => {
                 if (response.data.status) {
-                  this.Recs = response.data.respJSON;
-                  this.Recs[0].action = 'update';              
+                  this.Ord = response.data.respJSON;       
+                  this.Ord[0].action = 'update'                   
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       },
-      get_rec_list(rec_id){
-        axios.post(url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
+      get_Ord_list(ord_id){
+        axios.post(url_base + 'api/orders/get_order_list.php',{ord_id:ord_id})
             .then(response => {
                 if (response.data.status) {
-                  this.Rec_lists = response.data.respJSON;    
+                  this.Ord_lists = response.data.respJSON;    
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       },
-      b_Recs_insert(){
-        this.b_Recs_close();
+      b_Order_insert(){
+        this.b_Order_close();
+        var user_data = JSON.parse(localStorage.getItem("user_data"));
+        this.Ord[0].ord_own = user_data.fullname
+        console.log(user_data.fullname)
       },  
-      b_Recs_update(rec_id){
-        this.$refs['m_show'].click();
-        this.get_rec(rec_id)
-        this.get_rec_list(rec_id)
+      b_Order_update(ord_id){        
+        this.$refs['m_show'].click()
+        this.get_Order(ord_id)
+        this.get_Ord_list(ord_id)
       },
-      async b_Check(rec_id,str_id){
-        await this.get_rec(rec_id)
-        await this.get_rec_list(rec_id)
-        await this.get_Store(str_id)
-        console.log(str_id)
+      b_Check(ord_id,str_id){
+        this.get_Order(ord_id)
+        this.get_Ord_list(ord_id)
       },
       b_active(){
-        this.Recs[0].action='active'
-        axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        this.Ord[0].action='active'
+        axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
               .then(response => {
                   if (response.data.status == 'success'){
                     Swal.fire({
@@ -458,7 +413,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       showConfirmButton: false,
                       timer: 1500
                     });
-                    this.get_Recs();
+                    this.get_Orders();
                     this.$refs['m3_close'].click();                    
                   }else{
                     Swal.fire({
@@ -474,10 +429,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });
         }, 
 
-      b_Recs_save(){
-        if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
+      b_Order_save(){
+        if(this.Ord[0].ord_own != '' && this.Ord[0].rec_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
           var jwt = localStorage.getItem("jwt");
-          axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+          axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
               .then(response => {
                   if (response.data.status == 'success') {
                     Swal.fire({
@@ -487,9 +442,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       timer: 1500
                     });
                     this.$refs['m_close'].click();
-                    this.get_Recs();  
-                    this.Recs = [{rec_id:'', rec_own:'', rec_app:'', str_id:'', action:'insert'}]
-                    this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]
+                    this.get_Orders();  
+                    this.Ord = [{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}]
+                    this.Ord_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:''}]
                   }else{
                     Swal.fire({
                       icon: response.data.status,
@@ -512,7 +467,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
 
       },
-      destroy_Recs(rec_id){
+      destroy_Order(ord_id){
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -524,9 +479,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
               }).then((result) => {
                 if (result.isConfirmed) {
                   var jwt = localStorage.getItem("jwt");
-                  this.Recs[0].action = 'delete';  
-                  this.Recs[0].rec_id = rec_id;  
-                  axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  this.Ord[0].action = 'delete';  
+                  this.Ord[0].ord_id = ord_id;  
+                  axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         if (response.data.status == 'success') {
                           Swal.fire({
@@ -535,7 +490,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             showConfirmButton: false,
                             timer: 1500
                           })
-                          this.get_Recs(); 
+                          this.get_Orders(); 
                              
                         }else{
                           Swal.fire({
@@ -553,17 +508,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }
               });            
         },
-        b_Recs_close(){
-          this.Recs = [{rec_id:'',rec_own:'',rec_app:'', rec_date:'',str_id:'',price_total:0, comment:'',action:'insert'}]  
-          this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]   
+        b_Order_close(){
+          this.Ord = [{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}] 
+          this.Ord_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:''}]   
         },
-        b_rls_plus(){
-          this.Rec_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0})
+        b_orl_plus(){
+          this.Ord_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:''})
         },
-        b_rls_del(index){
-          this.Rec_lists.pop()
-          this.count_price_total()
-          // console.log(index)
+        b_orl_del(index){
+          this.Ord_lists.pop()
         } ,
         b_pro_show(index){
           // console.log(index)
@@ -594,27 +547,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
           this.get_Products()
           // console.log('blur', e.target.placeholder)
         },
-        select_pro(pro_id,pro_name,unit_name){
-          this.Rec_lists[this.select_pro_index].pro_id = pro_id
-          this.Rec_lists[this.select_pro_index].pro_name = pro_name
-          this.Rec_lists[this.select_pro_index].unit_name = unit_name
+        select_pro(pro_id,pro_name,unit_name,instock,min){
+          this.Ord_lists[this.select_pro_index].pro_id = pro_id
+          this.Ord_lists[this.select_pro_index].pro_name = pro_name
+          this.Ord_lists[this.select_pro_index].unit_name = unit_name
+          this.Ord_lists[this.select_pro_index].instock = instock
+          this.Ord_lists[this.select_pro_index].min = min
           this.$refs['m2_close'].click();
           this.reset_search()
           // console.log(pro_id)
         },
         keyup_price(index){
-          this.Rec_lists[index].price = this.Rec_lists[index].price_one * this.Rec_lists[index].qua
+          this.Ord_lists[index].price = this.Ord_lists[index].price_one * this.Ord_lists[index].qua
           this.count_price_total()
         },
         keyup_qua(index){
-          this.Rec_lists[index].price = this.Rec_lists[index].price_one * this.Rec_lists[index].qua
+          this.Ord_lists[index].price = this.Ord_lists[index].price_one * this.Ord_lists[index].qua
           this.count_price_total()
         },
         count_price_total(){    
-          this.Recs[0].price_total = 0      
-          for (let i = 0; i < this.Rec_lists.length; i++) {
-            this.Recs[0].price_total = Number(this.Recs[0].price_total) + Number(this.Rec_lists[i].price)
-            // console.log(this.Rec_lists.length + ' ' + parseInt(this.Rec_lists[i].price))
+          this.Ord[0].price_total = 0      
+          for (let i = 0; i < this.Ord_lists.length; i++) {
+            this.Ord[0].price_total = Number(this.Ord[0].price_total) + Number(this.Ord_lists[i].price)
+            // console.log(this.Ord_lists.length + ' ' + parseInt(this.Ord_lists[i].price))
           }
         },
         
@@ -622,7 +577,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           console.log(num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'))
         }
       },
-  }).mount('#appRecs');
+  }).mount('#appOrder');
 </script>
 </body>
 </html>

@@ -18,18 +18,42 @@ $data = json_decode(file_get_contents("php://input"));
 //     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `stock` LEFT JOIN products ON products.pro_id = stock.pro_id  WHERE stock.pro_id = $data->pro_id ORDER BY stock.created_at ASC LIMIT 0,100;";
+    $sql = "SELECT * FROM `ord_lists` WHERE ord_id = $data->ord_id ;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
     $datas = array();
 
+    foreach($result as $rs){
+        $sql = "SELECT bal FROM `stock` WHERE pro_id = $rs->pro_id ORDER BY stck_id DESC LIMIT 0,1;";
+        $query = $dbcon->prepare($sql);
+        $query->execute();
+        $stock = $query->fetchAll(PDO::FETCH_OBJ);
+        if($stock){
+            $instock = $stock[0]->bal;
+        }else{
+            $instock = 0;
+        }
+
+        array_push($datas,array(
+            'ord_list_id' => $rs->ord_list_id,
+            'ord_id' => $rs->ord_id,
+            'pro_id' => $rs->pro_id,
+            'pro_name' => $rs->pro_name,
+            'unit_name' => $rs->unit_name,
+            'instock' => $instock,
+            'qua' => $rs->qua,
+        ));
+    }
+
+
+
     http_response_code(200);
     echo json_encode(array(
-        'status' => 'success', 
+        'status' => true, 
         'massege' =>  'Ok', 
-        'respJSON' =>  $result, 
-        // 'respJSON' => $datas
+        // 'respJSON' =>  $result, 
+        'respJSON' => $datas
     ));
 
 }catch(PDOException $e){

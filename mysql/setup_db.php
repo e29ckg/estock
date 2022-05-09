@@ -76,11 +76,11 @@ try{
         pro_detail TEXT NULL,
         cat_name VARCHAR(250) NOT NULL,
         unit_name VARCHAR(250) NOT NULL,
-        instock INT(10) NULL,
-        locat VARCHAR(250) NULL,
-        lower INT(10) NULL,
-        min INT(10) NULL,
-        st INT(10) NOT NULL,
+        instock INT(10) DEFAULT 0,
+        locat VARCHAR(250) DEFAULT 1,
+        lower INT(10) DEFAULT 1,
+        min INT(10) DEFAULT 1,
+        st INT(10) DEFAULT 1,
         img VARCHAR(250) NULL,
         own VARCHAR(250) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -157,6 +157,7 @@ try{
     $sql = "CREATE TABLE stock(
         stck_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         pro_id INT(13) NOT NULL,
+        unit_name VARCHAR(250) NULL,
         price_one VARCHAR(100) NULL,
         bf INT(10) NOT NULL,
         stck_in INT(10) NULL,
@@ -181,7 +182,7 @@ try{
         str_id INT(13) NOT NULL,
         price_total VARCHAR(250) NULL,
         comment VARCHAR(250) NULL,
-        st INT(10) NULL,
+        st INT(10) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";
@@ -193,15 +194,17 @@ try{
     $sql = "CREATE TABLE rec_lists(
         rec_list_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         rec_id INT(13) NOT NULL,
+        rec_date DATE NULL,
         pro_id INT(13) NOT NULL,
         pro_name VARCHAR(250) NULL,
         unit_name VARCHAR(250) NOT NULL,
         qua INT(10) NOT NULL,
+        qua_for_ord INT(10) NOT NULL,
         price_one VARCHAR(250) NOT NULL,
         price VARCHAR(250) NOT NULL,
         rec_own VARCHAR(250) NOT NULL,
         rec_app VARCHAR(250) NOT NULL,
-        st INT(10) NULL,
+        st INT(10) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";
@@ -213,11 +216,12 @@ try{
     $sql = "CREATE TABLE ords(
         ord_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         ord_own VARCHAR(250) NULL,
+        ord_date DATE DEFAULT CURRENT_TIMESTAMP,
         ord_app VARCHAR(250) NULL,
         ord_pay DATETIME NULL,
         ord_pay_own VARCHAR(250) NULL,
         comment VARCHAR(250) NULL,
-        st INT(10) NULL,
+        st INT(10) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";
@@ -230,9 +234,12 @@ try{
         ord_list_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         ord_id INT(13) NOT NULL,
         pro_id INT(13) NOT NULL,
+        pro_name VARCHAR(250) NULL,
         unit_name VARCHAR(250) NOT NULL,
         qua INT(10) NOT NULL,
-        st INT(10) NULL,
+        ord_own VARCHAR(250) NOT NULL,
+        ord_app VARCHAR(250) NOT NULL,
+        st INT(10) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )";

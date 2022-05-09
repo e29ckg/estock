@@ -10,8 +10,8 @@ include "../dbconfig.php";
 
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT recs.*, store.str_name  FROM recs LEFT JOIN store ON recs.str_id = store.str_id ORDER BY recs.rec_date DESC;";
+    // $sql = "SELECT * FROM catalog ORDs BY created_at DESC";
+    $sql = "SELECT * FROM ords ORDER BY ord_date DESC;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);

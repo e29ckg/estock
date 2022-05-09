@@ -11,7 +11,7 @@ include "../dbconfig.php";
 try{
     /*ดึงข้อมูลทั้งหมด*/
     // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT * FROM stock ;";
+    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id ;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);

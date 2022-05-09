@@ -41,6 +41,7 @@ try{
     if($Recs->action == 'insert'){
         $dbcon->beginTransaction();
         $rec_id = time();
+
         
         $sql = "INSERT INTO recs(rec_id, rec_date, str_id, price_total, rec_own, comment) VALUE(:rec_id, :rec_date, :str_id, :price_total, :rec_own, :comment);";        
         $query = $dbcon->prepare($sql);
@@ -53,22 +54,22 @@ try{
         $query->execute();  
         
         $Rec_lists = $data->Rec_lists;
-        $i = 0;
         foreach($Rec_lists as $rls){
-            if($Rec_lists[$i]->pro_id != ''){
-                $sql = "INSERT INTO rec_lists(rec_id, pro_id, pro_name, unit_name, qua, price_one, price, rec_own) VALUE(:rec_id, :pro_id, :pro_name, :unit_name, :qua, :price_one, :price, :rec_own);";        
+            if($rls->pro_id != ''){
+                $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own) VALUE(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own);";        
                 $query = $dbcon->prepare($sql);
                 $query->bindParam(':rec_id', $rec_id, PDO::PARAM_INT);
-                $query->bindParam(':pro_id', $Rec_lists[$i]->pro_id, PDO::PARAM_INT);
-                $query->bindParam(':pro_name', $Rec_lists[$i]->pro_name, PDO::PARAM_STR);
-                $query->bindParam(':unit_name', $Rec_lists[$i]->unit_name, PDO::PARAM_STR);
-                $query->bindParam(':qua', $Rec_lists[$i]->qua, PDO::PARAM_INT);
-                $query->bindParam(':price_one', $Rec_lists[$i]->price_one, PDO::PARAM_STR);
-                $query->bindParam(':price', $Rec_lists[$i]->price, PDO::PARAM_STR);
+                $query->bindParam(':rec_date', $Recs->rec_date);
+                $query->bindParam(':pro_id', $rls->pro_id, PDO::PARAM_INT);
+                $query->bindParam(':pro_name', $rls->pro_name, PDO::PARAM_STR);
+                $query->bindParam(':unit_name', $rls->unit_name, PDO::PARAM_STR);
+                $query->bindParam(':qua', $rls->qua, PDO::PARAM_INT);                
+                $query->bindParam(':qua_for_ord', $rls->qua, PDO::PARAM_INT);
+                $query->bindParam(':price_one', $rls->price_one, PDO::PARAM_STR);
+                $query->bindParam(':price', $rls->price, PDO::PARAM_STR);
                 $query->bindParam(':rec_own', $rec_own, PDO::PARAM_STR);
                 $query->execute();  
             }
-            $i++ ;
         }
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
         http_response_code(200);
@@ -97,17 +98,19 @@ try{
         $dbcon->exec($sql);
         $Rec_lists = $data->Rec_lists;
         foreach($Rec_lists as $rls){
-            if($Rec_lists[$i]->pro_id != ''){
+            if($rls->pro_id != ''){
                 
-                    $sql = "INSERT INTO rec_lists(rec_id, pro_id, pro_name, unit_name, qua, price_one, price, rec_own) VALUE(:rec_id, :pro_id, :pro_name, :unit_name, :qua, :price_one, :price, :rec_own);";        
+                    $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own) VALUE(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own);";        
                     $query = $dbcon->prepare($sql);
                     $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_INT);
-                    $query->bindParam(':pro_id', $Rec_lists[$i]->pro_id, PDO::PARAM_INT);
-                    $query->bindParam(':pro_name', $Rec_lists[$i]->pro_name, PDO::PARAM_STR);
-                    $query->bindParam(':unit_name', $Rec_lists[$i]->unit_name, PDO::PARAM_STR);
-                    $query->bindParam(':qua', $Rec_lists[$i]->qua, PDO::PARAM_INT);
-                    $query->bindParam(':price_one', $Rec_lists[$i]->price_one, PDO::PARAM_STR);
-                    $query->bindParam(':price', $Rec_lists[$i]->price, PDO::PARAM_STR);
+                    $query->bindParam(':rec_date', $Recs->rec_date, PDO::PARAM_INT);
+                    $query->bindParam(':pro_id', $rls->pro_id, PDO::PARAM_INT);
+                    $query->bindParam(':pro_name', $rls->pro_name, PDO::PARAM_STR);
+                    $query->bindParam(':unit_name', $rls->unit_name, PDO::PARAM_STR);
+                    $query->bindParam(':qua', $rls->qua, PDO::PARAM_INT);
+                    $query->bindParam(':qua_for_ord', $rls->qua, PDO::PARAM_INT);
+                    $query->bindParam(':price_one', $rls->price_one, PDO::PARAM_STR);
+                    $query->bindParam(':price', $rls->price, PDO::PARAM_STR);
                     $query->bindParam(':rec_own', $rec_own, PDO::PARAM_STR);
                     $query->execute();  
                 
@@ -145,6 +148,7 @@ try{
             /**
              *  stck_id INT(13) AUTO_INCREMENT PRIMARY KEY,
              *   pro_id INT(13) NOT NULL,
+             * unit_name
              * price_one VARCHAR(100) NULL,
             *    bf INT(10) NOT NULL,
             *    stck_in INT(10) NULL,
@@ -164,9 +168,9 @@ try{
             /** ckeck row */
             if(count($result) == 0){
                 $bf = 0;
-                $stck_in = $rls->qua;
+                $stck_in = (integer)$rls->qua;
                 $stck_out = 0;
-                $bal = 0;                
+                $bal = (integer)$rls->qua;                
             }else{
                 $bf = $result[0]->bal;
                 $stck_in = $rls->qua;
@@ -174,10 +178,11 @@ try{
                 $bal = (integer)$result[0]->bal + (integer)$rls->qua;
             }
 
-            $sql = "INSERT INTO stock(pro_id, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
+            $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
                 $query = $dbcon->prepare($sql); 
                 $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
-                $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_INT);
+                $query->bindParam(':unit_name',$rls->unit_name, PDO::PARAM_STR);
+                $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_STR);
                 $query->bindParam(':bf',$bf);
                 $query->bindParam(':stck_in',$stck_in, PDO::PARAM_INT);
                 $query->bindParam(':stck_out',$stck_out);

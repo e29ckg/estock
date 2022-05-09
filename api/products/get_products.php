@@ -10,8 +10,8 @@ include "../dbconfig.php";
 
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    // $sql = "SELECT products.pro_name, products.pro_id, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
+    $sql = "SELECT * FROM products ORDER BY pro_name ASC";
+    // $sql = "SELECT products.pro_name, products.pro_id, products.instock, products.min, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
@@ -25,6 +25,8 @@ try{
             "unit_name" => $res->unit_name,
             // "cat_id" => $res->cat_id,
             "cat_name" => $res->cat_name,
+            "min" => $res->min,
+            "instock" => $res->instock,
             "img" => $res->img
         ));
     }

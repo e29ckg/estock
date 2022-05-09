@@ -83,6 +83,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.cat_name}}/
                           {{data.unit_name}}
                       </td>
+                      <td>{{data.instock}}</td>
                       <td>
                         <button @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</button>  
                         <button @click="b_product_update(data.pro_id)" >Update</button>  
@@ -251,8 +252,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr>
                       <td>date</td>
                       <td>product</td>
-                      <td>code</td>
-                      <td>price_one</td>
+                      <td>เลขเอกสาร</td>
+                      <td>หน่วยนับ</td>
+                      <td>ราคาต่อหน่วย</td>
                       <td>ยกมา</td>
                       <td>รับ</td>
                       <td>ออก</td>
@@ -264,6 +266,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="prst in pro_stock">
                       <td>{{prst.created_at}}</td>
                       <td>{{prst.pro_name}}</td>
+                      <td>{{prst.rec_ord_id}}</td>
                       <td>{{prst.unit_name}}</td>
                       <td>{{prst.price_one}}</td>
                       <td>{{prst.bf}}</td>
@@ -472,18 +475,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });            
         },
         b_product_code(){
-          this.product = [{
-                              pro_id:'',
-                              pro_name:'',
-                              pro_detail:'',
-                              cat_name:'',
-                              unit_name:'',
-                              locat:'',
-                              lower:1,
-                              min:1,
-                              st:'1',
-                              action:'insert'        
-                            }];     
+          this.product = [{pro_id:'', pro_name:'', pro_detail:'', cat_name:'', unit_name:'', locat:'', lower:1, min:1, st:'1', action:'insert'}];     
         },
         b_pro_img(pro_id,index){
           this.pro_img.id = pro_id;
