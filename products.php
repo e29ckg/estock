@@ -90,12 +90,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.pro_id}}</td>
                       <td>
                         <!-- {{data.img}} -->
-                        <a v-if="data.img"  @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
-                          <img :src="'./uploads/'+data.img" alt="data.img" class="float-left" height="60" >
+                        <a   @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
+                          <img v-if="data.img" :src="'./uploads/'+data.img" alt="data.img" class="float-left" height="60" >
+                          <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" height="60" >
                           <!-- <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id)">แก้ไขภาพ</button> -->
-
                         </a>
-                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id,index)" v-else>ใส่ภาพ</button>
+                        <!-- <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id,index)" v-else>ใส่ภาพ</button> -->
                       </td>
                       <td>
                         {{data.pro_name}}
@@ -108,7 +108,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       </td>
                       <td>{{data.instock}}</td>
                       <td>
-                        <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >Update</button>  
+                        <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >แก้ไข</button>  
                         <!-- <button @click="destroy_pro(data.pro_id)">Delete</button>   -->
                       </td>
                     </tr>

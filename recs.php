@@ -235,7 +235,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name)">
               <div class="info-box">
-                <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
+                <!-- <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span> -->
+                <img v-if="dp.img" :src="'./uploads/' + dp.img" alt="data.img" class="float-left" width="60" >
+                <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" width="60" >
                 <div class="info-box-content">
                   <span class="info-box-text">{{dp.pro_name}}</span>
                   <span class="info-box-number">{{dp.instock}} {{dp.unit_name}}</span>

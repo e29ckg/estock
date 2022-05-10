@@ -72,7 +72,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
                       </td>
                       <td>
-                        <button class="btn btn-block btn-primary btn-xs" v-else data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.ord_id)">รายละเอียด</button>                      
+                        <button class="btn btn-block btn-primary btn-xs" data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.ord_id)">รายละเอียด</button>                      
                         <button class="btn btn btn-block btn-warning btn-xs" @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
                         <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
                       </td>
@@ -221,7 +221,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
           <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock,dp.min)">
             <div class="info-box">
-              <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span>
+              <!-- <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span> -->
+              <img v-if="dp.img" :src="'./uploads/' + dp.img" alt="data.img" class="float-left" width="60" >
+              <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" width="60" >
               <div class="info-box-content">
                 <span class="info-box-text">{{dp.pro_name}}</span>
                 <span class="info-box-number">{{dp.instock}} {{dp.unit_name}}</span>
