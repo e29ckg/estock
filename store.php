@@ -67,8 +67,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                        {{data.str_name}} {{data.str_detail}} {{data.str_phone}}
                       </td>
                       <td>
-                        <button @click="b_store_update(data.str_id)" >Update</button>  
-                        <button @click="destroy_store(data.str_id)">Delete</button>  
+                        <button class="btn btn-warning" @click="b_store_update(data.str_id)" >Update</button>  
+                        <!-- <button @click="destroy_store(data.str_id)">Delete</button>   -->
                       </td>
                     </tr>
                   </tbody>
