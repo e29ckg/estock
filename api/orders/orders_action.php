@@ -199,9 +199,8 @@ try{
     
                             $stck_in    = 0;
                             $stck_out   = $stck_out;
-                            $bal        = $bf - $stck_out;              // 
-                            $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
-                            
+                            $bal        = $bf - $stck_out;;              // 
+                            $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list                            
     
                         }
                         /** บันทึกรายการ ลง stock */
@@ -228,18 +227,19 @@ try{
     
                         $bf = $bal;     //bal -> fb ยอดยกไป รอบต่อไป  
                     }
+
                     
 
-                }
+                } /**foreach */
 
-                $instock = $instock - $instock_qua;
+                $instock = $bal;
                 /**     ปรับ products instock */
                 $sql = "UPDATE products SET instock=:instock WHERE pro_id = :pro_id;";
                 $query = $dbcon->prepare($sql); 
                 $query->bindParam(':instock',$instock, PDO::PARAM_INT);
                 $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
                 $query->execute();
-            }
+            } /** Qua > 0 */
 
             /**  order_list st = 1 */
             $sql = "UPDATE ord_lists SET st=1, ord_app=:ord_app WHERE ord_id = :ord_id ;"; 
