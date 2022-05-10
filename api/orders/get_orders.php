@@ -11,7 +11,7 @@ include "../dbconfig.php";
 try{
     /*ดึงข้อมูลทั้งหมด*/
     // $sql = "SELECT * FROM catalog ORDs BY created_at DESC";
-    $sql = "SELECT * FROM ords ORDER BY ord_date DESC;";
+    $sql = "SELECT * FROM ords ORDER BY ord_id DESC;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
