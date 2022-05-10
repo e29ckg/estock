@@ -58,8 +58,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr>
                       <th style="width: 10px">#</th>
                       <th>วันที่รับ</th>
-                      <th>รับจาก</th>
-                      <th>ราคารวม</th>
+                      <th >รับจาก</th>
+                      <th >ราคารวม</th>
+                      <th >สถานะ</th>
                     </tr>
                   </thead>
                   <tbody >
@@ -70,11 +71,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.str_name}}</td>
                       <td>{{data.price_total}}</td>
                       <td>
-                        <button v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">ตรวจสอบ</button>
-                        <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
-                      
-                        <button @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >Update</button>  
-                        <button @click.prevent="destroy_Recs(data.rec_id)" v-if="data.st == 0">Delete</button>  
+                        <!-- <span v-if="data.st == 0" class="badge bg-danger">รอการตรวจสอบ</span> -->
+                        <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
+                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รอการตรวจสอบ</button>
+                      </td>
+                      <td>                        
+                        <button class="btn btn-block btn-warning btn-xs" @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >Update</button>  
+                        <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Recs(data.rec_id)" v-if="data.st == 0">Delete</button>  
+                        <button class="btn btn-block btn-primary btn-xs" v-if="data.st == 1" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
                       </td>
                     </tr>
                   </tbody>
