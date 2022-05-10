@@ -80,6 +80,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <th style="width: 10px">#</th>
                       <th>name</th>
                       <th></th>
+                      <th></th>
+                      <th>คงเหลือ</th>
                       <th ></th>
                     </tr>
                   </thead>
@@ -95,16 +97,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         </a>
                         <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id,index)" v-else>ใส่ภาพ</button>
                       </td>
-                      <td>{{data.pro_name}}</td>
+                      <td>
+                        {{data.pro_name}}
+                        <span class="badge bg-primary" @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</span>
+                        <!-- <button type="button" class="btn  btn-block btn-primary btn-xs"  @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</button>   -->
+                      </td>
                       <td>
                           {{data.cat_name}}/
                           {{data.unit_name}}
                       </td>
                       <td>{{data.instock}}</td>
                       <td>
-                        <button @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</button>  
-                        <button @click="b_product_update(data.pro_id)" >Update</button>  
-                        <button @click="destroy_pro(data.pro_id)">Delete</button>  
+                        <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >Update</button>  
+                        <!-- <button @click="destroy_pro(data.pro_id)">Delete</button>   -->
                       </td>
                     </tr>
                   </tbody>
@@ -267,16 +272,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <td>date</td>
-                      <td>product</td>
-                      <td>เลขเอกสาร</td>
-                      <td>หน่วยนับ</td>
-                      <td>ราคาต่อหน่วย</td>
-                      <td>ยกมา</td>
-                      <td>รับ</td>
-                      <td>ออก</td>
-                      <td>คงเหลือ</td>
-                      <td>หมายเหตุ</td>
+                      <th>date</th>
+                      <th>product</th>
+                      <th>เลขเอกสาร</th>
+                      <th>หน่วยนับ</th>
+                      <th>ราคาต่อหน่วย</th>
+                      <th>ยกมา</th>
+                      <th>รับ</th>
+                      <th>ออก</th>
+                      <th>คงเหลือ</th>
+                      <th>หมายเหตุ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -284,12 +289,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{prst.created_at}}</td>
                       <td>{{prst.pro_name}}</td>
                       <td>{{prst.rec_ord_id}}</td>
-                      <td>{{prst.unit_name}}</td>
-                      <td>{{prst.price_one}}</td>
-                      <td>{{prst.bf}}</td>
-                      <td>{{prst.stck_in}}</td>
-                      <td>{{prst.stck_out}}</td>
-                      <td>{{prst.bal}}</td>
+                      <td class="text-center">{{prst.unit_name}}</td>
+                      <td class="text-center">{{prst.price_one}}</td>
+                      <td class="text-center">{{prst.bf}}</td>
+                      <td class="text-center">{{prst.stck_in}}</td>
+                      <td class="text-center">{{prst.stck_out}}</td>
+                      <td class="text-center">{{prst.bal}}</td>
                       <td>{{prst.comment}}</td>
                     </tr>
                   </tbody>
