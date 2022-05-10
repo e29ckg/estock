@@ -45,11 +45,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col-lg-12">
             <div class="card">
               <div class="card-header">
-                <h5 class="card-title">Order </h5>
+                <h3 class="card-title">Order </h3>
                 <div class="card-tools">
-                  <!-- <button @click="test_action()">test</button> -->
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Order_insert()" ref="m_show">เพิ่มใบเบิกของ</button>                  
-                              
+                    <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click.prevent="b_Order_insert()" ref="m_show">เพิ่มใบเบิกของ</button>                  
+                                              
                 </div>
               </div>
               <div class="card-body">
@@ -59,8 +58,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <th>วันที่เบิก</th>
                       <th>code</th>
                       <th>ผู้เบิก</th>
-                      <th>สถานะ/วันที่ส่งมอบ</th>
-                      <th></th>
+                      <th width="10%">สถานะ</th>
+                      <th width="10%"></th>
                     </tr>
                   </thead>
                   <tbody >
@@ -69,16 +68,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.ord_id}}</td>
                       <td>{{data.ord_own}}</td>
                       <td>
-                        <span v-if="data.st == 0">รอการตรวจสอบ</span>
-                        <span v-if="data.st == 1">อนุมัติแล้ว</span>
+                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">รอตรวจสอบ</button>
+                        <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
                       </td>
-                      <td>{{data.st}}</td>
                       <td>
-                        <button v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">ตรวจสอบ</button>
-                        <button v-else data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">รายละเอียด</button>
-                      
-                        <button @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
-                        <button @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
+                        <button class="btn btn-block btn-primary btn-xs" v-else data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.ord_id)">รายละเอียด</button>                      
+                        <button class="btn btn btn-block btn-warning btn-xs" @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
+                        <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -306,7 +302,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <td>{{orl.instock}}</td>
                     <td>{{orl.qua}}</td>
                     <td>
-                      <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button>
+                      <!-- <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button> -->
                       {{orl.comment}}
 
                     </td>
@@ -331,6 +327,89 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </div>
     </div>
     <!-- //****************************** */ -->
+
+    <!-- //********** รายละเอียด *********** */ -->
+
+    <div class="modal fade" id="exampleModal4"  data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl"  role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body"> 
+          <div class="invoice p-3 mb-3">
+            <!-- {{Order}} -->
+            <div class="row">
+              <div class="col-12">
+              <h4>
+                <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
+                <small class="float-right">Date: {{Ord[0].ord_date}}</small>
+              </h4>
+              </div>
+            </div>
+            <div class="row invoice-info">
+              <div class="col-sm-4 invoice-col">
+                ผู้เบิก
+                <address>
+                  <strong>{{Ord[0].ord_own}}</strong><br>
+                </address>
+            </div>
+
+            <div class="col-sm-4 invoice-col">
+              <!-- To
+              <address>
+              <strong>...</strong><br>
+              </address> -->
+            </div>
+
+            <div class="col-sm-4 invoice-col">
+              <b>CODE #{{Ord[0].ord_id}}</b><br>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>หน่วยนับ</th>
+                    <th>จำนวนที่ขอเบิก</th>
+                    <th>หมายเหตุ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="orl,index in Ord_lists">
+                    <td>{{index + 1 }}</td>
+                    <td>{{orl.pro_name}}</td>
+                    <td>{{orl.unit_name}}</td>
+                    <td>{{orl.qua}}</td>
+                    <td>
+                      <!-- <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button> -->
+                      {{orl.comment}}
+
+                    </td>
+                  </tr>            
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row no-print">
+            <div class="col-12">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>                      
+            </div>
+          </div>
+          </div>
+        </div>
+                      
+        </div>
+      </div>
+    </div>
     
 
 
