@@ -47,11 +47,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header">
                 <h5 class="card-title">Stock</h5>
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal">test</button>                  
+                  <!-- <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal">test</button>                   -->
                 </div>
               </div>
               <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-striped">
                   <thead>
                     <tr>
                       <th>วันที่</th>
