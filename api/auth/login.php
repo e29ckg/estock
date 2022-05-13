@@ -51,7 +51,7 @@ if($num > 0){
     {
         // This is your client secret
         $key = '__test_secret__';
-        $t = 5 * 60 * 60 ; // 
+        $t = 60 * 60 * 60 ; // 
         // $secret_key = "99299929";
         $issuer_claim = "localhost"; // this can be the servername
         $audience_claim = "E29CKG";
