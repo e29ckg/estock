@@ -40,7 +40,7 @@ if($jwt){
         $issuer_claim = "localhost"; // this can be the servername
         $audience_claim = "E29CKG";
         $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim; //not before in seconds
+        $notbefore_claim = $issuedat_claim ; //not before in seconds
         $expire_claim = $issuedat_claim; // expire time in seconds
         $token = array(
             "iss" => $issuer_claim,
@@ -51,13 +51,12 @@ if($jwt){
             "data" => $decoded->data
         );
 
-        // $jwt = JWT::encode($token, $secret_key, 'RS256');
         // $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
         
         http_response_code(200);
         echo json_encode(
             array(
-                "status" => "ok",
+                "status" => "success",
                 "message" => "Access granted.",
                 "jwt" => $jwt,
                 "user_data" => $decoded->data,
@@ -70,6 +69,7 @@ if($jwt){
         http_response_code(401);
 
         echo json_encode(array(
+            "status" => "error",
             "message" => "Access denied.",
             "error" => $e->getMessage()
         ));

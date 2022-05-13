@@ -69,21 +69,19 @@ try{
         exit;
     }
 
-    
+    if($action == 'delete'){    
+        $dbcon->beginTransaction();
+        $sql = "DELETE FROM ords WHERE ord_id = $Ord->ord_id";
+        $dbcon->exec($sql);
 
-//     if($action == 'delete'){    
-//         $dbcon->beginTransaction();
-//         $sql = "DELETE FROM ords WHERE ord_id = $Ord->ord_id";
-//         $dbcon->exec($sql);
+        $sql = "DELETE FROM Ord_lists WHERE ord_id = $Ord->ord_id";
+        $dbcon->exec($sql);
 
-//         $sql = "DELETE FROM Ord_lists WHERE ord_id = $Ord->ord_id";
-//         $dbcon->exec($sql);
-
-//         $dbcon->commit();
-//         http_response_code(200);
-//         echo json_encode(array('status' => 'success', 'massege' => 'Record deleted successfully'));  
+        $dbcon->commit();
         
-//     }    
+        http_response_code(200);
+        echo json_encode(array('status' => 'success', 'massege' => 'Record deleted successfully'));
+    }    
 
 }catch(PDOException $e){
     if ($dbcon->inTransaction()) {

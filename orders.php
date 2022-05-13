@@ -99,12 +99,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </button>
           </div>
           <div class="modal-body">
-            <!-- <div class="row"> 
+            <div class="row"> 
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>ผู้เบิก</label>
-                  <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own" disabled>
-                  {{stores}}
+                  <!-- <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own"> -->
+                  <select v-model="Ord[0].ord_own" class="form-control" aria-label="Default select example" required>
+                    <option v-for="u in users" :value="u.fullname">{{u.fullname}}</option>
+                  </select>
+                  
                 </div>
               </div>  
               <div class="col-sm-6">
@@ -113,7 +116,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord[0].ord_date" required>
                 </div>
               </div>
-            </div>    -->
+            </div>   
             <div class="row">   
               <!-- <div class="col-sm-12">
                 <div class="form-group">
@@ -438,13 +441,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
         products:'',
         Ord:[{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}],
         Ord_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:''}],
-        select_pro_index:''
+        select_pro_index:'',
+        users:''
         
       }
     },
     mounted(){
       this.get_Orders()
       this.get_Products()
+      this.get_users()
     },
     methods: {      
       get_Orders(){
@@ -452,6 +457,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
+      get_users(){
+        axios.post(url_base + 'api/users/get_users.php')
+            .then(response => {
+                if (response.data.status) {
+                    this.users = response.data.respJSON;         
                 }
             })
             .catch(function (error) {
