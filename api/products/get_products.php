@@ -21,6 +21,7 @@ try{
         array_push($data,array(
             "pro_id" => $res->pro_id,
             "pro_name" => $res->pro_name,
+            "pro_detail" => $res->pro_detail,
             // "unit_id" => $res->unit_id,
             "unit_name" => $res->unit_name,
             // "cat_id" => $res->cat_id,
