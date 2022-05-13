@@ -171,6 +171,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
               <!-- </div>
             </div> -->
+            <!-- <div class="row">
+              <div class="col-sm-12"> -->
+                <div class="form-group ">
+                    <label>รายละเอียด</label>
+                    <textarea class="form-control" rows="3" placeholder="รายละเอียด" v-model="product[0].pro_detail"></textarea>
+                </div>
+              <!-- </div>
+            </div> -->
             <div class="row">
               <div class="col-sm-6">
                 <div class="form-group">
