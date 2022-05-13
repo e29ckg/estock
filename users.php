@@ -48,6 +48,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <h5 class="card-title">Users</h5>
                 <div class="card-tools">
                   <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_user_insert()" ref="m_show">เพิ่มสมาชิก</button>                  
+                  <button class="btn btn-danger" data-toggle="modal" data-target="#users_main_Modal" @click="get_Users_main()" ref="m_user_main_show">เพิ่มสมาชิก(from_main)</button>                  
                 </div>
               </div>
               <div class="card-body">
@@ -56,6 +57,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr>
                       <th style="width: 10px">#</th>
                       <th>ชื่อ</th>
+                      <th>username</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -63,6 +65,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="data,index in datas">
                      
                       <td>{{data.user_id}}</td>
+                      <td>{{data.fullname}}</td>
                       <td>
                        {{data.username}} {{data.dep}} {{data.phone}}
                       </td>
@@ -146,6 +149,59 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </div>
     </div>
+
+    <!-- Modal m_user_main-->
+    <div class="modal fade" id="users_main_Modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          
+          <div class="modal-header">
+            <h5 class="modal-title" id="users_main_ModalModalLabel">m_user_main</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="close_m_user_main" @click="b_user_close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">             
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <td>user_id</td>
+                  <td>username</td>
+                  <td>email</td>
+                  <td>fullname</td>
+                  <td>dep</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="dm,index in datas_main">
+                  <td>{{dm.user_id}}</td>
+                  <td>
+                    {{dm.username}}
+                  </td>
+                  <td>{{dm.email}}</td>
+                  <td>
+                    {{dm.fullname}}<br>
+                    {{dm.phone}}</td>
+                  <td>{{dm.dep}}</td>
+                  <td><button @click="add_user_for_main(index)">เพิ่มสมาชิก</button></td>
+                </tr>
+                
+              </tbody>
+            </table>
+            
+            <!-- {{datas_main}} -->
+                       
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- <button type="submit" class="btn btn-primary" >Save changes</button> -->
+          </div>
+            <!-- {{catatlog}} -->
+            
+        </div>
+      </div>
+    </div><!-- m_user_main -->
     
 
 
@@ -161,6 +217,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     data() {
       return {
         datas:'',
+        datas_main:'',
         message: 'Hello Vue!',
         user:[{
           user_id:'',
@@ -192,6 +249,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
+      get_Users_main(){
+        axios.post(url_base + 'api/users/get_users_main.php')
+            .then(response => {
+                // console.log(response.data);
+                if (response.data.status) {
+                    this.datas_main = response.data.respJSON;         
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
       b_user_insert(){
         this.b_user_close();
       },  
@@ -207,7 +276,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
             .catch(function (error) {
                 console.log(error);
             });
-      },  
+      }, 
+      add_user_for_main(index){
+        user = this.datas_main[index]
+        var jwt = localStorage.getItem("jwt");
+        axios.post(url_base + 'api/users/save_users_form_main.php',{user:user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+            .then(response => {
+                if (response.data.status == 'success') {
+                  Swal.fire({
+                    icon: response.data.status,
+                    title: response.data.massege,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  this.get_Users();  
+                }else{
+                  Swal.fire({
+                    icon: response.data.status,
+                    title: response.data.massege,
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },
       b_user_save(){
         var jwt = localStorage.getItem("jwt");
         axios.post(url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
