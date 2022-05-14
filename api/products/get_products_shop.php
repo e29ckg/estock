@@ -10,7 +10,7 @@ include "../dbconfig.php";
 
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM products ORDER BY pro_name ASC";
+    $sql = "SELECT * FROM products WHERE st=1 ORDER BY pro_name ASC";
     // $sql = "SELECT products.pro_name, products.pro_id, products.instock, products.min, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
     $query = $dbcon->prepare($sql);
     $query->execute();

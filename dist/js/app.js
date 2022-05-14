@@ -134,7 +134,9 @@ Vue.createApp({
           menu_url:'stock.php',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
-        },
+        }
+      ],
+      menus_setting:[
         {          
           menu_name:'ประเภทสินค้า',
           menu_class:'',
@@ -162,7 +164,7 @@ Vue.createApp({
           menu_url:'users.php',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
-        },
+        }
       ]
     }
   },
@@ -170,6 +172,7 @@ Vue.createApp({
     this.url = window.location.href
     this.url_base = url_base
     this.set_menu()
+    this.set_menus_setting()
   },
   methods: {
     set_menu(){
@@ -182,6 +185,18 @@ Vue.createApp({
           this.menus[i].menu_class = ''
         }
       }
+    },
+    set_menus_setting(){
+      for (let i = 0; i < this.menus_setting.length; i++) {
+        my_url = this.url_base + this.menus_setting[i].menu_url
+        // console.log(my_url)
+        if(this.url == my_url){
+          this.menus_setting[i].menu_class = 'active'
+        }else{
+          this.menus_setting[i].menu_class = ''
+        }
+      }
     }
+    
   },
 }).mount('#aside')

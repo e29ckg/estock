@@ -53,6 +53,7 @@ try{
         fullname VARCHAR(250) NOT NULL,
         dep VARCHAR(250) NULL,
         phone VARCHAR(100) NULL,
+        st INT(13) DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE (user_id)
@@ -80,7 +81,7 @@ try{
         locat VARCHAR(250) DEFAULT 1,
         lower INT(10) DEFAULT 1,
         min INT(10) DEFAULT 1,
-        st INT(10) DEFAULT 1,
+        st INT(10) DEFAULT 0,
         img VARCHAR(250) NULL,
         own VARCHAR(250) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

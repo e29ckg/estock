@@ -39,68 +39,54 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <div class="content">
+    <section class="content">
       <div class="container-fluid">
+
         <div class="row">
-          <div class="col-lg-6">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-
-                <p class="card-text">
-                  Some quick example text to build on the card title and make up the bulk of the card's
-                  content.
-                </p>
-
-                <a href="#" class="card-link">Card link</a>
-                <a href="#" class="card-link">Another link</a>
-              </div>
-            </div>
-
-            <div class="card card-primary card-outline">
-              <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-
-                <p class="card-text">
-                  Some quick example text to build on the card title and make up the bulk of the card's
-                  content.
-                </p>
-                <a href="#" class="card-link">Card link</a>
-                <a href="#" class="card-link">Another link</a>
-              </div>
-            </div><!-- /.card -->
-          </div>
-          <!-- /.col-md-6 -->
-          <div class="col-lg-6">
-            <div class="card">
-              <div class="card-header">
-                <h5 class="m-0">Featured</h5>
-              </div>
-              <div class="card-body">
-                <h6 class="card-title">Special title treatment</h6>
-
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-              </div>
-            </div>
-
-            <div class="card card-primary card-outline">
-              <div class="card-header">
-                <h5 class="m-0">Featured</h5>
-              </div>
-              <div class="card-body">
-                <h6 class="card-title">Special title treatment</h6>
-
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Sales</span>
+                <span class="info-box-number">{{order_st0}}</span>
               </div>
             </div>
           </div>
-          <!-- /.col-md-6 -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">{{order_st1}}</span>
+                <span class="info-box-number">
+                        10
+                  <small>%</small>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Likes</span>
+                <span class="info-box-number">{{recs_st0}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="clearfix hidden-md-up"></div> -->
+          
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">New Members</span>
+                <span class="info-box-number">{{user_all}}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
+      </div>
+    </section>
     <button @click="countP">test {{count}}</button>
     <!-- /.content -->
   </div>
@@ -114,13 +100,65 @@ scratch. This page gets rid of all links and provides the needed markup only.
   Vue.createApp({
     data() {
       return {
+        order_st0:0,
+        order_st1:0,
+        recs_st0:0,
+        user_all:0,
         message: 'Hello Vue!',
         count:0
       }
     },
+    mounted(){
+      this.url = window.location.href
+      this.url_base = url_base
+      this.count_odrs_st0()
+      this.count_odrs_st1()
+      this.count_recs_st0()
+      this.count_users()
+    },
     methods: {
     countP() {
       this.count++
+    },
+    count_odrs_st0(){
+      axios.post(url_base + 'api/orders/orders_count.php',{data:'st0'})
+        .then(response => {
+            if(response.data.status) { 
+              this.order_st0 = response.data.respJSON;
+            }else {
+              this.order_st0 = 0;
+            }
+        })
+    },
+    count_odrs_st1(){
+      axios.post(url_base + 'api/orders/orders_count.php',{data:'st1'})
+        .then(response => {
+            if(response.data.status) { 
+              this.order_st0 = response.data.respJSON;
+            }else {
+              this.order_st0 = 0;
+            }
+        })
+    },
+    count_recs_st0(){
+      axios.post(url_base + 'api/recs/recs_count.php',{data:'st0'})
+        .then(response => {
+            if(response.data.status) { 
+              this.recs_st0 = response.data.respJSON;
+            }else {
+              this.recs_st0 = 0;
+            }
+        })
+    },
+    count_users(){
+      axios.post(url_base + 'api/users/users_count.php',{})
+        .then(response => {
+            if(response.data.status) { 
+              this.user_all = response.data.respJSON;
+            }else {
+              this.user_all = 0;
+            }
+        })
     }
   },
   }).mount('#app')

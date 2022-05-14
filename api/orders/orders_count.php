@@ -2,37 +2,39 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+// header("'Access-Control-Allow-Credentials', 'true'");
+// header('Content-Type: application/javascript');
 header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
-
 $data = json_decode(file_get_contents("php://input"));
-// $product = $data;
+$data = $data->data;
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'massege' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
-
-$ord_id = $data->ord_id;
 try{
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `ord_lists` WHERE ord_id = :ord_id ORDER BY ord_list_id ASC;";
+    if($data == 'st0'){
+        $sql = "SELECT * FROM ords WHERE st=0";
+    }elseif($data == 'st1'){
+        $sql = "SELECT * FROM ords WHERE st=1";
+    }else{
+        $sql = "SELECT * FROM ords";
+    }
     $query = $dbcon->prepare($sql);
-    $query->bindParam(':ord_id',$ord_id, PDO::PARAM_INT);
     $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+    $result = count($query->fetchAll(PDO::FETCH_OBJ));
+    // $data = array();
 
+    // foreach($result as $res){
+    //     array_push($data,array(
+    //         "unit_id" => $res->unit_id,
+    //         "unit_name" => $res->unit_name
+    //     ));
+    // }
     http_response_code(200);
     echo json_encode(array(
-        'status' => 'success', 
+        'status' => true, 
         'massege' =>  'Ok', 
         'respJSON' =>  $result, 
-        'respJSON2' => $data->ord_id
+        // 'respJSON' => $data
     ));
 
 }catch(PDOException $e){
@@ -40,3 +42,5 @@ try{
     http_response_code(400);
     echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
+
+

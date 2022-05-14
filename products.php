@@ -76,12 +76,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                 <table class="table table-bordered">
                   <thead>
-                    <tr>
+                    <tr class="text-center">
                       <th style="width: 10px">#</th>
-                      <th>name</th>
-                      <th></th>
-                      <th></th>
+                      <th>ภาพ</th>
+                      <th>ชื่อสินค้า</th>
+                      <th>ประเภทสินค้า/หน่วยนับ </th>
                       <th>คงเหลือ</th>
+                      <th>สถานะ</th>
                       <th ></th>
                     </tr>
                   </thead>
@@ -91,7 +92,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>
                         <!-- {{data.img}} -->
                         <a   @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
-                          <img v-if="data.img" :src="'./uploads/'+data.img" alt="data.img" class="float-left" height="60" >
+                          <img v-if="data.img" :src="'./uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
                           <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" height="60" >
                           <!-- <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id)">แก้ไขภาพ</button> -->
                         </a>
@@ -106,7 +107,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.cat_name}}/
                           {{data.unit_name}}
                       </td>
-                      <td>{{data.instock}}</td>
+                      <td class="text-center">{{formatCurrency(data.instock)}}</td>
+                      <td>
+                        <span v-if="data.st == 1" class="badge bg-primary">ปกติ</span>
+                        <span v-else class="badge bg-danger">ระงับ</span>
+                      </td>
                       <td>
                         <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >แก้ไข</button>  
                         <!-- <button @click="destroy_pro(data.pro_id)">Delete</button>   -->
@@ -194,7 +199,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </div>
             </div>
             <div class="form-group">
-              <label>สถานะ {{product[0].st}}</label>
+              <label>
+                สถานะ 
+                <span v-if="product[0].st == 1" class="badge bg-primary">ปกติ</span>
+                <span v-else class="badge bg-danger">ระงับ</span>
+              </label>
                 <!-- <input type="text" class="form-control" v-model="product[0].st"> -->
               <select class="form-control" v-model="product[0].st" required>
                 <option value="1">ใช้งาน</option>
@@ -538,11 +547,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         showConfirmButton: true,
                         timer: 1500
                       });
-                      // this.$refs.m_img_upload.click();
-                      // this.$refs.m_img_upload.value;
-                      // console.log(document.getElementById('file'));
-                      // console.log(this.$refs.myFiles.value);
-                      // document.getElementById('file').value = "";
                       this.get_products();
                       this.pro_img.img = response.data.img;
                       // this.pro_img.label = '';
@@ -595,6 +599,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
           this.q = ''
           this.get_products()
           // console.log('blur', e.target.placeholder)
+        },
+        getYM(dat){
+            let MyDate = new Date(dat);
+            let MyDateString;
+            // MyDate.setDate(MyDate.getDate() + 20);
+            MyDateString = MyDate.getFullYear() + '-' + ("0" + (MyDate.getMonth()+1)).slice(-2)
+            return ("0" + MyDate.getDate()).slice(-2)+ '-' + ("0" + (MyDate.getMonth()+1)).slice(-2) + '-' + (MyDate.getFullYear() + 543)
+        },
+        formatCurrency(number) {
+          number = parseFloat(number);
+          return number.toFixed(0).replace(/./g, function(c, i, a) {
+              return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+          });
         }
     },
   }).mount('#appProduct')

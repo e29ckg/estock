@@ -155,7 +155,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <input type="text" class="form-control text-center" v-model="orl.unit_name" placeholder="หน่วยนับ" disabled>
                   </td>
                   <td>
-                     <input type="number" class="form-control text-center" :value="orl.instock" disabled>
+                     <input v-if="orl.instock" type="text" class="form-control text-center" :value="formatCurrency0(orl.instock)" disabled>
+                     <input v-else type="text" class="form-control text-center" :value="0" disabled>
                   </td>
                   <td>
                      <input type="number" class="form-control text-center" v-model="orl.qua"  placeholder="จำนวน" v-if="orl.instock > 0" @keyup="keyup_qua(index)" @change="keyup_qua(index)" >
@@ -251,7 +252,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m3_close">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="m3_close_click"  ref="m3_close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -290,7 +291,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="col-12 table-responsive">
               <table class="table table-striped">
                 <thead>
-                  <tr>
+                  <tr class="text-center">
                     <th>#</th>
                     <th>Product</th>
                     <th>หน่วยนับ</th>
@@ -300,14 +301,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="orl,index in Ord_lists">
+                  <tr v-for="orl,index in Ord_lists" class="text-center">
                     <td>{{index + 1 }}</td>
                     <td>{{orl.pro_name}}</td>
                     <td>{{orl.unit_name}}</td>
-                    <td>{{orl.instock}}</td>
-                    <td>{{orl.qua}}</td>
+                    <td>{{formatCurrency0(orl.instock)}}</td>
+                    <td>{{formatCurrency0(orl.qua)}}</td>
                     <td>
-                      <!-- <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button> -->
+                      <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0 "><i class="fas fa-times"></i></button>
                       {{orl.comment}}
 
                     </td>
@@ -319,10 +320,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>
           <div class="row no-print">
             <div class="col-12">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-              <button type="button" class="btn btn-success float-right"  v-if="Ord[0].st == 0" @click="b_active()"><i class="far fa-credit-card"></i>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="m3_close_click" >Close</button>
+              {{ck_order}}
+              <button v-if="ck_order === 0" type="button" class="btn btn-success float-right "  v-if="Ord[0].st == 0" @click="b_active()">
+                <i class="far fa-credit-card"></i>
                 อนุมัติการเบิก
               </button>            
+                        
             </div>
           </div>
           </div>
@@ -442,7 +446,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
         Ord:[{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}],
         Ord_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:''}],
         select_pro_index:'',
-        users:''
+        users:'',
+        ck_order:''
         
       }
     },
@@ -523,6 +528,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         this.get_Order(ord_id)
         this.get_Ord_list(ord_id)
       },
+      m3_close_click(){
+        this.ck_order = 0
+      },
       b_active(){
         Swal.fire({
                 title: 'Are you sure?',
@@ -546,6 +554,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           timer: 1500
                         });
                         this.get_Orders();
+                        this.ck_order = 0
                         this.$refs['m3_close'].click();                    
                       }else{
                         Swal.fire({
@@ -710,6 +719,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
             this.Ord[0].price_total = Number(this.Ord[0].price_total) + Number(this.Ord_lists[i].price)
             // console.log(this.Ord_lists.length + ' ' + parseInt(this.Ord_lists[i].price))
           }
+        },
+        formatCurrency(number) {
+          number = parseFloat(number);
+          return number.toFixed(2).replace(/./g, function(c, i, a) {
+              return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+          });
+        },
+        formatCurrency0(number) {
+          number = parseFloat(number);
+          return number.toFixed(0).replace(/./g, function(c, i, a) {
+              return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+          });
         },
         
         test(num){

@@ -7,34 +7,31 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
+$data = json_decode(file_get_contents("php://input"));
+$user_own = $data->user_own;
+
 
 try{
-    /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT * FROM users ;";
+    
+    $sql = "SELECT * FROM ords WHERE ord_own=:ord_own AND st=0;";
     $query = $dbcon->prepare($sql);
+    $query->bindParam(':ord_own', $user_own,PDO::PARAM_STR);
     $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+    $result = count($query->fetchAll(PDO::FETCH_OBJ));
+    // $data = array();
 
-    foreach($result as $res){
-        array_push($datas,array(
-            "user_id" => $res->user_id,
-            "email" => $res->email,
-            "username" => $res->username,
-            "dep" => $res->dep,
-            "fullname" => $res->fullname,
-            "role" => $res->role,
-            "phone" => $res->phone,
-            "st" => $res->st,
-        ));
-    }
+    // foreach($result as $res){
+    //     array_push($data,array(
+    //         "unit_id" => $res->unit_id,
+    //         "unit_name" => $res->unit_name
+    //     ));
+    // }
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
         'massege' =>  'Ok', 
-        // 'respJSON' =>  $result, 
-        'respJSON' => $datas
+        'respJSON' =>  $result, 
+        // 'respJSON' => $data
     ));
 
 }catch(PDOException $e){

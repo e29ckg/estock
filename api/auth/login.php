@@ -31,7 +31,7 @@ $password = $data->password;
 
 $table_name = 'users';
 
-$query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? LIMIT 0,1";
+$query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? AND st = 10 LIMIT 0,1";
 
 $stmt = $conn->prepare( $query );
 $stmt->bindParam(1, $email);

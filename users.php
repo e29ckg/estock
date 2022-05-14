@@ -58,6 +58,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <th style="width: 10px">#</th>
                       <th>ชื่อ</th>
                       <th>username</th>
+                      <th>สถานะ</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -68,6 +69,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.fullname}}</td>
                       <td>
                        {{data.username}} {{data.dep}} {{data.phone}}
+                      </td>
+                      <td>
+                        <!-- {{data.st}} -->
+                        <span v-if="data.st == 10" class="badge badge-primary">ปกติ</span>
+                        <span v-else class="badge badge-danger">ระงับ</span>
                       </td>
                       <td>
                         <button @click="b_user_update(data.user_id)" >Update</button>  
@@ -136,6 +142,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
               </div>
             </div>   
+            <div class="row">   
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>สถานะ</label>
+                  <select class="form-control" v-model="user[0].st">
+                    <option value=10>ใช้งาน</option>
+                    <option value=0>ระงับการใช้งาน</option>
+                  </select>
+                </div>
+              </div>
+            </div>   
+
             
             
           </div>
@@ -227,6 +245,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           email:'',          
           dep:'',          
           phone:'',          
+          st:10,          
           fullname:'',          
           action:'insert'        
         }],

@@ -42,7 +42,7 @@ try{
             exit;
         }
 
-        $sql = "INSERT INTO users(fullname,username,password,email,dep,phone) VALUE(:fullname, :username,:password,:email,:dep,:phone);";        
+        $sql = "INSERT INTO users(fullname,username,password,email,dep,phone,st) VALUE(:fullname, :username,:password,:email,:dep,:phone,:st);";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':fullname',$user->fullname, PDO::PARAM_STR);
         $query->bindParam(':username',$user->username, PDO::PARAM_STR);
@@ -50,6 +50,7 @@ try{
         $query->bindParam(':email',$user->email, PDO::PARAM_STR);
         $query->bindParam(':dep',$user->dep, PDO::PARAM_STR);
         $query->bindParam(':phone',$user->phone, PDO::PARAM_STR);
+        $query->bindParam(':st',$user->st, PDO::PARAM_STR);
         $query->execute();
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";

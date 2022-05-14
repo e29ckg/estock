@@ -43,7 +43,8 @@ $query = "INSERT INTO " . $table_name . "
                 SET fullname = :fullname,
                     email = :email,
                     username = :username,
-                    password = :password";
+                    password = :password,
+                    st = 0";
 
 $stmt = $conn->prepare($query);
 
@@ -59,11 +60,11 @@ $stmt->bindParam(':password', $password_hash);
 if($stmt->execute()){
 
     http_response_code(200);
-    echo json_encode(array("message" => "User was successfully registered."));
+    echo json_encode(array("status" => "ok","message" => "User was successfully registered."));
 }
 else{
     http_response_code(400);
 
-    echo json_encode(array("message" => "Unable to register the user."));
+    echo json_encode(array("status" => "error","message" => "Unable to register the user."));
 }
 ?>

@@ -16,32 +16,23 @@ $data = json_decode(file_get_contents("php://input"));
 //         'respJSON' => $data->pro_id
 //     ));
 //     exit;
+
+$ord_id = $data->ord_id;
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `users` WHERE user_id = $data->user_id LIMIT 0,1;";
+    $sql = "SELECT ord_lists.*, products.img FROM `ord_lists` INNER JOIN products ON products.pro_id = ord_lists.pro_id WHERE ord_lists.ord_id = :ord_id ORDER BY ord_lists.ord_list_id ASC;";
     $query = $dbcon->prepare($sql);
+    $query->bindParam(':ord_id',$ord_id, PDO::PARAM_INT);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
     $datas = array();
-    foreach($result as $res){
-        array_push($datas,array(
-            "user_id" => $res->user_id,
-            "email" => $res->email,
-            "username" => $res->username,
-            "dep" => $res->dep,
-            "fullname" => $res->fullname,
-            "role" => $res->role,
-            "phone" => $res->phone,
-            "st" => $res->st,
-        ));
-    }
 
     http_response_code(200);
     echo json_encode(array(
-        'status' => true, 
+        'status' => 'success', 
         'massege' =>  'Ok', 
-        // 'respJSON' =>  $result, 
-        'respJSON' => $datas
+        'respJSON' =>  $result, 
+        'respJSON2' => $data->ord_id
     ));
 
 }catch(PDOException $e){

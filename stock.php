@@ -53,7 +53,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-body">
                 <table class="table table-striped">
                   <thead>
-                    <tr>
+                    <tr class="text-center">
                       <th>วันที่</th>
                       <th>รายการ</th>
                       <th>เลขเอกสาร</th>
@@ -67,16 +67,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     </tr>
                   </thead>
                   <tbody >
-                    <tr v-for="data,index in datas">
+                    <tr v-for="data,index in datas" class="text-center">
                       <td>{{data.created_at}}</td>
                       <td>{{data.pro_name}}(id:{{data.pro_id}})</td>
                       <td>{{data.rec_ord_id}}</td>
                       <td>{{data.unit_name}}</td>
-                      <td>{{data.price_one}}</td>
-                      <td>{{data.bf}}</td>
-                      <td>{{data.stck_in}}</td>
-                      <td>{{data.stck_out}}</td>
-                      <td>{{data.bal}}</td>
+                      <td class="text-center">{{formatCurrency(data.price_one)}}</td>
+                      <td>{{formatCurrency0(data.bf)}}</td>
+                      <td>{{formatCurrency0(data.stck_in)}}</td>
+                      <td>{{formatCurrency0(data.stck_out)}}</td>
+                      <td>{{formatCurrency0(data.bal)}}</td>
                       <td>{{data.comment}}</td>    
                     </tr>
                   </tbody>
@@ -154,8 +154,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-             
+      formatCurrency(number) {
+        number = parseFloat(number);
+        return number.toFixed(2).replace(/./g, function(c, i, a) {
+            return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+        });
       },
+      formatCurrency0(number) {
+        number = parseFloat(number);
+        return number.toFixed(0).replace(/./g, function(c, i, a) {
+            return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+        });
+      }
+             
+    },
   }).mount('#appStock');
 </script>
 </body>

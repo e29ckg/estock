@@ -68,8 +68,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                      
                       <td>{{data.rec_id}}</td>
                       <td>{{data.rec_date}}</td>
-                      <td>{{data.str_name}}</td>
-                      <td>{{data.price_total}}</td>
+                      <td >{{data.str_name}}</td>
+                      <td class="text-right">{{formatCurrency(data.price_total)}}</td>
                       <td>
                         <!-- <span v-if="data.st == 0" class="badge bg-danger">รอการตรวจสอบ</span> -->
                         <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
@@ -168,7 +168,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <input type="number" class="form-control text-right" v-model="rls.price_one" placeholder="ราตาต่อหน่วย" v-else disabled>
                   </td>
                   <td>
-                    <input type="text" class="form-control text-right" v-model="rls.price" placeholder="ราคารวม" disabled>
+                    <!-- <input type="text" class="form-control text-right" v-model="rls.price" placeholder="ราคารวม" disabled> -->
+                    <input type="text" class="form-control text-right" :value="formatCurrency(rls.price)" placeholder="ราคารวม" disabled>
                   </td>
                   <td>
                     <button v-if="index +1  == Rec_lists.length && index > 0" @click.prevent="b_rls_del(index)" class="btn btn-danger btn-sm"><i class="fas fa-times"></i>ลบ</button></td>
@@ -183,7 +184,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </td>
                   <td class="bg-green text-right">
                     <h5>
-                      {{Recs[0].price_total}}
+                      {{formatCurrency(Recs[0].price_total)}}
                     </h5>
                   </td>
                   <td></td>
@@ -302,7 +303,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="col-12 table-responsive">
               <table class="table table-striped">
                 <thead>
-                  <tr>
+                  <tr class="text-center">
                     <th>#</th>
                     <th>Product</th>
                     <th>หน่วยนับ</th>
@@ -312,17 +313,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="rls,index in Rec_lists">
+                  <tr v-for="rls,index in Rec_lists" class="text-center">
                     <td>{{index + 1 }}</td>
                     <td>{{rls.pro_name}}</td>
                     <td>{{rls.unit_name}}</td>
                     <td>{{rls.qua}}</td>
-                    <td>{{rls.price_one}}</td>
-                    <td class="text-right">{{rls.price}}</td>
+                    <td class="text-right">{{formatCurrency(rls.price_one)}}</td>
+                    <td class="text-right">{{formatCurrency(rls.price)}}</td>
                   </tr>            
                   <tr>
                     <td colspan="5"></td>
-                    <td class="bg-gray text-right">{{Recs[0].price_total}}</td>
+                    <td class="bg-gray text-right">{{formatCurrency(Recs[0].price_total)}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -655,6 +656,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
             this.Recs[0].price_total = Number(this.Recs[0].price_total) + Number(this.Rec_lists[i].price)
             // console.log(this.Rec_lists.length + ' ' + parseInt(this.Rec_lists[i].price))
           }
+        },
+        getYM(dat){
+            let MyDate = new Date(dat);
+            let MyDateString;
+            // MyDate.setDate(MyDate.getDate() + 20);
+            MyDateString = MyDate.getFullYear() + '-' + ("0" + (MyDate.getMonth()+1)).slice(-2)
+            return ("0" + MyDate.getDate()).slice(-2)+ '-' + ("0" + (MyDate.getMonth()+1)).slice(-2) + '-' + (MyDate.getFullYear() + 543)
+        },
+        formatCurrency(number) {
+          number = parseFloat(number);
+          return number.toFixed(2).replace(/./g, function(c, i, a) {
+              return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+          });
         },
         
         test(num){

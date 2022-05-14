@@ -26,6 +26,7 @@ try{
             "fullname" => $res->fname.$res->name.' '.$res->sname,
             "dep" => $res->dep,
             "phone" => $res->phone,
+            "st" => $res->status,
         ));
     }
     http_response_code(200);
