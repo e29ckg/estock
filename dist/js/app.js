@@ -36,7 +36,7 @@ Vue.createApp({
     },
 
     protected(jwt) {
-      axios.post(url_base + 'api/auth/protected.php',{},{ 
+      axios.post(url_base + 'api/auth/protected_admin.php',{},{ 
         headers: {
             "Access-Control-Allow-Origin" : "*",
             "Content-type": "Application/json",

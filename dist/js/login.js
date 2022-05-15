@@ -5,7 +5,7 @@ function login() {
     const password = document.getElementById("password").value;
   
     const xhttp = new XMLHttpRequest();
-    xhttp.open("POST", url_base + "/estock/api/auth/login.php");
+    xhttp.open("POST", url_base + "/estock/api/auth/login_admin.php");
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhttp.send(JSON.stringify({
       "username": username,

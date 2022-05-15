@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AdminLTE 3 | Log in</title>
+<title>E-Stock v2 | Log in</title>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
@@ -17,7 +17,7 @@
 <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="#"><b>Admin</b>LTE</a>
+            <a href="#"><b>E-Stock</b></a>
         </div>
 
         <div class="card">
@@ -43,14 +43,10 @@
                     <div class="row">
                         <div class="col">
                             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-                        </div>
-                        
+                        </div>                        
                     </div>
-
-
-            </div>
-                </form>
-                
+                </div>
+                </form>                
             </div>
             
                     <p class="mb-1">
