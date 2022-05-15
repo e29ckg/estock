@@ -56,16 +56,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr>
                       <th style="width: 10px">#</th>
                       <th>ชื่อร้านค้า</th>
+                      <th>รายละเอียด</th>
+                      <th>phone</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
                      
-                      <td>{{data.store_id}}</td>
+                      <td>{{data.str_id}}</td>
                       <td>
-                       {{data.str_name}} {{data.str_detail}} {{data.str_phone}}
+                        {{data.str_name}}
                       </td>
+                      <td>
+                        {{data.str_detail}} 
+                      </td>
+                      <td>{{data.str_phone}}</td>
                       <td>
                         <button class="btn btn-warning" @click="b_store_update(data.str_id)" >Update</button>  
                         <!-- <button @click="destroy_store(data.str_id)">Delete</button>   -->

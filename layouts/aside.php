@@ -10,35 +10,6 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">         
           
-          <!-- <li class="nav-item">
-            <a href="./products.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Products
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="./catalogs.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                ประเภทสินค้า
-                <span class="right badge badge-danger">ประเภทสินค้า</span>
-              </p>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="./units.php" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                หน่วยนับ
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li> -->
-
           <li class="nav-item " v-for="menu,index in menus">
             <a :href="url_base + menu.menu_url" :class="'nav-link ' + menu.menu_class" @click="set_menu(menu.menu_url)">
               <i :class="menu.menu_icon_class"></i>

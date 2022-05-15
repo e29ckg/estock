@@ -58,6 +58,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <th style="width: 10px">#</th>
                       <th>ชื่อ</th>
                       <th>username</th>
+                      <th>เบอร์โทร</th>
                       <th>สถานะ</th>
                       <th></th>
                     </tr>
@@ -66,10 +67,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="data,index in datas">
                      
                       <td>{{data.user_id}}</td>
-                      <td>{{data.fullname}}</td>
+                      <td>{{data.fullname}}<br><small>{{data.dep}}</small></td>
                       <td>
-                       {{data.username}} {{data.dep}} {{data.phone}}
+                        {{data.username}}  
                       </td>
+                      <td>{{data.phone}}</td>
                       <td>
                         <!-- {{data.st}} -->
                         <span v-if="data.st == 10" class="badge badge-primary">ปกติ</span>

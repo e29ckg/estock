@@ -133,6 +133,8 @@ Vue.createApp({
       datas:'',
       url:'',
       url_base:'',
+      order_st0:'',
+      recs_st0:'',
       menus:[
         {          
           menu_name:'Home',
@@ -207,6 +209,8 @@ Vue.createApp({
     this.url_base = url_base
     this.set_menu()
     this.set_menus_setting()
+    this.count_odrs_st0()
+    this.count_recs_st0()
   },
   methods: {
     set_menu(){
@@ -230,7 +234,26 @@ Vue.createApp({
           this.menus_setting[i].menu_class = ''
         }
       }
-    }
-    
+    },
+    count_odrs_st0(){
+      axios.post(url_base + 'api/orders/orders_count.php',{data:'st0'})
+        .then(response => {
+            if(response.data.status) { 
+              this.menus[1].menu_badge = response.data.respJSON;
+              if(response.data.respJSON === 0){this.menus[1].menu_badge = ''}
+            }else {
+              this.menus[1].menu_badge = '';
+            }
+        })
+    },
+    count_recs_st0(){
+      axios.post(url_base + 'api/recs/recs_count.php',{data:'st0'})
+        .then(response => {
+            if(response.data.status) { 
+              this.menus[2].menu_badge = response.data.respJSON
+              if(response.data.respJSON === 0){this.menus[2].menu_badge = ''}
+            }
+        })
+    },
   },
 }).mount('#aside')
