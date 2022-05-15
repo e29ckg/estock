@@ -37,30 +37,21 @@ if($jwt){
         // $t = 5 * 60 * 60 ; // 
         $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);       
         
-        $issuer_claim = "localhost"; // this can be the servername
-        $audience_claim = "E29CKG";
-        $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim ; //not before in seconds
-        $expire_claim = $issuedat_claim; // expire time in seconds
-        $token = array(
-            "iss" => $issuer_claim,
-            "aud" => $audience_claim,
-            "iat" => $issuedat_claim,
-            "nbf" => $notbefore_claim,
-            "exp" => $expire_claim,
-            "data" => $decoded->data
-        );
+        $user_id = $decoded->user_id;
+        $token_gen = bin2hex(random_bytes(16));
 
-        // $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
-        
+        $query = "UPDATE users SET token=:token WHERE user_id=:user_id";
+
+        $stmt = $conn->prepare( $query );
+        $stmt->bindParam(":token", $token_gen, PDO::PARAM_STR);
+        $stmt->bindParam(":user_id", $user_id,PDO::PARAM_INT);
+        $stmt->execute();
+    
         http_response_code(200);
         echo json_encode(
             array(
-                "status" => "success",
-                "message" => "Access granted.",
-                "jwt" => $jwt,
-                "user_data" => $decoded->data,
-                "expireAt" => $expire_claim,
+                "status" => "success",                
+                "message" => "You Logout Success",                
                 "ts"=> time()
             ));        
 

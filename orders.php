@@ -250,87 +250,87 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div class="modal fade" id="exampleModal3" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl"  role="document">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="m3_close_click"  ref="m3_close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body"> 
-          <div class="invoice p-3 mb-3">
-            <!-- {{Order}} -->
-            <div class="row">
-              <div class="col-12">
-              <h4>
-                <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
-                <small class="float-right">Date: {{Ord[0].ord_date}}</small>
-              </h4>
+          <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="m3_close_click"  ref="m3_close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body"> 
+              <div class="invoice p-3 mb-3">
+                <!-- {{Order}} -->
+                <div class="row">
+                  <div class="col-12">
+                  <h4>
+                    <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
+                    <small class="float-right">Date: {{Ord[0].ord_date}}</small>
+                  </h4>
+                  </div>
+                </div>
+                <div class="row invoice-info">
+                  <div class="col-sm-4 invoice-col">
+                    ผู้เบิก
+                    <address>
+                      <strong>{{Ord[0].ord_own}}</strong><br>
+                    </address>
+                </div>
+
+                <div class="col-sm-4 invoice-col">
+                  <!-- To
+                  <address>
+                  <strong>...</strong><br>
+                  </address> -->
+                </div>
+
+                <div class="col-sm-4 invoice-col">
+                  <b>CODE #{{Ord[0].ord_id}}</b><br>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr class="text-center">
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>หน่วยนับ</th>
+                        <th>จำนวนที่มี</th>
+                        <th>จำนวนที่ขอเบิก</th>
+                        <th>หมายเหตุ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="orl,index in Ord_lists" class="text-center">
+                        <td>{{index + 1 }}</td>
+                        <td>{{orl.pro_name}}</td>
+                        <td>{{orl.unit_name}}</td>
+                        <td>{{formatCurrency0(orl.instock)}}</td>
+                        <td>{{formatCurrency0(orl.qua)}}</td>
+                        <td>
+                          <button class="btn btn-danger" v-if="Number(orl.qua) > Number(orl.instock) || Number(orl.qua) == 0 ">
+                            <i class="fas fa-times"></i>
+                          </button>
+                          {{orl.comment}}
+                        </td>
+                      </tr>            
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="row no-print">
+                <div class="col-12">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="m3_close_click" >Close</button>                  
+                  <button  type="button" class="btn btn-success float-right "  v-if="Ord[0].st == 0" @click="b_active()">
+                    <i class="far fa-credit-card"></i>
+                    อนุมัติการเบิก
+                  </button>            
+                            
+                </div>
               </div>
             </div>
-            <div class="row invoice-info">
-              <div class="col-sm-4 invoice-col">
-                ผู้เบิก
-                <address>
-                  <strong>{{Ord[0].ord_own}}</strong><br>
-                </address>
-            </div>
-
-            <div class="col-sm-4 invoice-col">
-              <!-- To
-              <address>
-              <strong>...</strong><br>
-              </address> -->
-            </div>
-
-            <div class="col-sm-4 invoice-col">
-              <b>CODE #{{Ord[0].ord_id}}</b><br>
-            </div>
           </div>
-
-          <div class="row">
-            <div class="col-12 table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr class="text-center">
-                    <th>#</th>
-                    <th>Product</th>
-                    <th>หน่วยนับ</th>
-                    <th>จำนวนที่มี</th>
-                    <th>จำนวนที่ขอเบิก</th>
-                    <th>หมายเหตุ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="orl,index in Ord_lists" class="text-center">
-                    <td>{{index + 1 }}</td>
-                    <td>{{orl.pro_name}}</td>
-                    <td>{{orl.unit_name}}</td>
-                    <td>{{formatCurrency0(orl.instock)}}</td>
-                    <td>{{formatCurrency0(orl.qua)}}</td>
-                    <td>
-                      <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0 "><i class="fas fa-times"></i></button>
-                      {{orl.comment}}
-
-                    </td>
-                  </tr>            
-                  
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="row no-print">
-            <div class="col-12">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="m3_close_click" >Close</button>
-              {{ck_order}}
-              <button v-if="ck_order === 0" type="button" class="btn btn-success float-right "  v-if="Ord[0].st == 0" @click="b_active()">
-                <i class="far fa-credit-card"></i>
-                อนุมัติการเบิก
-              </button>            
-                        
-            </div>
-          </div>
-          </div>
-        </div>
                       
         </div>
       </div>
@@ -338,84 +338,84 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- //****************************** */ -->
 
     <!-- //********** รายละเอียด *********** */ -->
-
     <div class="modal fade" id="exampleModal4"  data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl"  role="document">
         <div class="modal-content">
-        <div class="modal-header">
+          <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">ร้านค้า</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body"> 
-          <div class="invoice p-3 mb-3">
-            <!-- {{Order}} -->
-            <div class="row">
-              <div class="col-12">
-              <h4>
-                <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
-                <small class="float-right">Date: {{Ord[0].ord_date}}</small>
-              </h4>
+            <div class="invoice p-3 mb-3">
+              <!-- {{Order}} -->
+              <div class="row">
+                <div class="col-12">
+                  <h4>
+                    <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
+                    <small class="float-right">Date: {{Ord[0].ord_date}}</small>
+                  </h4>
+                </div>
+              </div>
+              <div class="row invoice-info">
+                <div class="col-sm-4 invoice-col">
+                  ผู้เบิก
+                  <address>
+                    <strong>{{Ord[0].ord_own}}</strong><br>
+                  </address>
+                </div>
+
+                <div class="col-sm-4 invoice-col">
+                  <!-- To
+                  <address>
+                  <strong>...</strong><br>
+                  </address> -->
+                </div>
+
+                <div class="col-sm-4 invoice-col">
+                  <b>CODE #{{Ord[0].ord_id}}</b><br>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>หน่วยนับ</th>
+                        <th>จำนวนที่ขอเบิก</th>
+                        <th>จำนวนที่จ่าย</th>
+                        <th>หมายเหตุ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="orl,index in Ord_lists">
+                        <td>{{index + 1 }}</td>
+                        <td>{{orl.pro_name}}</td>
+                        <td>{{orl.unit_name}}</td>
+                        <td>{{orl.qua}}</td>
+                        <td>{{orl.qua_pay}}</td>
+                        <td>
+                          <!-- <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button> -->
+                          {{orl.comment}}
+
+                        </td>
+                      </tr>            
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="row no-print">
+                <div class="col-12">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>                      
+                </div>
               </div>
             </div>
-            <div class="row invoice-info">
-              <div class="col-sm-4 invoice-col">
-                ผู้เบิก
-                <address>
-                  <strong>{{Ord[0].ord_own}}</strong><br>
-                </address>
-            </div>
-
-            <div class="col-sm-4 invoice-col">
-              <!-- To
-              <address>
-              <strong>...</strong><br>
-              </address> -->
-            </div>
-
-            <div class="col-sm-4 invoice-col">
-              <b>CODE #{{Ord[0].ord_id}}</b><br>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-12 table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Product</th>
-                    <th>หน่วยนับ</th>
-                    <th>จำนวนที่ขอเบิก</th>
-                    <th>หมายเหตุ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="orl,index in Ord_lists">
-                    <td>{{index + 1 }}</td>
-                    <td>{{orl.pro_name}}</td>
-                    <td>{{orl.unit_name}}</td>
-                    <td>{{orl.qua}}</td>
-                    <td>
-                      <!-- <button class="btn btn-danger" v-if="orl.qua > orl.instock || orl.qua == 0"><i class="fas fa-times"></i></button> -->
-                      {{orl.comment}}
-
-                    </td>
-                  </tr>            
-                  
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="row no-print">
-            <div class="col-12">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>                      
-            </div>
-          </div>
-          </div>
-        </div>
-                      
+          </div>                      
         </div>
       </div>
     </div>
@@ -423,7 +423,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
   </div>
-<!-- END APP -->
+  <!-- END APP -->
   <?php include "./layouts/footer.php";?>
 </div>
 <?php include "./layouts/footer2.php";?>

@@ -48,6 +48,7 @@ try{
         user_id INT(13) AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(250) NOT NULL,
         password VARCHAR(250) NOT NULL,
+        token VARCHAR(250) NULL,
         email VARCHAR(250) NOT NULL,
         role VARCHAR(100) NOT NULL,
         fullname VARCHAR(250) NOT NULL,
@@ -63,8 +64,8 @@ try{
 
     $password = "admin";
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
-    $sql = "INSERT INTO users(username, password, email, role, fullname, dep, phone)
-    VALUES ('admin', '$password_hash', 'admin@example.com', 'admin', 'administartor','-','0123456789')";
+    $sql = "INSERT INTO users(username, password, email, role, fullname, dep, phone, st)
+    VALUES ('admin', '$password_hash', 'admin@example.com', 'admin', 'administartor','-','0123456789',10)";
     // use exec() because no results are returned
     $conn->exec($sql);
     echo "Admin New record created successfully<br>";
@@ -219,7 +220,7 @@ try{
         ord_own VARCHAR(250) NULL,
         ord_date DATE DEFAULT CURRENT_TIMESTAMP,
         ord_app VARCHAR(250) NULL,
-        ord_pay DATETIME NULL,
+        ord_pay_date DATETIME NULL,
         ord_pay_own VARCHAR(250) NULL,
         comment VARCHAR(250) NULL,
         st INT(10) DEFAULT 0,
@@ -237,7 +238,8 @@ try{
         pro_id INT(13) NOT NULL,
         pro_name VARCHAR(250) NULL,
         unit_name VARCHAR(250) NOT NULL,
-        qua INT(10) NOT NULL,
+        qua INT(10) DEFAULT 0,
+        qua_pay INT(10) DEFAULT 0,
         ord_own VARCHAR(250) NOT NULL,
         ord_app VARCHAR(250) NOT NULL,
         st INT(10) DEFAULT 0,

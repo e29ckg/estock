@@ -107,7 +107,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.cat_name}}/
                           {{data.unit_name}}
                       </td>
-                      <td class="text-center">{{formatCurrency(data.instock)}}</td>
+                      <td class="text-center">{{formatCurrency0(data.instock)}}</td>
                       <td>
                         <span v-if="data.st == 1" class="badge bg-primary">ปกติ</span>
                         <span v-else class="badge bg-danger">ระงับ</span>
@@ -307,11 +307,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{prst.pro_name}}</td>
                       <td>{{prst.rec_ord_id}}</td>
                       <td class="text-center">{{prst.unit_name}}</td>
-                      <td class="text-center">{{prst.price_one}}</td>
-                      <td class="text-center">{{prst.bf}}</td>
-                      <td class="text-center">{{prst.stck_in}}</td>
-                      <td class="text-center">{{prst.stck_out}}</td>
-                      <td class="text-center">{{prst.bal}}</td>
+                      <td class="text-center">{{formatCurrency(prst.price_one)}}</td>
+                      <td class="text-center">{{formatCurrency0(prst.bf)}}</td>
+                      <td class="text-center">{{formatCurrency0(prst.stck_in)}}</td>
+                      <td class="text-center">{{formatCurrency0(prst.stck_out)}}</td>
+                      <td class="text-center">{{formatCurrency0(prst.bal)}}</td>
                       <td>{{prst.comment}}</td>
                     </tr>
                   </tbody>
@@ -608,6 +608,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
             return ("0" + MyDate.getDate()).slice(-2)+ '-' + ("0" + (MyDate.getMonth()+1)).slice(-2) + '-' + (MyDate.getFullYear() + 543)
         },
         formatCurrency(number) {
+          number = parseFloat(number);
+          return number.toFixed(2).replace(/./g, function(c, i, a) {
+              return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+          });
+        },
+        formatCurrency0(number) {
           number = parseFloat(number);
           return number.toFixed(0).replace(/./g, function(c, i, a) {
               return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;

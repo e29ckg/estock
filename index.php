@@ -25,12 +25,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Starter Page</h1>
+            <h1 class="m-0">Home</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Starter Page</li>
+              <li class="breadcrumb-item active">Home</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -43,39 +43,36 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
 
         <div class="row">
-          <div class="col-12 col-sm-6 col-md-3">
+          <div class="col-12 col-sm-6 col-md-3" @click="go_order_page">
             <div class="info-box mb-3">
               <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
               <div class="info-box-content">
-                <span class="info-box-text">Sales</span>
+                <span class="info-box-text">Order รอตรวจสอบ</span>
                 <span class="info-box-number">{{order_st0}}</span>
               </div>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-md-3">
+          <div class="col-12 col-sm-6 col-md-3" @click="go_order_page">
             <div class="info-box">
               <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
               <div class="info-box-content">
-                <span class="info-box-text">{{order_st1}}</span>
-                <span class="info-box-number">
-                        10
-                  <small>%</small>
-                </span>
+                <span class="info-box-text">Order ตรวจสอบแล้ว</span>
+                <span class="info-box-number">{{order_st1}}</span>
               </div>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-md-3">
+          <div class="col-12 col-sm-6 col-md-3" @click="go_recs_page">
             <div class="info-box mb-3">
               <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
               <div class="info-box-content">
-                <span class="info-box-text">Likes</span>
+                <span class="info-box-text">ใบนำเข้าที่ต้องตรวจสอบ</span>
                 <span class="info-box-number">{{recs_st0}}</span>
               </div>
             </div>
           </div>
           <!-- <div class="clearfix hidden-md-up"></div> -->
           
-          <div class="col-12 col-sm-6 col-md-3">
+          <div class="col-12 col-sm-6 col-md-3" @click="go_users_page">
             <div class="info-box mb-3">
               <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
               <div class="info-box-content">
@@ -134,9 +131,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
       axios.post(url_base + 'api/orders/orders_count.php',{data:'st1'})
         .then(response => {
             if(response.data.status) { 
-              this.order_st0 = response.data.respJSON;
+              this.order_st1 = response.data.respJSON;
             }else {
-              this.order_st0 = 0;
+              this.order_st1 = 0;
             }
         })
     },
@@ -159,6 +156,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
               this.user_all = 0;
             }
         })
+    },
+    go_order_page(){
+      window.location.href = './orders.php'
+    },
+    go_recs_page(){
+      window.location.href = './recs.php'
+    },
+    go_users_page(){
+      window.location.href = './users.php'
     }
   },
   }).mount('#app')

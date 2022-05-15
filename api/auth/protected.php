@@ -23,47 +23,46 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 
 $arr = explode(" ", $authHeader);
 
-// print_r($_SERVER);
-// echo json_encode(array(
-//     "message" => "sd " .$arr[1]
-// ));
-// exit;
-
 $jwt = $arr[1];
 
 if($jwt){
 
     try {
         // $t = 5 * 60 * 60 ; // 
-        $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);       
-        
-        $issuer_claim = "localhost"; // this can be the servername
-        $audience_claim = "E29CKG";
-        $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim; //not before in seconds
-        $expire_claim = $issuedat_claim; // expire time in seconds
-        $token = array(
-            "iss" => $issuer_claim,
-            "aud" => $audience_claim,
-            "iat" => $issuedat_claim,
-            "nbf" => $notbefore_claim,
-            "exp" => $expire_claim,
-            "data" => $decoded->data
-        );
+        $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);     
+         
+        $token = $decoded->token;
+        $user_id = $decoded->user_id;
 
-        // $jwt = JWT::encode($token, $secret_key, 'RS256');
-        // $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
+        $query = "SELECT fullname, role FROM users WHERE user_id = :user_id AND token = :token AND st = 10 LIMIT 0,1";
+
+        $stmt = $conn->prepare( $query );
+        $stmt->bindParam(":user_id", $user_id,PDO::PARAM_INT);
+        $stmt->bindParam(":token", $token, PDO::PARAM_STR);
+        $stmt->execute();
+        $num = $stmt->rowCount();
+        
+        if(empty($num)){
+            http_response_code(200);
+            echo json_encode(
+                array(
+                    "status" => "error",
+                    "message" => "Access denied..",
+                    "ts"=> time()
+                ));
+                
+            die;
+
+        }
         
         http_response_code(200);
-        echo json_encode(
-            array(
-                "status" => "ok",
-                "message" => "Access granted.",
-                "jwt" => $jwt,
-                "user_data" => $decoded->data,
-                "expireAt" => $expire_claim,
-                "ts"=> time()
-            ));        
+        echo json_encode(array(
+            "status" => "ok",                
+            "message" => "Access granted.",
+            // "data" => $decoded,
+            "ts"=> time()
+        ));
+        
 
     }catch (Exception $e){
 

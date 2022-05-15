@@ -12,7 +12,7 @@ include "../dbconfig.php";
 
 try{
    
-    $sql = "SELECT * FROM users WHERE st=0";
+    $sql = "SELECT * FROM users WHERE st=10";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = count($query->fetchAll(PDO::FETCH_OBJ));

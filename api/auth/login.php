@@ -30,69 +30,91 @@ $username = $data->username;
 $password = $data->password;
 
 $table_name = 'users';
+try {
+    $query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? AND st = 10 LIMIT 0,1";
 
-$query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? AND st = 10 LIMIT 0,1";
+    $stmt = $conn->prepare( $query );
+    $stmt->bindParam(1, $email);
+    $stmt->bindParam(2, $username);
+    $stmt->execute();
+    $num = $stmt->rowCount();
 
-$stmt = $conn->prepare( $query );
-$stmt->bindParam(1, $email);
-$stmt->bindParam(2, $username);
-$stmt->execute();
-$num = $stmt->rowCount();
+    if($num > 0){
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if($num > 0){
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user_id = $row['user_id'];
+        $fullname = $row['fullname'];
+        $password2 = $row['password'];
+        $role = $row['role'];
 
-    $user_id = $row['user_id'];
-    $fullname = $row['fullname'];
-    $password2 = $row['password'];
-    $role = $row['role'];
+        if(password_verify($password, $password2))
+        {
+            // This is your client secret
+            $key = '__test_secret__';
+            $t = 3600 ; // 
+            $token_gen = bin2hex(random_bytes(16));
 
-    if(password_verify($password, $password2))
-    {
-        // This is your client secret
-        $key = '__test_secret__';
-        $t = 60 * 60 * 60 ; // 
-        // $secret_key = "99299929";
-        $issuer_claim = "localhost"; // this can be the servername
-        $audience_claim = "E29CKG";
-        $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim + 1; //not before in seconds
-        $expire_claim = $issuedat_claim + $t; // expire time in seconds
-        $token = array(
-            "iss" => $issuer_claim,
-            "aud" => $audience_claim,
-            "iat" => $issuedat_claim,
-            // "nbf" => $notbefore_claim,
-            "exp" => $expire_claim,
-            "data" => array(
+            $query = "UPDATE users SET token=:token WHERE user_id=:user_id";
+
+            $stmt = $conn->prepare( $query );
+            $stmt->bindParam(":token", $token_gen, PDO::PARAM_STR);
+            $stmt->bindParam(":user_id", $user_id,PDO::PARAM_INT);
+            $stmt->execute();
+
+            // $secret_key = "99299929";
+            $issuer_claim = "localhost"; // this can be the servername
+            $audience_claim = "E29CKG";
+            $issuedat_claim = time(); // issued at
+            $notbefore_claim = $issuedat_claim + 1; //not before in seconds
+            $expire_claim = $issuedat_claim + $t; // expire time in seconds
+            $token = array(
+                "iss" => $issuer_claim,
+                "aud" => $audience_claim,
+                "iat" => $issuedat_claim,
+                "token" => $token_gen,
                 "user_id" => $user_id,
-                "fullname" => $fullname,
-                "role" => $role,
-                "email" => $email
-        ));
-        
-        // $jwt = JWT::encode($token, $secret_key, 'RS256');
-        http_response_code(200);
-        $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
-        echo json_encode(
-            array(
-                "status" => "success",
-                "message" => "Successful login.",
-                "jwt" => $jwt,
-                "user_data" => json_encode($row),
-                "email" => $email,
-                "expireAt" => $expire_claim
+                // "nbf" => $notbefore_claim,
+                "exp" => $expire_claim,
+                "data" => array(                
+                    "fullname" => $fullname,
+                    "role" => $role,
+                    "email" => $email
             ));
-    }
-    else{
+            
+            // $jwt = JWT::encode($token, $secret_key, 'RS256');
+            $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
+            http_response_code(200);
+            echo json_encode(
+                array(
+                    "status" => "success",
+                    "message" => "Successful login.",
+                    "jwt" => $jwt,
+                    "user_data" => json_encode(array(                
+                        "fullname" => $fullname,
+                        "role" => $role,
+                        "email" => $email
+                    )),
+                    "email" => $email,
+                    "expireAt" => $expire_claim
+                ));
+        }else{
 
-        http_response_code(401);
-        echo json_encode(array("message" => "Login failed. Password Incorrect", "password" => $password));
+            http_response_code(200);
+            echo json_encode(array("message" => "Login failed. Password Incorrect", "password" => $password));
+        }
+    }else{
+            http_response_code(200);
+            echo json_encode(array("message" => "Login failed. Username Not Found", "username" => $username));
+        
     }
-}else{
-        http_response_code(200);
-        echo json_encode(array("message" => "Login failed. Username Not Found", "username" => $username));
-    
+}catch (Exception $e){
+
+    http_response_code(401);
+
+    echo json_encode(array(
+        "message" => "Access denied.",
+        "error" => $e->getMessage()
+    ));
 }
 
 ?>

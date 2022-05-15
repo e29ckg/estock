@@ -1,8 +1,9 @@
 var url_base = window.location.protocol + '//' + window.location.host + '/estock/'
 
 var jwt = localStorage.getItem("jwt");
-if (jwt == null) {
-  window.location.href = './login.php'
+var user_data = localStorage.getItem("user_data");
+if (jwt == null || user_data == null) {
+  window.location.href = './login.html'
 }  
 
 Vue.createApp({
@@ -35,26 +36,25 @@ Vue.createApp({
     },
 
     protected(jwt) {
-      axios.post(url_base + '/api/auth/protected.php',{},{ 
+      axios.post(url_base + 'api/auth/protected.php',{},{ 
         headers: {
             "Access-Control-Allow-Origin" : "*",
             "Content-type": "Application/json",
             // "Authorization": `Bearer ${jwt}`
             "Authorization" : 'Bearer '+ jwt 
           }})
-            .then(response => {
-              
-                // console.log(response.data);
+            .then(response => {  
+                       
+                console.log(response.data.token);
                 if (response.data.status == 'ok' ) {
                   user_data = JSON.stringify(response.data.user_data)
-                  localStorage.setItem("jwt", response.data.jwt);
-                  localStorage.setItem("user_data",user_data);
+                  // localStorage.setItem("user_data",user_data);                  
                 }else{
                   localStorage.removeItem("jwt");
                   localStorage.removeItem("user_data");    
                   swal.fire({
-                    icon: objects['status'],
-                    title: objects['message'],
+                    icon: 'error',
+                    title: response.data.message,
                     showConfirmButton: true,
                     timer: 1000
                   });
@@ -66,13 +66,21 @@ Vue.createApp({
             .catch(function (error) {
                 console.log(error);
                 localStorage.removeItem("jwt");
-                  localStorage.removeItem("user_data"); 
-                  window.location.href = './login.php';
+                localStorage.removeItem("user_data"); 
+                swal.fire({
+                  icon: 'error',
+                  title:response.data.message,
+                  showConfirmButton: true,
+                  timer: 1000
+                });
+                setTimeout(function() {
+                  window.location.href = './login.html';
+                }, 1001); 
             });
 
 
     },
-    logout() {
+    logout() {      
       Swal.fire({
         title: 'Are you sure?',
         text: "You won't Logout!",
@@ -83,9 +91,35 @@ Vue.createApp({
         confirmButtonText: 'Yes !'
       }).then((result) => {
         if (result.isConfirmed) {
-          localStorage.removeItem("jwt");      
-          localStorage.removeItem("user_data"); 
-          window.location.href = './login.php';
+          axios.post(url_base + 'api/auth/logout.php',{},{ 
+            headers: {
+                "Access-Control-Allow-Origin" : "*",
+                "Content-type": "Application/json",
+                // "Authorization": `Bearer ${jwt}`
+                "Authorization" : 'Bearer '+ jwt 
+              }})
+                .then(response => {                            
+                    if (response.data.status == 'success' ) {  
+                      localStorage.removeItem("jwt");
+                      localStorage.removeItem("user_data");    
+                      swal.fire({
+                        icon: response.data.status,
+                        title: response.data.message,
+                        showConfirmButton: true,
+                        timer: 1000
+                      });
+                      setTimeout(function() {
+                        window.location.href = './login.php';
+                      }, 1001); 
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    localStorage.removeItem("jwt");
+                    localStorage.removeItem("user_data"); 
+                    window.location.href = './login.html';
+                });
+
         }
       })    
     }

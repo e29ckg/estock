@@ -43,6 +43,7 @@ try{
             'unit_name' => $rs->unit_name,
             'instock' => $instock,
             'qua' => $rs->qua,
+            'qua_pay' => $rs->qua_pay,
         ));
     }
 
