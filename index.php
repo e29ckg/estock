@@ -84,7 +84,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </div>
     </section>
-    <button @click="countP">test {{count}}</button>
+    <!-- <button @click="countP">test {{count}}</button> -->
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
@@ -158,13 +158,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
         })
     },
     go_order_page(){
-      window.location.href = './orders.php'
+      window.location.href = './orders'
     },
     go_recs_page(){
-      window.location.href = './recs.php'
+      window.location.href = './recs'
     },
     go_users_page(){
-      window.location.href = './users.php'
+      window.location.href = './users'
     }
   },
   }).mount('#app')

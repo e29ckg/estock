@@ -26,7 +26,7 @@ function login() {
             localStorage.setItem("user_data", objects['user_data']);
             console.log(objects['user_data']);
             setTimeout(function() {
-              window.location.href = './index.php';
+              window.location.href = './index';
             }, 1001);
             
         } else {

@@ -3,7 +3,7 @@ var url_base = window.location.protocol + '//' + window.location.host + '/estock
 var jwt = localStorage.getItem("jwt");
 var user_data = localStorage.getItem("user_data");
 if (jwt == null || user_data == null) {
-  window.location.href = './login.html'
+  window.location.href = './login'
 }  
 
 Vue.createApp({
@@ -59,7 +59,7 @@ Vue.createApp({
                     timer: 1000
                   });
                   setTimeout(function() {
-                    window.location.href = './login.php';
+                    window.location.href = './login';
                   }, 1001); 
                 }
             })
@@ -74,7 +74,7 @@ Vue.createApp({
                   timer: 1000
                 });
                 setTimeout(function() {
-                  window.location.href = './login.html';
+                  window.location.href = './login';
                 }, 1001); 
             });
 
@@ -109,7 +109,7 @@ Vue.createApp({
                         timer: 1000
                       });
                       setTimeout(function() {
-                        window.location.href = './login.php';
+                        window.location.href = './login';
                       }, 1001); 
                     }
                 })
@@ -117,7 +117,7 @@ Vue.createApp({
                     console.log(error);
                     localStorage.removeItem("jwt");
                     localStorage.removeItem("user_data"); 
-                    window.location.href = './login.html';
+                    window.location.href = './login';
                 });
 
         }
@@ -139,35 +139,35 @@ Vue.createApp({
         {          
           menu_name:'Home',
           menu_class:'',
-          menu_url:'index.php',
+          menu_url:'index',
           menu_icon_class:'nav-icon fas fa-tachometer-alt',
           menu_badge:'',
         },
         {          
           menu_name:'ใบเบิก',
           menu_class:'',
-          menu_url:'orders.php',
+          menu_url:'orders',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'ใบรับของ',
           menu_class:'',
-          menu_url:'recs.php',
+          menu_url:'recs',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'Products',
           menu_class:'',
-          menu_url:'products.php',
+          menu_url:'products',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'Stock',
           menu_class:'',
-          menu_url:'stock.php',
+          menu_url:'stock',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         }
@@ -176,28 +176,28 @@ Vue.createApp({
         {          
           menu_name:'ประเภทสินค้า',
           menu_class:'',
-          menu_url:'catalogs.php',
+          menu_url:'catalogs',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'หน่วยนับ',
           menu_class:'',
-          menu_url:'units.php',
+          menu_url:'units',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'ร้านค้า',
           menu_class:'',
-          menu_url:'store.php',
+          menu_url:'store',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         },
         {          
           menu_name:'สมาชิก',
           menu_class:'',
-          menu_url:'users.php',
+          menu_url:'users',
           menu_icon_class:'nav-icon fas fa-th',
           menu_badge:'',
         }
@@ -236,7 +236,7 @@ Vue.createApp({
       }
     },
     count_odrs_st0(){
-      axios.post(url_base + 'api/orders/orders_count.php',{data:'st0'})
+      axios.post(url_base + 'api/orders/orders_count',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.menus[1].menu_badge = response.data.respJSON;
@@ -247,7 +247,7 @@ Vue.createApp({
         })
     },
     count_recs_st0(){
-      axios.post(url_base + 'api/recs/recs_count.php',{data:'st0'})
+      axios.post(url_base + 'api/recs/recs_count',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.menus[2].menu_badge = response.data.respJSON
