@@ -11,17 +11,10 @@ include "../dbconfig.php";
 $data = json_decode(file_get_contents("php://input"));
 // $product = $data;
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'massege' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
     // $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    $sql = "SELECT * FROM `products` WHERE pro_name LIKE '%$data->q%'";
+    $sql = "SELECT * FROM `products` WHERE pro_name LIKE '%$data->q%' AND st=1";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);

@@ -21,10 +21,6 @@ $conn = $databaseService->getConnection();
 
 $data = json_decode(file_get_contents("php://input"));
 
-// http_response_code(200);
-//     echo json_encode(array("message" => $data->username."User was successfully registered."));
-//     exit;
-
 $email = $data->username;
 $username = $data->username;
 $password = $data->password;
@@ -52,7 +48,8 @@ try {
         {
             // This is your client secret
             $key = '__test_secret__';
-            $t = 3600 ; // 
+            // $t = 100 ; // 
+            $t = 2 * 3600 ; // 
             $token_gen = bin2hex(random_bytes(16));
 
             $query = "UPDATE users SET token=:token WHERE user_id=:user_id";
@@ -82,7 +79,6 @@ try {
                     "email" => $email
             ));
             
-            // $jwt = JWT::encode($token, $secret_key, 'RS256');
             $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
             http_response_code(200);
             echo json_encode(

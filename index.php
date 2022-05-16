@@ -52,21 +52,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </div>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-md-3" @click="go_order_page">
-            <div class="info-box">
-              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
-              <div class="info-box-content">
-                <span class="info-box-text">Order ตรวจสอบแล้ว</span>
-                <span class="info-box-number">{{order_st1}}</span>
-              </div>
-            </div>
-          </div>
           <div class="col-12 col-sm-6 col-md-3" @click="go_recs_page">
             <div class="info-box mb-3">
               <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
               <div class="info-box-content">
                 <span class="info-box-text">ใบนำเข้าที่ต้องตรวจสอบ</span>
                 <span class="info-box-number">{{recs_st0}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3" @click="go_order_page">
+            <div class="info-box">
+              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Order ตรวจสอบแล้ว</span>
+                <span class="info-box-number">{{order_st1}}</span>
               </div>
             </div>
           </div>
