@@ -23,13 +23,17 @@ try{
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
     $datas = array();
+    $price = 0;
+    foreach($result as $rs){
+        $price = $price + $rs->price;
+    }
 
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
         'massege' =>  'Ok', 
         'respJSON' =>  $result, 
-        // 'respJSON' => $datas
+        'price_all' => $price
     ));
 
 }catch(PDOException $e){

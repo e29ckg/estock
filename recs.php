@@ -323,7 +323,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </tr>            
                   <tr>
                     <td colspan="5"></td>
-                    <td class="bg-gray text-right">{{formatCurrency(Recs[0].price_total)}}</td>
+                    <td class="bg-gray text-right">{{formatCurrency(Rec_lists_price_all)}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -379,6 +379,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           action:'insert'        
         }],
         Rec_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}],
+        Rec_lists_price_all:0,
         select_pro_index:''
         
       }
@@ -450,7 +451,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
         axios.post(url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
             .then(response => {
                 if (response.data.status) {
-                  this.Rec_lists = response.data.respJSON;    
+                  this.Rec_lists = response.data.respJSON;  
+                  this.Rec_lists_price_all = response.data.price_all  
                 }
             })
             .catch(function (error) {
