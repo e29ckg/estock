@@ -4,10 +4,14 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="./index.php" class="nav-link">Home</a>
+        <a href="./index.php" class="nav-link">
+          <i class="fas fa-tachometer-alt mr-2"></i>Home
+        </a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="../eshop" target="_blank" class="nav-link">E-SHOP</a>
+        <a href="../eshop" target="_blank" class="nav-link">
+        <i class="fas fa-shopping-cart mr-2"></i>E-SHOP
+        </a>
       </li>
     </ul>
 

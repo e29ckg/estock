@@ -26,8 +26,8 @@ Vue.createApp({
     },
 
     ck_protect(){
-      var t = 6 * 60 * 1000
-      // var t = 3000
+      // var t = timer
+      var t = 60000
       setInterval(()=> {
         var jwt = localStorage.getItem("jwt");
         this.protected(jwt);
@@ -45,16 +45,14 @@ Vue.createApp({
           }})
             .then(response => {  
                        
-                console.log(response.data.token);
                 if (response.data.status == 'ok' ) {
-                  user_data = JSON.stringify(response.data.user_data)
-                  // localStorage.setItem("user_data",user_data);                  
+                  user_data = JSON.stringify(response.data.user_data)            
                 }else{
                   localStorage.removeItem("jwt");
                   localStorage.removeItem("user_data");    
                   swal.fire({
                     icon: 'error',
-                    title: response.data.message,
+                    title: 'ออกจากระบบ',
                     showConfirmButton: true,
                     timer: 1000
                   });
@@ -69,7 +67,7 @@ Vue.createApp({
                 localStorage.removeItem("user_data"); 
                 swal.fire({
                   icon: 'error',
-                  title:response.data.message,
+                  title:'ออกจากระบบ',
                   showConfirmButton: true,
                   timer: 1000
                 });
@@ -103,8 +101,8 @@ Vue.createApp({
                       localStorage.removeItem("jwt");
                       localStorage.removeItem("user_data");    
                       swal.fire({
-                        icon: response.data.status,
-                        title: response.data.message,
+                        icon: 'success',
+                        title: 'ออกจากระบบ',
                         showConfirmButton: true,
                         timer: 1000
                       });
@@ -172,7 +170,7 @@ Vue.createApp({
           menu_badge:'',
         },
         {          
-          menu_name:'Report',
+          menu_name:'Report ประจำปี',
           menu_class:'',
           menu_url:'report',
           menu_icon_class:'nav-icon fas fa-tag',
@@ -262,5 +260,14 @@ Vue.createApp({
             }
         })
     },
+    ck_protect(){
+      var t = 60000
+      setInterval(()=> {
+        this.count_odrs_st0()
+        this.count_recs_st0()
+        console.log(t++)
+      }, t);
+    },
+    
   },
 }).mount('#aside')

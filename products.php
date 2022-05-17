@@ -52,10 +52,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header">
                 <h3 class="card-title">Products</h3>                
                 <div class="card-tools">
-                  <!-- <input type="text" @blur="handleBlurSearch" v-model="q" @keyup="search" ref="search" placeholder="Search."> -->
 
-<!--                   
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_product_insert()" ref="m_show">เพิ่มสินค้า</button>   -->
                 </div>
               </div>
               <div class="card-body">
@@ -89,19 +86,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <tbody >
                     <tr v-for="data,index in datas">
                       <td>{{data.pro_id}}</td>
-                      <td>
+                      <td class="text-center">
                         <!-- {{data.img}} -->
-                        <a   @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
+                        <a @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
                           <img v-if="data.img" :src="'./uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
                           <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" height="60" >
-                          <!-- <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id)">แก้ไขภาพ</button> -->
-                        </a>
-                        <!-- <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal" @click="b_pro_img(data.pro_id,index)" v-else>ใส่ภาพ</button> -->
+                        </a>                        
                       </td>
                       <td>
                         {{data.pro_name}}
-                        <span class="badge bg-primary" @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</span>
-                        <!-- <button type="button" class="btn  btn-block btn-primary btn-xs"  @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">detail</button>   -->
+                        <span class="badge bg-primary" @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">
+                          <i class="fas fa-search mr-2"></i>detail
+                        </span>                        
                       </td>
                       <td>
                           {{data.cat_name}}/
@@ -113,13 +109,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <span v-else class="badge bg-danger">ระงับ</span>
                       </td>
                       <td>
-                        <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >แก้ไข</button>  
-                        <!-- <button @click="destroy_pro(data.pro_id)">Delete</button>   -->
+                        <button type="button" class="btn btn-block btn-warning btn-xs"  @click="b_product_update(data.pro_id)" >แก้ไข</button>                          
                       </td>
                     </tr>
                   </tbody>
                 </table>
-
               </div>
             </div>
           </div>          
@@ -129,7 +123,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <form @submit.prevent="b_product_save()">
@@ -168,22 +161,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </div>
             </div>
 
-            <!-- <div class="row">
-              <div class="col-sm-12"> -->
                 <div class="form-group ">
                     <label>สถานทีเก็บ</label>
                     <textarea class="form-control" rows="3" placeholder="สถานที่..." v-model="product[0].locat"></textarea>
                 </div>
-              <!-- </div>
-            </div> -->
-            <!-- <div class="row">
-              <div class="col-sm-12"> -->
                 <div class="form-group ">
                     <label>รายละเอียด</label>
                     <textarea class="form-control" rows="3" placeholder="รายละเอียด" v-model="product[0].pro_detail"></textarea>
                 </div>
-              <!-- </div>
-            </div> -->
             <div class="row">
               <div class="col-sm-6">
                 <div class="form-group">
@@ -204,7 +189,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <span v-if="product[0].st == 1" class="badge bg-primary">ปกติ</span>
                 <span v-else class="badge bg-danger">ระงับ</span>
               </label>
-                <!-- <input type="text" class="form-control" v-model="product[0].st"> -->
+    
               <select class="form-control" v-model="product[0].st" required>
                 <option value="1">ใช้งาน</option>
                 <option value="0">ไม่ใช้งาน</option>
@@ -216,8 +201,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_product_code()">Close</button>
             <button type="submit" class="btn btn-primary" >Save changes</button>
           </div>
-            <!-- {{product}} -->
-            
+                
           </form>
         </div>
       </div>
@@ -242,8 +226,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <img class="img-fluid" :src="'./uploads/'+ pro_img.img" alt="Photo" v-if="pro_img.img">
             </div>
           </div>
-              <!-- <img :src="'./uploads/'+ pro_img.img" alt="pro_img.img"  width="450" > -->
-                          
+                              
             <form @submit="onUpload">
             <!-- <input type="file" name="file" id="file" @change="previewFiles"> -->
               <input type="hidden" name="pro_id" :value="pro_img.id">
@@ -253,18 +236,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <label class="custom-file-label" for="exampleInputFile" >{{pro_img.label}}</label>
                 </div>
                 <div class="input-group-append">
-                  <!-- <span class="input-group-text" @click.prevent="onUpload">Upload</span> -->
-                  <!-- <button type="submit" class="input-group-text" >Upload</button> -->
                 </div>
               </div>
-              <!-- <input class="form-control" type="file" ref="myFiles" @change="onChangeInput()" accept="img/*" name="file" id="file" > -->
-              <!-- {{pro_img}} -->
-              <!-- <button type="submit">Upload</button> -->
             </form>
           </div>
           <div class="modal-footer">
-            <!-- <button type="button" class="btn btn-default" @click="test">Close_test</button> -->
-            <!-- <button type="button" class="btn btn-success" @click.prevent="onUpload">Upload</button> -->
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -366,7 +342,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 // console.log(response.data);
                 if (response.data.status) {
                     this.datas = response.data.respJSON;
-                    // console.log(this.datas);                   
                 }
             })
             .catch(function (error) {

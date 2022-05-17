@@ -47,7 +47,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header no-print">
                 <h5 class="card-title">Report</h5>
                 <div class="card-tools">
-                  <!-- <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal">test</button>                   -->
+                  <div class="form-group">
+                    <select class="form-control" id="search_year" v-model="year" @change="year_change">
+                      <option v-for="sy in sel_year">{{sy}}</option>
+                      <option>2567</option>
+                    </select>
+                  </div>           
                 </div>
               </div>
               <div class="card-body">
@@ -57,7 +62,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td colspan="6" class="text-center">
                         <h5>ศาลเยาวชนและครอบครัวจังหวัดประจวบคีรีขันธ์<br>
                         รายละเอียดบัญชีวัสดุคงเหลือ<br>
-                        ณ วันที่ 30 กันยายน 2565 ประจำปีงบประมาณ 2565</h5>
+                        {{text_head}}</h5>
                       </td>
                     </tr>
                     <tr class="text-center">
@@ -71,8 +76,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody v-for="data,index in datas"> 
                      
-                    <tr class="bg-gray" >
-                      <td colspan="6"> {{data.cat_name}} </td>
+                    <tr>
+                      <td colspan="6" class="bg-gray"> {{data.cat_name}} </td>
                     </tr>
                     <tr class="text-center" v-for="dl,index in data.lists">
                       <td>{{dl.no}}</td>
@@ -115,21 +120,34 @@ scratch. This page gets rid of all links and provides the needed markup only.
     data() {
       return {
         datas:'',
-        no:0 ,
-        price_all:0    
+        year:'',
+        no:0,
+        price_all:0 ,
+        text_head:'',
+        sel_year:[]  
         
       }
     },
     mounted(){
+      this.set_sel_year()
       this.get_Report();
     },
-    methods: {      
+    methods: {   
+      set_sel_year(){
+        const d = new Date();
+        year = d.getFullYear() + 542
+        for (let i = 0; i < 3; i++) {
+          this.sel_year.push(year + i)
+        }
+        this.year = d.getFullYear() + 543
+      } ,  
       get_Report(){
-        axios.post(url_base + 'api/report/get_report.php')
+        axios.post(url_base + 'api/report/get_report.php',{year:this.year})
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;       
                     this.price_all = response.data.price_all;       
+                    this.text_head = response.data.text_head;       
                 }
             })
             .catch(function (error) {
@@ -144,7 +162,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         this.no = Number(this.no) + 1
         return this.formatCurrency0(this.no)
       },
-      
+      year_change(){
+        this.get_Report()
+      },
       formatCurrency(number) {
         number = parseFloat(number);
         return number.toFixed(2).replace(/./g, function(c, i, a) {

@@ -34,8 +34,8 @@ try {
     $query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? AND st = 10 LIMIT 0,1";
 
     $stmt = $conn->prepare( $query );
-    $stmt->bindParam(1, $email);
-    $stmt->bindParam(2, $username);
+    $stmt->bindParam(1, $email, PDO::PARAM_STR);
+    $stmt->bindParam(2, $username, PDO::PARAM_STR);
     $stmt->execute();
     $num = $stmt->rowCount();
 
@@ -51,7 +51,7 @@ try {
         {
             // This is your client secret
             $key = '__test_secret__';
-            $t = 3600 ; // 
+            $t = 2 * 3600 ; // 
             $token_gen = bin2hex(random_bytes(16));
 
             $query = "UPDATE users SET token=:token WHERE user_id=:user_id";
