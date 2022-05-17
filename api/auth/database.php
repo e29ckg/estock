@@ -1,5 +1,5 @@
 <?php
-$key = "__test_secret__";
+$key = "8cea895549b19eb150b451a6ad6061a5";
 
 // used to get mysql database connection
 class DatabaseService{

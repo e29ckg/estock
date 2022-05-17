@@ -5,7 +5,6 @@ $servername = "localhost";
 $username = "root";
 $userpass = "";
 $dbname = "estock";
-$key = "8cea895549b19eb150b451a6ad6061a5";
 
 try{
     $dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $userpass);

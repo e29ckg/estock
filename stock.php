@@ -69,7 +69,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <tbody >
                     <tr v-for="data,index in datas" class="text-center">
                       <td>{{data.created_at}}</td>
-                      <td>{{data.pro_name}}</td>
+                      <td class="text-left">{{data.pro_name}}</td>
                       <td>{{data.rec_ord_id}}</td>
                       <td>{{data.unit_name}}</td>
                       <td class="text-center">{{formatCurrency(data.price_one)}}</td>

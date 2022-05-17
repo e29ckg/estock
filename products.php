@@ -85,7 +85,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
-                      <td>{{data.pro_id}}</td>
+                      <td class="text-center">{{index +1 }}</td>
                       <td class="text-center">
                         <!-- {{data.img}} -->
                         <a @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
@@ -93,7 +93,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" height="60" >
                         </a>                        
                       </td>
-                      <td>
+                      <td class="text-left">
                         {{data.pro_name}}
                         <span class="badge bg-primary" @click="b_product_strock(data.pro_id)" data-toggle="modal" data-target="#myModalDetail">
                           <i class="fas fa-search mr-2"></i>detail
@@ -283,7 +283,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{prst.pro_name}}</td>
                       <td>{{prst.rec_ord_id}}</td>
                       <td class="text-center">{{prst.unit_name}}</td>
-                      <td class="text-center">{{formatCurrency(prst.price_one)}}</td>
+                      <td class="text-right">{{formatCurrency(prst.price_one)}}</td>
                       <td class="text-center">{{formatCurrency0(prst.bf)}}</td>
                       <td class="text-center">{{formatCurrency0(prst.stck_in)}}</td>
                       <td class="text-center">{{formatCurrency0(prst.stck_out)}}</td>

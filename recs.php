@@ -315,7 +315,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <tbody>
                   <tr v-for="rls,index in Rec_lists" class="text-center">
                     <td>{{index + 1 }}</td>
-                    <td>{{rls.pro_name}}</td>
+                    <td class="text-left">{{rls.pro_name}}</td>
                     <td>{{rls.unit_name}}</td>
                     <td>{{rls.qua}}</td>
                     <td class="text-right">{{formatCurrency(rls.price_one)}}</td>

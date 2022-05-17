@@ -116,15 +116,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord[0].ord_date" required>
                 </div>
               </div>
-            </div>   
-            <div class="row">   
-              <!-- <div class="col-sm-12">
-                <div class="form-group">
-                  <label>รายละเอียด</label>
-                  <input type="text" class="form-control" v-model="Ord[0].comment" required>
-                </div> -->
-              <!-- </div> -->
-            </div> 
+            </div>  
             <!-- {{Ord}} -->
             <table class="table">
               <thead class="text-center bg-lime">
@@ -303,7 +295,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tbody>
                       <tr v-for="orl,index in Ord_lists" class="text-center">
                         <td>{{index + 1 }}</td>
-                        <td>{{orl.pro_name}}</td>
+                        <td class="text-left">{{orl.pro_name}}</td>
                         <td>{{orl.unit_name}}</td>
                         <td>{{formatCurrency0(orl.instock)}}</td>
                         <td>{{formatCurrency0(orl.qua)}}</td>
@@ -382,7 +374,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="col-12 table-responsive">
                   <table class="table table-striped">
                     <thead>
-                      <tr>
+                      <tr class="text-center">
                         <th>#</th>
                         <th>Product</th>
                         <th>หน่วยนับ</th>
@@ -392,9 +384,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="orl,index in Ord_lists">
+                      <tr v-for="orl,index in Ord_lists" class="text-center">
                         <td>{{index + 1 }}</td>
-                        <td>{{orl.pro_name}}</td>
+                        <td class="text-left">{{orl.pro_name}}</td>
                         <td>{{orl.unit_name}}</td>
                         <td>{{orl.qua}}</td>
                         <td>{{orl.qua_pay}}</td>

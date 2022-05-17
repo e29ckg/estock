@@ -154,6 +154,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </select>
                 </div>
               </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>สิทธิ์</label>
+                  <select class="form-control" v-model="user[0].role">
+                    <option value="admin">ADMIN</option>
+                    <option value="member">MEMBER</option>
+                  </select>
+                </div>
+              </div>
             </div>   
 
             
@@ -249,6 +258,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           phone:'',          
           st:10,          
           fullname:'',          
+          role:'',          
           action:'insert'        
         }],
         

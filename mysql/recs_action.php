@@ -136,8 +136,7 @@ try{
         // $i = 0;
         $Rec_lists = $data->Rec_lists;
         foreach($Rec_lists as $rls){            
-            $pro_id = (integer)$rls->pro_id;
-
+                
             $sql = "UPDATE rec_lists SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id ;"; 
             $query = $dbcon->prepare($sql);           
             $query->bindParam(':rec_app', $rec_own, PDO::PARAM_STR);
@@ -162,7 +161,7 @@ try{
              */
             $sql = "SELECT * FROM `stock` WHERE pro_id =:pro_id ORDER BY stck_id DESC LIMIT 0,1;";
             $query = $dbcon->prepare($sql);
-            $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
+            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
             $query->execute();
             $result = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -181,7 +180,7 @@ try{
 
             $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
             $query = $dbcon->prepare($sql); 
-            $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
+            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
             $query->bindParam(':unit_name',$rls->unit_name, PDO::PARAM_STR);
             $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_STR);
             $query->bindParam(':bf',$bf);

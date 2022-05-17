@@ -50,7 +50,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <div class="form-group">
                     <select class="form-control" id="search_year" v-model="year" @change="year_change">
                       <option v-for="sy in sel_year">{{sy}}</option>
-                      <option>2567</option>
                     </select>
                   </div>           
                 </div>
@@ -76,7 +75,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody v-for="data,index in datas"> 
                      
-                    <tr>
+                    <tr v-if=" data.lists != ''">
                       <td colspan="6" class="bg-gray"> {{data.cat_name}} </td>
                     </tr>
                     <tr class="text-center" v-for="dl,index in data.lists">

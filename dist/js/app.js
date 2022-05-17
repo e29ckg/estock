@@ -27,7 +27,7 @@ Vue.createApp({
 
     ck_protect(){
       // var t = timer
-      var t = 60000
+      var t = 60 * 1000
       setInterval(()=> {
         var jwt = localStorage.getItem("jwt");
         this.protected(jwt);
@@ -216,6 +216,7 @@ Vue.createApp({
     this.set_menus_setting()
     this.count_odrs_st0()
     this.count_recs_st0()
+    this.ck_protect()
   },
   methods: {
     set_menu(){
@@ -257,15 +258,16 @@ Vue.createApp({
             if(response.data.status) { 
               this.menus[2].menu_badge = response.data.respJSON
               if(response.data.respJSON === 0){this.menus[2].menu_badge = ''}
+            }else {
+              this.menus[2].menu_badge = '';
             }
         })
     },
     ck_protect(){
-      var t = 60000
+      var t = 60 * 1000
       setInterval(()=> {
         this.count_odrs_st0()
         this.count_recs_st0()
-        console.log(t++)
       }, t);
     },
     

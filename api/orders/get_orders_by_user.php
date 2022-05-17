@@ -35,7 +35,7 @@ try{
     $ord_own = $data_auth->fullname;
 
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `ords` WHERE ord_own = :ord_own ORDER BY ord_id DESC LIMIT 0,10;";
+    $sql = "SELECT * FROM `ords` WHERE ord_own = :ord_own ORDER BY ord_id DESC LIMIT 10;";
     $query = $dbcon->prepare($sql);
     $query->bindParam(':ord_own',$ord_own, PDO::PARAM_STR);
     $query->execute();
@@ -53,5 +53,5 @@ try{
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => 'error', 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }

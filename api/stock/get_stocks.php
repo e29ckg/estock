@@ -11,24 +11,27 @@ include "../dbconfig.php";
 try{
     /*ดึงข้อมูลทั้งหมด*/
     // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id LIMIT 100;";
+    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
-    // $data = array();
+    $total_row = count($result);
 
-    // foreach($result as $res){
-    //     array_push($data,array(
-    //         "unit_id" => $res->unit_id,
-    //         "unit_name" => $res->unit_name
-    //     ));
-    // }
+    $begin = $total_row - 100;
+    if($begin < 0){$begin = 0;}
+    $end = $total_row;
+
+    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id;";
+    $query = $dbcon->prepare($sql);
+    $query->execute();
+    $result = $query->fetchAll(PDO::FETCH_OBJ);
+    
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
         'massege' =>  'Ok', 
         'respJSON' =>  $result, 
-        // 'respJSON' => $data
+        'total_row' => $total_row
     ));
 
 }catch(PDOException $e){

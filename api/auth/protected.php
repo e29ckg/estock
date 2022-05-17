@@ -28,7 +28,6 @@ $jwt = $arr[1];
 if($jwt){
 
     try {
-        // $t = 5 * 60 * 60 ; // 
         $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']);     
          
         $token = $decoded->token;

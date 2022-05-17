@@ -44,7 +44,7 @@ try{
             exit;
         }
 
-        $sql = "INSERT INTO users(fullname,username,password,email,dep,phone,st) VALUE(:fullname, :username,:password,:email,:dep,:phone,:st);";        
+        $sql = "INSERT INTO users(fullname,username,password,email,dep,phone,st,role) VALUE(:fullname, :username,:password,:email,:dep,:phone,:st,role);";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':fullname',$user->fullname, PDO::PARAM_STR);
         $query->bindParam(':username',$user->username, PDO::PARAM_STR);
@@ -54,6 +54,7 @@ try{
         $query->bindParam(':dep',$user->dep, PDO::PARAM_STR);
         $query->bindParam(':phone',$user->phone, PDO::PARAM_STR);
         $query->bindParam(':st',$user->st, PDO::PARAM_INT);
+        $query->bindParam(':role',$user->role, PDO::PARAM_STR);
         $query->execute();
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
@@ -67,7 +68,7 @@ try{
         exit;
     }
     if($user->action == 'update'){
-        $sql = "UPDATE users SET fullname=:fullname, username=:username, email=:email, dep=:dep, phone=:phone, st=:st WHERE user_id = :user_id ";        
+        $sql = "UPDATE users SET fullname=:fullname, username=:username, email=:email, dep=:dep, phone=:phone, st=:st, role=:role WHERE user_id = :user_id ";        
         $query = $dbcon->prepare($sql);
         $query->bindParam(':fullname',$user->fullname, PDO::PARAM_STR);
         $query->bindParam(':username',$user->username, PDO::PARAM_STR);
@@ -77,6 +78,7 @@ try{
         $query->bindParam(':dep',$user->dep, PDO::PARAM_STR);
         $query->bindParam(':phone',$user->phone, PDO::PARAM_STR);
         $query->bindParam(':st',$user->st, PDO::PARAM_INT);
+        $query->bindParam(':role',$user->role, PDO::PARAM_STR);
         $query->bindParam(':user_id',$user->user_id, PDO::PARAM_INT);
         $query->execute();
         if($query->rowCount() > 0){
