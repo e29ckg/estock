@@ -32,7 +32,7 @@ try{
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
-        'massege' =>  'Ok', 
+        'message' =>  'Ok', 
         'respJSON' =>  $result, 
         // 'respJSON' => $data
     ));
@@ -40,7 +40,7 @@ try{
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

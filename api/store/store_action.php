@@ -25,7 +25,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 $arr = explode(" ", $authHeader);
 
 // http_response_code(200);
-// echo json_encode(array('status' => true, 'massege' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $store_id ));
+// echo json_encode(array('status' => true, 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $store_id ));
 // exit;           
 try{
     $jwt = $arr[1];
@@ -40,7 +40,7 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => 'error', 'massege' => 'storename นี้มีในระบบแล้ว', 'responseJSON' => $query->fetchAll(PDO::FETCH_OBJ)));
+            echo json_encode(array('status' => 'error', 'message' => 'storename นี้มีในระบบแล้ว', 'responseJSON' => $query->fetchAll(PDO::FETCH_OBJ)));
             exit;
         }
 
@@ -53,11 +53,11 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $data));
+            echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $data));
         }else{
             // echo "มีบางอย่างผิดพลาด";
             http_response_code(200);
-            echo json_encode(array('status' => 'error', 'massege' => 'มีบางอย่างผิดพลาด', 'responseJSON' => $data));
+            echo json_encode(array('status' => 'error', 'message' => 'มีบางอย่างผิดพลาด', 'responseJSON' => $data));
         }
         exit;
     }
@@ -72,11 +72,11 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $store));
+            echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $store));
         }else{
             // echo "มีบางอย่างผิดพลาด";
             http_response_code(200);
-            echo json_encode(array('status' => 'error', 'massege' => 'ไม่มีการปรับปรุง', 'responseJSON' => $store));
+            echo json_encode(array('status' => 'error', 'message' => 'ไม่มีการปรับปรุง', 'responseJSON' => $store));
         }
         exit;
     }
@@ -84,14 +84,14 @@ try{
         $sql = "DELETE FROM store WHERE str_id = $store->str_id";
         $dbcon->exec($sql);
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'Record deleted successfully'));  
+        echo json_encode(array('status' => 'success', 'message' => 'Record deleted successfully'));  
         exit;
     }    
 
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => 'error', 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => 'error', 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

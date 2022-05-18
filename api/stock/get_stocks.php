@@ -17,11 +17,11 @@ try{
     $result = $query->fetchAll(PDO::FETCH_OBJ);
     $total_row = count($result);
 
-    $begin = $total_row - 100;
+    $begin = $total_row - 20;
     if($begin < 0){$begin = 0;}
     $end = $total_row;
 
-    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id;";
+    $sql = "SELECT stock.*, products.pro_name, products.instock FROM stock LEFT JOIN products ON stock.pro_id = products.pro_id LIMIT $begin,$end;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);
@@ -29,7 +29,7 @@ try{
     http_response_code(200);
     echo json_encode(array(
         'status' => true, 
-        'massege' =>  'Ok', 
+        'message' =>  'Ok', 
         'respJSON' =>  $result, 
         'total_row' => $total_row
     ));
@@ -37,7 +37,7 @@ try{
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

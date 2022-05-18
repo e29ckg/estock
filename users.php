@@ -316,7 +316,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 if (response.data.status == 'success') {
                   Swal.fire({
                     icon: response.data.status,
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -324,7 +324,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }else{
                   Swal.fire({
                     icon: response.data.status,
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   })
@@ -341,7 +341,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 if (response.data.status == 'success') {
                   Swal.fire({
                     icon: response.data.status,
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -359,7 +359,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 }else{
                   Swal.fire({
                     icon: response.data.status,
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   })
@@ -388,7 +388,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         if (response.data.status == 'success') {
                           Swal.fire({
                             icon: response.data.status,
-                            title: response.data.massege,
+                            title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
                           })
@@ -397,7 +397,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         }else{
                           Swal.fire({
                             icon: response.data.status,
-                            title: response.data.massege,
+                            title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
                           })

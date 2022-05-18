@@ -50,12 +50,12 @@ try{
         $pro_id_for_no_new = '';
         foreach($result_rec_lists as $rl){
             $pro_id_for_no_new = $rl->pro_id;
-            if($pro_id_for_no_new == $pro_id_for_no_old){
-                $no = '';
-            }else{
+            // if($pro_id_for_no_new == $pro_id_for_no_old){
+            //     $no = '';
+            // }else{
                 $no = $i++;
                 
-            }
+            // }
             $pro_id_for_no_old = $pro_id_for_no_new;
 
             $price = $rl->qua_for_ord * (float)$rl->price_one;

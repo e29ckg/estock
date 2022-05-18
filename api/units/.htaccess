@@ -1,9 +1,0 @@
-# SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
-
-RewriteEngine On
-RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization},last]
-
-# Cross domain access for API
-Header add Access-Control-Allow-Origin "*"
-Header add Access-Control-Allow-Headers "origin, Authorization, x-requested-with, content-type"
-Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"

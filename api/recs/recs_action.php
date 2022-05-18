@@ -28,7 +28,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 $arr = explode(" ", $authHeader);
 
 // http_response_code(200);
-// echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Recs->str_id ));
+// echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Recs->str_id ));
 // die; 
 
 try{
@@ -73,7 +73,7 @@ try{
         }
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $Rec_lists));
+        echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $Rec_lists));
 
         $dbcon->commit();
         exit;
@@ -119,7 +119,7 @@ try{
         }        
         // echo "เพิ่มข้อมูลเรียบร้อย ok";
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
+        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
         $dbcon->commit();
         exit;
     }
@@ -214,7 +214,7 @@ try{
         //     $i++ ;
         }        
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $result));
+        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $result));
         $dbcon->commit();
         exit;
     }
@@ -229,7 +229,7 @@ try{
 
         $dbcon->commit();
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'Record deleted successfully'));  
+        echo json_encode(array('status' => 'success', 'message' => 'Record deleted successfully'));  
         
     }    
 
@@ -241,7 +241,7 @@ try{
 
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => 'error', 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => 'error', 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

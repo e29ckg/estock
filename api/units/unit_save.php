@@ -11,7 +11,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 date_default_timezone_set("Asia/Bangkok");
 
-$key = "__test_secret__";
 $jwt = null;
 // $databaseService = new DatabaseService();
 // $conn = $databaseService->getConnection();
@@ -24,7 +23,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 $arr = explode(" ", $authHeader);
 
 // http_response_code(200);
-// echo json_encode(array('status' => true, 'massege' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $unit_id ));
+// echo json_encode(array('status' => true, 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $unit_id ));
 // exit;           
 try{
     $jwt = $arr[1];
@@ -39,7 +38,7 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => false, 'massege' => 'ชื่อสินค้านี้มีในระบบแล้ว', 'responseJSON' => $query->fetchAll(PDO::FETCH_OBJ)));
+            echo json_encode(array('status' => false, 'message' => 'ชื่อสินค้านี้มีในระบบแล้ว', 'responseJSON' => $query->fetchAll(PDO::FETCH_OBJ)));
             exit;
         }
 
@@ -50,11 +49,11 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => true, 'massege' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $data));
+            echo json_encode(array('status' => true, 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $data));
         }else{
             // echo "มีบางอย่างผิดพลาด";
             http_response_code(200);
-            echo json_encode(array('status' => false, 'massege' => 'มีบางอย่างผิดพลาด', 'responseJSON' => $data));
+            echo json_encode(array('status' => false, 'message' => 'มีบางอย่างผิดพลาด', 'responseJSON' => $data));
         }
         exit;
     }
@@ -67,11 +66,11 @@ try{
         if($query->rowCount() > 0){
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
             http_response_code(200);
-            echo json_encode(array('status' => true, 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $unit));
+            echo json_encode(array('status' => true, 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $unit));
         }else{
             // echo "มีบางอย่างผิดพลาด";
             http_response_code(200);
-            echo json_encode(array('status' => false, 'massege' => 'ไม่มีการปรับปรุง', 'responseJSON' => $unit));
+            echo json_encode(array('status' => false, 'message' => 'ไม่มีการปรับปรุง', 'responseJSON' => $unit));
         }
         exit;
     }
@@ -80,14 +79,14 @@ try{
         $sql = "DELETE FROM units WHERE unit_id = $unit->unit_id";
         $dbcon->exec($sql);
         http_response_code(200);
-        echo json_encode(array('status' => true, 'massege' => 'Record deleted successfully'));  
+        echo json_encode(array('status' => true, 'message' => 'Record deleted successfully'));  
         exit;
     }    
 
 }catch(PDOException $e){
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

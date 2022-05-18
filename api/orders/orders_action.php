@@ -26,7 +26,7 @@ $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 $arr = explode(" ", $authHeader);
 
 // http_response_code(200);
-// echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Ord->str_id ));
+// echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Ord->str_id ));
 // die; 
 empty($Ord->ord_date) ? $ord_date = date("Y-m-d h:s:i") : $ord_date = $Ord->ord_date;
 try{
@@ -64,7 +64,7 @@ try{
         }
             // echo "เพิ่มข้อมูลเรียบร้อย ok";
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $Ord_lists));
+        echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $Ord_lists));
 
         $dbcon->commit();
         exit;
@@ -101,7 +101,7 @@ try{
     //         $i++ ;
         }        
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
+        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
         $dbcon->commit();
         exit;
     }
@@ -212,6 +212,7 @@ try{
                                 $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list                            
         
                             }
+                            $qua_pay = $qua_pay + $stck_out;
                             /** บันทึกรายการ ลง stock */
                             $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
                             $query = $dbcon->prepare($sql); 
@@ -235,11 +236,12 @@ try{
                             $query->execute();
         
                             $bf = $bal;     //bal -> fb ยอดยกไป รอบต่อไป  
-                            $qua_pay = $qua_pay + $stck_out;
                         }
-    
+                        
                         
                         $instock = $bal;
+                        
+
                         /**     ปรับ products instock */
                         $sql = "UPDATE products SET instock=:instock WHERE pro_id = :pro_id;";
                         $query = $dbcon->prepare($sql); 
@@ -251,21 +253,21 @@ try{
 
                 // }/*** $product_instock > $qua  */
 
+                
             } /** Qua > 0 */
-
-            /**  order_list st = 1 */
-            $sql = "UPDATE ord_lists SET st=1, ord_app=:ord_app, qua_pay=:qua_pay WHERE ord_id = :ord_id ;"; 
+            
+            $sql = "UPDATE ord_lists SET st=1, ord_app=:ord_app, qua_pay=:qua_pay WHERE ord_list_id = :ord_list_id ;"; 
             $query = $dbcon->prepare($sql);           
             $query->bindParam(':ord_app', $ord_own, PDO::PARAM_STR);
             $query->bindParam(':qua_pay', $qua_pay, PDO::PARAM_INT);
-            $query->bindParam(':ord_id', $Ord->ord_id, PDO::PARAM_INT);
+            $query->bindParam(':ord_list_id', $rec_ord_list_id, PDO::PARAM_INT);
             $query->execute();
-
-
+            /**  order_list st = 1 */
             
-        }        
+        } /**foreach($Ord_lists as $ord_l)            */  
+             
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => ''));
+        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => ''));
         $dbcon->commit();
         exit;
     }
@@ -280,7 +282,7 @@ try{
 
         $dbcon->commit();
         http_response_code(200);
-        echo json_encode(array('status' => 'success', 'massege' => 'Record deleted successfully'));  
+        echo json_encode(array('status' => 'success', 'message' => 'Record deleted successfully'));  
         
     }    
 
@@ -292,7 +294,7 @@ try{
 
     echo "Faild to connect to database" . $e->getMessage();
     http_response_code(400);
-    echo json_encode(array('status' => 'error', 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode(array('status' => 'error', 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
 

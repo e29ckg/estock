@@ -183,7 +183,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   Swal.fire({
                     // position: 'top-end',
                     icon: 'success',
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   });
@@ -198,7 +198,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   Swal.fire({
                     // position: 'top-end',
                     icon: 'error',
-                    title: response.data.massege,
+                    title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   })
@@ -229,7 +229,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           Swal.fire({
                             // position: 'top-end',
                             icon: 'success',
-                            title: response.data.massege,
+                            title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
                           })
@@ -239,7 +239,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           Swal.fire({
                             // position: 'top-end',
                             icon: 'error',
-                            title: response.data.massege,
+                            title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
                           })
