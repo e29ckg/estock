@@ -108,10 +108,12 @@ try{
 
     if($Ord->action == 'active'){
         $dbcon->beginTransaction();
-        
-        $sql = "UPDATE ords SET st=1, ord_app=:ord_app, ord_pay_own=:ord_pay_own WHERE ord_id = :ord_id ;"; 
+        $ord_pay_date = date("Y-m-d h:s:i");
+
+        $sql = "UPDATE ords SET st=1, ord_app=:ord_app, ord_pay_date=:ord_pay_date, ord_pay_own=:ord_pay_own WHERE ord_id = :ord_id ;"; 
         $query = $dbcon->prepare($sql);
         $query->bindParam(':ord_app',$ord_own, PDO::PARAM_STR);
+        $query->bindParam(':ord_pay_date',$ord_pay_date);
         $query->bindParam(':ord_pay_own', $ord_own, PDO::PARAM_STR);
         $query->bindParam(':ord_id', $Ord->ord_id, PDO::PARAM_STR);
         $query->execute();  

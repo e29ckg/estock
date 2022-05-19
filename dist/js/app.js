@@ -47,8 +47,8 @@ Vue.createApp({
                 if (response.data.status == 'ok' ) {
                   this.user_data = JSON.stringify(response.data.user_data)            
                 }else{
-                  // localStorage.removeItem("jwt");
-                  // localStorage.removeItem("user_data");    
+                  localStorage.removeItem("jwt");
+                  localStorage.removeItem("user_data");    
                   swal.fire({
                     icon: 'error',
                     title: 'ออกจากระบบ',
@@ -62,8 +62,8 @@ Vue.createApp({
             })
             .catch(function (error) {
                 console.log(error);
-                // localStorage.removeItem("jwt");
-                // localStorage.removeItem("user_data"); 
+                localStorage.removeItem("jwt");
+                localStorage.removeItem("user_data"); 
                 swal.fire({
                   icon: 'error',
                   title:'ออกจากระบบ',
@@ -71,7 +71,7 @@ Vue.createApp({
                   timer: 1000
                 });
                 setTimeout(function() {
-                  // window.location.href = './login';
+                  window.location.href = './login';
                 }, 1001); 
             });
 

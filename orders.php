@@ -75,6 +75,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <button class="btn btn-block btn-primary btn-xs" data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.ord_id)">รายละเอียด</button>                      
                         <button class="btn btn btn-block btn-warning btn-xs" @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
                         <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
+                        <button class="btn btn-block btn-success btn-xs" @click.prevent="order_print(data.ord_id)" >พิมพ์</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -303,6 +304,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           <button class="btn btn-danger" v-if="Number(orl.qua) > Number(orl.instock) || Number(orl.qua) == 0 ">
                             <i class="fas fa-times"></i>
                           </button>
+                          
                           {{orl.comment}}
                         </td>
                       </tr>            
@@ -446,7 +448,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
       this.get_Products()
       this.get_users()
     },
-    methods: {      
+    methods: { 
+      order_print(ord_id){
+        axios.post(this.url_base + 'api/orders/orders_print.php',{ord_id:ord_id})
+            .then(response => {
+                if (response.data.status) {
+                    ord_print = JSON.stringify(response.data)   
+                    localStorage.setItem("ord_print",ord_print)
+                    window.open("orders-print.php",'_blank')      
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      },    
       get_Orders(){
         axios.post(this.url_base + 'api/orders/get_orders.php')
             .then(response => {
