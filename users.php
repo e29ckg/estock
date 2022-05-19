@@ -240,11 +240,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         datas_main:'',
         message: 'Hello Vue!',
@@ -265,11 +264,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.get_Users();
     },
     methods: {      
       get_Users(){
-        axios.post(url_base + 'api/users/get_users.php')
+        axios.post(this.url_base + 'api/users/get_users.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -281,7 +281,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Users_main(){
-        axios.post(url_base + 'api/users/get_users_main.php')
+        axios.post(this.url_base + 'api/users/get_users_main.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -297,7 +297,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_user_update(user_id){
         this.$refs.m_show.click();
-        axios.post(url_base + 'api/users/get_user.php',{user_id:user_id})
+        axios.post(this.url_base + 'api/users/get_user.php',{user_id:user_id})
             .then(response => {
                 if (response.data.status) {
                   this.user = response.data.respJSON;
@@ -311,7 +311,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       add_user_for_main(index){
         user = this.datas_main[index]
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + 'api/users/save_users_form_main.php',{user:user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + 'api/users/save_users_form_main.php',{user:user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 if (response.data.status == 'success') {
                   Swal.fire({
@@ -336,7 +336,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },
       b_user_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 if (response.data.status == 'success') {
                   Swal.fire({
@@ -383,7 +383,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.user[0].action = 'delete';  
                   this.user[0].user_id = user_id;  
-                  axios.post(url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         if (response.data.status == 'success') {
                           Swal.fire({

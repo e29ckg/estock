@@ -423,13 +423,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 </script>
 <script>
- 
-
-  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-
   Vue.createApp({
     data() {
       return {
+        this:'',
         datas:'',
         q:'',
         message: 'Hello Vue!',
@@ -444,13 +441,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.get_Orders()
       this.get_Products()
       this.get_users()
     },
     methods: {      
       get_Orders(){
-        axios.post(url_base + 'api/orders/get_orders.php')
+        axios.post(this.url_base + 'api/orders/get_orders.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
@@ -461,7 +459,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_users(){
-        axios.post(url_base + 'api/users/get_users.php')
+        axios.post(this.url_base + 'api/users/get_users.php')
             .then(response => {
                 if (response.data.status) {
                     this.users = response.data.respJSON;         
@@ -472,7 +470,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Products(){
-        axios.post(url_base + 'api/orders/get_products.php')
+        axios.post(this.url_base + 'api/orders/get_products.php')
             .then(response => {
                 if (response.data.status) {
                     this.products = response.data.respJSON;  
@@ -483,7 +481,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Order(ord_id){
-        axios.post(url_base + 'api/orders/get_order.php',{ord_id:ord_id})
+        axios.post(this.url_base + 'api/orders/get_order.php',{ord_id:ord_id})
             .then(response => {
                 if (response.data.status) {
                   this.Ord = response.data.respJSON;       
@@ -495,7 +493,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Ord_list(ord_id){
-        axios.post(url_base + 'api/orders/get_order_list.php',{ord_id:ord_id})
+        axios.post(this.url_base + 'api/orders/get_order_list.php',{ord_id:ord_id})
             .then(response => {
                 if (response.data.status) {
                   this.Ord_lists = response.data.respJSON;    
@@ -536,7 +534,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 if (result.isConfirmed) {
                   var jwt = localStorage.getItem("jwt");
                   this.Ord[0].action='active'
-                  axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                       if (response.data.status == 'success'){
                         Swal.fire({
@@ -566,7 +564,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       b_Order_save(){
         if(this.Ord[0].ord_own != '' && this.Ord[0].rec_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
           var jwt = localStorage.getItem("jwt");
-          axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+          axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
               .then(response => {
                   if (response.data.status == 'success') {
                     Swal.fire({
@@ -615,7 +613,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.Ord[0].action = 'delete';  
                   this.Ord[0].ord_id = ord_id;  
-                  axios.post(url_base + 'api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         if (response.data.status == 'success') {
                           Swal.fire({
@@ -661,7 +659,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         ch_search_pro(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(url_base + 'api/products/product_search.php',{q:this.q})
+            axios.post(this.url_base + 'api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.products = response.data.respJSON;                    

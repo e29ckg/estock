@@ -90,7 +90,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <!-- {{data.img}} -->
                         <a @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
                           <img v-if="data.img" :src="'./uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
-                          <img v-else src="./dist/img/pro_no_pic.jpg" alt="No-pic" class="float-left" height="60" >
+                          <img v-else src="./uploads/none.png" alt="No-pic" class="float-left" height="60" >
                         </a>                        
                       </td>
                       <td class="text-left">
@@ -311,11 +311,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host;
-
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         message: 'Hello Vue!',
         product:[{pro_id:'', pro_name:'', pro_detail:'', cat_name:'', unit_name:'', locat:'',lower:1,min:1,st:'1',img:'',action:'insert'}],
@@ -334,10 +333,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     mounted(){
       this.get_products();
+      this.url_base = window.location.protocol + '//' + window.location.host;
     },
     methods: {      
       get_products(){
-        axios.post(url_base + '/estock/api/products/get_products.php')
+        axios.post(this.url_base + '/estock/api/products/get_products.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -349,7 +349,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_cats(){
-        axios.post(url_base + '/estock/api/products/get_cats.php')
+        axios.post(this.url_base + '/estock/api/products/get_cats.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -362,7 +362,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_units(){
-        axios.post(url_base + '/estock/api/products/get_units.php')
+        axios.post(this.url_base + '/estock/api/products/get_units.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -381,7 +381,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_product_update(pro_id){
         this.$refs.m_show.click();
-        axios.post(url_base + '/estock/api/products/get_product.php',{pro_id:pro_id})
+        axios.post(this.url_base + '/estock/api/products/get_product.php',{pro_id:pro_id})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -396,7 +396,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_product_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : 'Bearer ' + jwt}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -426,7 +426,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },
       b_product_strock(pro_id){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + '/estock/api/products/get_product_stock.php',{pro_id:pro_id})
+        axios.post(this.url_base + '/estock/api/products/get_product_stock.php',{pro_id:pro_id})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status == 'success' ) {                  
@@ -458,7 +458,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.product[0].action = 'delete';  
                   this.product[0].pro_id = pro_id;  
-                  axios.post(url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {
@@ -510,7 +510,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               formData.append("sendimage", image[0]);
               formData.append("pro_id", this.pro_img.id);
               axios.post(
-                url_base + '/estock/api/products/upload_img.php', 
+                this.url_base + '/estock/api/products/upload_img.php', 
                 formData, 
                 {headers:{'Content-Type': 'multipart/form-data'}
               })
@@ -554,7 +554,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         search(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(url_base + '/estock/api/products/product_search.php',{q:this.q})
+            axios.post(this.url_base + '/estock/api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.datas = response.data.respJSON;

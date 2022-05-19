@@ -1,55 +1,54 @@
-var url_base = window.location.protocol + '//' + window.location.host + '/estock/'
 
-var jwt = localStorage.getItem("jwt");
-var user_data = localStorage.getItem("user_data");
-if (jwt == null || user_data == null) {
-  window.location.href = './login'
-}  
+// var this.jwt = localStorage.getItem("this.jwt");
+// var user_data = localStorage.getItem("user_data");
+// if (this.jwt == null || user_data == null) {
+//   window.location.href = './login'
+// }  
 
 Vue.createApp({
   data() {
     return {
+      url_base:'',
+      jwt:'',
       user:'',
       url_img:'./node_modules/admin-lte/dist/img/user2-160x160.jpg',
     }
   },
   mounted(){
+    this.url_base = window.location.protocol + '//' + window.location.host + '/estock/'
+    this.jwt = localStorage.getItem("jwt")
     this.get_fullname()
     this.ck_protect()
-    var jwt = localStorage.getItem("jwt")
-    this.protected(jwt)
+    this.protected()
   },
   methods: {
     get_fullname() {
       this.user = JSON.parse(localStorage.getItem("user_data"));
-      // this.user = localStorage.getItem("user_data");
     },
-
     ck_protect(){
       // var t = timer
       var t = 60 * 1000
       setInterval(()=> {
-        var jwt = localStorage.getItem("jwt");
-        this.protected(jwt);
+        this.protected();
         console.log(t++)
       }, t);
     },
 
-    protected(jwt) {
-      axios.post(url_base + 'api/auth/protected_admin.php',{},{ 
+    protected() {
+      axios.post(this.url_base + 'api/auth/protected_admin.php',{},{ 
         headers: {
             "Access-Control-Allow-Origin" : "*",
             "Content-type": "Application/json",
-            // "Authorization": `Bearer ${jwt}`
-            "Authorization" : 'Bearer '+ jwt 
+            // "Authorization": `Bearer ${this.jwt}`
+            "Authorization" : 'Bearer '+ this.jwt 
           }})
             .then(response => {  
                        
                 if (response.data.status == 'ok' ) {
-                  user_data = JSON.stringify(response.data.user_data)            
+                  this.user_data = JSON.stringify(response.data.user_data)            
                 }else{
-                  localStorage.removeItem("jwt");
-                  localStorage.removeItem("user_data");    
+                  // localStorage.removeItem("jwt");
+                  // localStorage.removeItem("user_data");    
                   swal.fire({
                     icon: 'error',
                     title: 'ออกจากระบบ',
@@ -57,14 +56,14 @@ Vue.createApp({
                     timer: 1000
                   });
                   setTimeout(function() {
-                    window.location.href = './login';
+                    // window.location.href = './login';
                   }, 1001); 
                 }
             })
             .catch(function (error) {
                 console.log(error);
-                localStorage.removeItem("jwt");
-                localStorage.removeItem("user_data"); 
+                // localStorage.removeItem("jwt");
+                // localStorage.removeItem("user_data"); 
                 swal.fire({
                   icon: 'error',
                   title:'ออกจากระบบ',
@@ -72,7 +71,7 @@ Vue.createApp({
                   timer: 1000
                 });
                 setTimeout(function() {
-                  window.location.href = './login';
+                  // window.location.href = './login';
                 }, 1001); 
             });
 
@@ -89,12 +88,12 @@ Vue.createApp({
         confirmButtonText: 'Yes !'
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post(url_base + 'api/auth/logout.php',{},{ 
+          axios.post(this.url_base + 'api/auth/logout.php',{},{ 
             headers: {
                 "Access-Control-Allow-Origin" : "*",
                 "Content-type": "Application/json",
-                // "Authorization": `Bearer ${jwt}`
-                "Authorization" : 'Bearer '+ jwt 
+                // "Authorization": `Bearer ${this.jwt}`
+                "Authorization" : 'Bearer '+ this.jwt 
               }})
                 .then(response => {                            
                     if (response.data.status == 'success' ) {  
@@ -211,7 +210,7 @@ Vue.createApp({
   },
   mounted(){
     this.url = window.location.href
-    this.url_base = url_base
+    this.url_base = window.location.protocol + '//' + window.location.host + '/estock/'
     this.set_menu()
     this.set_menus_setting()
     this.count_odrs_st0()
@@ -242,7 +241,7 @@ Vue.createApp({
       }
     },
     count_odrs_st0(){
-      axios.post(url_base + 'api/orders/orders_count.php',{data:'st0'})
+      axios.post(this.url_base + 'api/orders/orders_count.php',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.menus[1].menu_badge = response.data.respJSON;
@@ -253,7 +252,7 @@ Vue.createApp({
         })
     },
     count_recs_st0(){
-      axios.post(url_base + 'api/recs/recs_count.php',{data:'st0'})
+      axios.post(this.url_base + 'api/recs/recs_count.php',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.menus[2].menu_badge = response.data.respJSON

@@ -73,12 +73,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>
                         <!-- <span v-if="data.st == 0" class="badge bg-danger">รอการตรวจสอบ</span> -->
                         <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
-                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รอการตรวจสอบ</button>
+                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id)">รอการตรวจสอบ</button>
                       </td>
                       <td>                        
                         <button class="btn btn-block btn-warning btn-xs" @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >Update</button>  
                         <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Recs(data.rec_id)" v-if="data.st == 0">Delete</button>  
-                        <button class="btn btn-block btn-primary btn-xs" v-if="data.st == 1" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id,)">รายละเอียด</button>
+                        <button class="btn btn-block btn-primary btn-xs" v-if="data.st == 1" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id)">รายละเอียด</button>
+                        <button class="btn btn-block btn-success btn-xs" v-if="data.st == 1" @click="print_rec(data.rec_id)">พิมพ์</button>
                       </td>
                     </tr>
                   </tbody>
@@ -357,12 +358,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </script>
 <script>
  
-
-  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-
   Vue.createApp({
     data() {
       return {
+        url_base:'',
+        jwt:'',
         datas:'',
         q:'',
         message: 'Hello Vue!',
@@ -385,13 +385,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
+      this.jwt = localStorage.getItem("jwt")
       this.get_Recs()
       this.get_Stores()
       this.get_Products()
     },
-    methods: {      
+    methods: {     
+      print_rec(rec_id){
+        axios.post(this.url_base + 'api/recs/rec_print.php',{rec_id:rec_id})
+            .then(response => {
+                if (response.data.status) {
+                  var print_rec = JSON.stringify(response.data);    
+                  localStorage.setItem("print_rec",print_rec);
+                  window.open(this.url_base + 'recs-report','_blank')
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+      }, 
       get_Recs(){
-        axios.post(url_base + 'api/recs/get_recs.php')
+        axios.post(this.url_base + 'api/recs/get_recs.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
@@ -402,7 +419,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Stores(){
-        axios.post(url_base + 'api/store/get_stores.php')
+        axios.post(this.url_base + 'api/store/get_stores.php')
             .then(response => {
                 if (response.data.status) {
                     this.stores = response.data.respJSON; 
@@ -413,7 +430,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Store(str_id){
-        axios.post(url_base + 'api/store/get_store.php',{str_id:str_id})
+        axios.post(this.url_base + 'api/store/get_store.php',{str_id:str_id})
             .then(response => {
                 if (response.data.status) {
                   // console.log(response.data.respJSON)
@@ -425,7 +442,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_Products(){
-        axios.post(url_base + 'api/products/get_products.php')
+        axios.post(this.url_base + 'api/products/get_products.php')
             .then(response => {
                 if (response.data.status) {
                     this.products = response.data.respJSON;  
@@ -436,7 +453,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_rec(rec_id){
-        axios.post(url_base + 'api/recs/get_rec.php',{rec_id:rec_id})
+        axios.post(this.url_base + 'api/recs/get_rec.php',{rec_id:rec_id})
             .then(response => {
                 if (response.data.status) {
                   this.Recs = response.data.respJSON;
@@ -448,7 +465,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       get_rec_list(rec_id){
-        axios.post(url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
+        axios.post(this.url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
             .then(response => {
                 if (response.data.status) {
                   this.Rec_lists = response.data.respJSON;  
@@ -483,10 +500,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           cancelButtonColor: '#d33',
           confirmButtonText: 'Yes, it!'
         }).then((result) => {
-          if (result.isConfirmed) {
-            var jwt = localStorage.getItem("jwt");
+          if (result.isConfirmed) {            
             this.Recs[0].action='active'
-            axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+            axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
               .then(response => {
                   if (response.data.status == 'success'){
                     Swal.fire({
@@ -511,15 +527,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });
               
           }
-        });
-        
+        });        
         }, 
 
       b_Recs_save(){
-
         if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
-          var jwt = localStorage.getItem("jwt");
-          axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+          axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
               .then(response => {
                   if (response.data.status == 'success') {
                     Swal.fire({
@@ -565,10 +578,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 confirmButtonText: 'Yes, delete it!'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
                   this.Recs[0].action = 'delete';  
                   this.Recs[0].rec_id = rec_id;  
-                  axios.post(url_base + 'api/recs/recs_action.php',{Recs:this.Recs},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
                     .then(response => {
                         if (response.data.status == 'success') {
                           Swal.fire({
@@ -615,7 +627,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         ch_search_pro(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(url_base + 'api/products/product_search.php',{q:this.q})
+            axios.post(this.url_base + 'api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.products = response.data.respJSON;                    

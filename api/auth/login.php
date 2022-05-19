@@ -100,11 +100,11 @@ try {
         }else{
 
             http_response_code(200);
-            echo json_encode(array("message" => "Login failed. Password Incorrect", "password" => $password));
+            echo json_encode(array("status"=>"error","message" => "Login failed. Password Incorrect", "password" => $password));
         }
     }else{
             http_response_code(200);
-            echo json_encode(array("message" => "Login failed. Username Not Found", "username" => $username));
+            echo json_encode(array("status"=>"error","message" => "Login failed. Username Not Found", "username" => $username));
         
     }
 }catch (Exception $e){
@@ -112,6 +112,7 @@ try {
     http_response_code(401);
 
     echo json_encode(array(
+        "status"=>"error",
         "message" => "Access denied.",
         "error" => $e->getMessage()
     ));

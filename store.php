@@ -152,11 +152,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
+  
 
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         message: 'Hello Vue!',
         store:[{
@@ -170,11 +171,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.get_Store();
     },
     methods: {      
       get_Store(){
-        axios.post(url_base + 'api/store/get_stores.php')
+        axios.post(this.url_base + 'api/store/get_stores.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
@@ -189,7 +191,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_store_update(str_id){
         this.$refs.m_show.click();
-        axios.post(url_base + 'api/store/get_store.php',{str_id:str_id})
+        axios.post(this.url_base + 'api/store/get_store.php',{str_id:str_id})
             .then(response => {
                 if (response.data.status) {
                   this.store = response.data.respJSON;
@@ -202,7 +204,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_store_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 if (response.data.status == 'success') {
                   Swal.fire({
@@ -247,7 +249,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.store[0].action = 'delete';  
                   this.store[0].str_id = str_id;  
-                  axios.post(url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         if (response.data.status == 'success') {
                           Swal.fire({

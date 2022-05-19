@@ -99,22 +99,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-
+  
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         message: 'Hello Vue!'       
         
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.get_Stock();
     },
     methods: {      
       get_Stock(){
-        axios.post(url_base + 'api/stock/get_stocks.php')
+        axios.post(this.url_base + 'api/stock/get_stocks.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
@@ -129,7 +130,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }, 
       b_stock_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + 'api/stock/stock_action.php',{stock:this.stock},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + 'api/stock/stock_action.php',{stock:this.stock},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 if (response.data.status == 'success') {
                   Swal.fire({

@@ -97,6 +97,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         order_st0:0,
         order_st1:0,
         recs_st0:0,
@@ -106,8 +107,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
-      this.url = window.location.href
-      this.url_base = url_base
+      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.count_odrs_st0()
       this.count_odrs_st1()
       this.count_recs_st0()
@@ -118,7 +118,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       this.count++
     },
     count_odrs_st0(){
-      axios.post(url_base + 'api/orders/orders_count.php',{data:'st0'})
+      axios.post(this.url_base + 'api/orders/orders_count.php',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.order_st0 = response.data.respJSON;
@@ -128,7 +128,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         })
     },
     count_odrs_st1(){
-      axios.post(url_base + 'api/orders/orders_count.php',{data:'st1'})
+      axios.post(this.url_base + 'api/orders/orders_count.php',{data:'st1'})
         .then(response => {
             if(response.data.status) { 
               this.order_st1 = response.data.respJSON;
@@ -138,7 +138,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         })
     },
     count_recs_st0(){
-      axios.post(url_base + 'api/recs/recs_count.php',{data:'st0'})
+      axios.post(this.url_base + 'api/recs/recs_count.php',{data:'st0'})
         .then(response => {
             if(response.data.status) { 
               this.recs_st0 = response.data.respJSON;
@@ -148,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         })
     },
     count_users(){
-      axios.post(url_base + 'api/users/users_count.php',{})
+      axios.post(this.url_base + 'api/users/users_count.php',{})
         .then(response => {
             if(response.data.status) { 
               this.user_all = response.data.respJSON;

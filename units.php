@@ -124,11 +124,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  var url_base = window.location.protocol + '//' + window.location.host;
-
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         message: 'Hello Vue!',
         unit:[{
@@ -140,11 +139,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host;
       this.get_Units();
     },
     methods: {      
       get_Units(){
-        axios.post(url_base + '/estock/api/units/read_units_all.php')
+        axios.post(this.url_base + '/estock/api/units/read_units_all.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -160,7 +160,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_unit_update(unit_id){
         this.$refs.m_show.click();
-        axios.post(url_base + '/estock/api/units/get_unit.php',{unit_id:unit_id})
+        axios.post(this.url_base + '/estock/api/units/get_unit.php',{unit_id:unit_id})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -175,7 +175,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_unit_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -219,7 +219,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.unit[0].action = 'delete';  
                   this.unit[0].unit_id = unit_id;  
-                  axios.post(url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {

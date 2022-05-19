@@ -19,7 +19,8 @@ $product = $data->product[0];
 $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 
 $arr = explode(" ", $authHeader);
-          
+ 
+
 try{
     $jwt = $arr[1];
     $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 

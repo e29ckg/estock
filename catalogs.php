@@ -123,28 +123,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <?php include "./layouts/footer.php";?>
 </div>
 <?php include "./layouts/footer2.php";?>
-<script>
-  var url_base = window.location.protocol + '//' + window.location.host;
+<script>  
 
   Vue.createApp({
     data() {
       return {
+        url_base:'',
         datas:'',
         message: 'Hello Vue!',
         catalog:[{
           cat_id:'',
           cat_name:'',          
           action:'insert'        
-        }],
-        
+        }],        
       }
     },
     mounted(){
+      this.url_base = window.location.protocol + '//' + window.location.host;
       this.get_catalogs();
     },
     methods: {      
       get_catalogs(){
-        axios.post(url_base + '/estock/api/catalogs/read_catalogs_all.php')
+        axios.post(this.url_base + '/estock/api/catalogs/read_catalogs_all.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -161,7 +161,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_catalog_update(cat_id){
         this.$refs.m_show.click();
-        axios.post(url_base + '/estock/api/catalogs/get_catalog.php',{cat_id:cat_id})
+        axios.post(this.url_base + '/estock/api/catalogs/get_catalog.php',{cat_id:cat_id})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -176,7 +176,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_catalog_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post(this.url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -222,7 +222,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   var jwt = localStorage.getItem("jwt");
                   this.catalog[0].action = 'delete';  
                   this.catalog[0].cat_id = cat_id;  
-                  axios.post(url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  axios.post(this.url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {
