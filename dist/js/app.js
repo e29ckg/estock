@@ -56,7 +56,7 @@ Vue.createApp({
                     timer: 1000
                   });
                   setTimeout(function() {
-                    // window.location.href = './login';
+                    window.location.href = './login';
                   }, 1001); 
                 }
             })
