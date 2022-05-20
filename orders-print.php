@@ -55,6 +55,7 @@
                   <thead>
                     <tr class="text-center">
                       <th>#</th>
+                      <th>ภาพ</th>
                       <th>รายการ</th>
                       <th>หน่วยนับ</th>
                       <th>จำนวนที่ขอเบิก</th>
@@ -65,6 +66,9 @@
                   <tbody>
                     <tr v-for="ol,index in order_lists" class="text-center" >
                       <td>{{index + 1}}</td>
+                      <td>
+                          <img :src="'./uploads/'+ ol.img" alt="data.img" class="float-left" height="60" >
+                      </td>
                       <td class="text-left">{{ol.pro_name}}</td>
                       <td>{{ol.unit_name}}</td>
                       <td>{{ol.qua}}</td>
@@ -74,7 +78,7 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="6" class="text-center">-</td>
+                      <td colspan="7" class="text-center">-</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -152,8 +156,8 @@
       this.ord_print = JSON.parse(localStorage.getItem("ord_print"))
       this.order = this.ord_print.order[0]
       this.order_lists = this.ord_print.order_lists
-      // localStorage.removeItem("ord_print")
-      // window.print()
+      localStorage.removeItem("ord_print")
+      window.print()
     },
     methods: {      
       

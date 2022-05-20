@@ -32,15 +32,19 @@ try{
     $datas = array();
 
     foreach($result as $rs){
-        $sql = "SELECT bal FROM `stock` WHERE pro_id = $rs->pro_id ORDER BY stck_id DESC LIMIT 0,1;";
+        $sql = "SELECT img FROM `products` WHERE pro_id = $rs->pro_id LIMIT 0,1;";
         $query = $dbcon->prepare($sql);
         $query->execute();
+        $resp_product = $query->fetchAll(PDO::FETCH_OBJ);
+        $resp_product[0]->img ? $img = $resp_product[0]->img : $img = 'none.png';
+        
         
         array_push($datas,array(
             'ord_list_id' => $rs->ord_list_id,
             'ord_id' => $rs->ord_id,
             'pro_id' => $rs->pro_id,
             'pro_name' => $rs->pro_name,
+            'img' => $img,
             'unit_name' => $rs->unit_name,
             'qua' => $rs->qua,
             'qua_pay' => $rs->qua_pay,
