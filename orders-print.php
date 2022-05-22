@@ -157,7 +157,7 @@
       this.order = this.ord_print.order[0]
       this.order_lists = this.ord_print.order_lists
       localStorage.removeItem("ord_print")
-      window.print()
+      // window.print()
     },
     methods: {      
       

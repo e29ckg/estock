@@ -70,7 +70,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="data,index in datas" class="text-center">
                       <td>{{data.created_at}}</td>
                       <td class="text-left">{{data.pro_name}}</td>
-                      <td>{{data.rec_ord_id}}</td>
+                      <td>
+                        <!-- {{data.rec_ord_id}} -->
+                        <a v-if="data.stck_in > 0" @click="show_recs(data.rec_ord_id)">{{data.rec_ord_id}}</a>
+                        <a  v-if="data.stck_out > 0" @click="show_ords(data.rec_ord_id)">{{data.rec_ord_id}}</a>
+                      </td>
                       <td>{{data.unit_name}}</td>
                       <td class="text-center">{{formatCurrency(data.price_one)}}</td>
                       <td>{{formatCurrency0(data.bf)}}</td>
@@ -113,7 +117,34 @@ scratch. This page gets rid of all links and provides the needed markup only.
       this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
       this.get_Stock();
     },
-    methods: {      
+    methods: {   
+      show_recs(rec_ord_id){
+        axios.post(this.url_base + 'api/recs/rec_print.php',{rec_id:rec_ord_id})
+            .then(response => {
+                if (response.data.status) {
+                  var print_rec = JSON.stringify(response.data);    
+                  localStorage.setItem("print_rec",print_rec);
+                  window.open(this.url_base + 'recs-report','_blank')
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      } ,  
+      show_ords(rec_ord_id){
+        axios.post(this.url_base + 'api/orders/orders_print.php',{ord_id:rec_ord_id})
+            .then(response => {
+                if (response.data.status) {
+                    ord_print = JSON.stringify(response.data)   
+                    localStorage.setItem("ord_print",ord_print)
+                    window.open("orders-print.php",'_blank')      
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+      } ,  
       get_Stock(){
         axios.post(this.url_base + 'api/stock/get_stocks.php')
             .then(response => {

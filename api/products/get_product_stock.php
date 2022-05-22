@@ -18,7 +18,7 @@ $data = json_decode(file_get_contents("php://input"));
 //     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `stock` LEFT JOIN products ON products.pro_id = stock.pro_id  WHERE stock.pro_id = $data->pro_id ORDER BY stock.created_at ASC LIMIT 0,100;";
+    $sql = "SELECT * FROM `stock` LEFT JOIN products ON products.pro_id = stock.pro_id  WHERE stock.pro_id = $data->pro_id ORDER BY stock.stck_id ASC LIMIT 0,100;";
     $query = $dbcon->prepare($sql);
     $query->execute();
     $result = $query->fetchAll(PDO::FETCH_OBJ);

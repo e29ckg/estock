@@ -16,7 +16,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- <div class="wrapper" > -->
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper" id="appRecs" v-cloak>   
+  <div class="wrapper" id="appRecs" v-cloak>   
 
     <div class="row">
       <div class="col-12 table-responsive">
@@ -59,6 +59,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </table>
       </div>
     </div>
+    <div class="row no-print">
+              <div class="col-12">
+                <button rel="noopener" class="btn btn-default" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                <!-- <button type="button" class="btn btn-success float-right"><i class="far fa-credit-card"></i> Submit
+                  Payment
+                </button>
+                <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+                  <i class="fas fa-download"></i> Generate PDF
+                </button> -->
+              </div>
+            </div>
     
 
   </div>
@@ -98,7 +109,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       this.datas = JSON.parse(localStorage.getItem("print_rec"))
       this.rec = this.datas.rec
       localStorage.removeItem("print_rec")
-      window.print()
+      // window.print()
     },
     methods: {    
       

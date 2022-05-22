@@ -4,6 +4,11 @@ header("Content-Type: application/json; charset=utf-8");
 include "../dbconfig.php";
 
 try{
+    
+    $sql = "TRUNCATE TABLE stock;";
+    $query = $dbcon->prepare($sql);
+    $query->execute();
+    
     /*ดึงข้อมูลทั้งหมด*/
     // rec
     $sql = "SELECT * FROM recs ORDER BY rec_date,rec_id ASC;";
@@ -26,6 +31,13 @@ try{
 
         foreach($res_rec_lists as $rrl){
             $pro_id = $rrl->pro_id;
+            $qua_for_ord = $rrl->qua;
+            
+            $sql = "UPDATE rec_lists SET qua_for_ord=:qua_for_ord WHERE rec_list_id = :rec_list_id ;"; 
+            $query = $dbcon->prepare($sql);           
+            $query->bindParam(':qua_for_ord', $qua_for_ord, PDO::PARAM_STR);
+            $query->bindParam(':rec_list_id', $rrl->rec_list_id, PDO::PARAM_INT);
+            $query->execute(); 
 
             $sql = "SELECT * FROM stock 
                     WHERE stock.pro_id =:pro_id 

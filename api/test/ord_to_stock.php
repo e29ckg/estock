@@ -59,7 +59,7 @@ try{
                     $product_instock = $product_instock + $rep_r->qua_for_ord;
                 }
 
-                if($product_instock > $qua){ /*** $product_instock > $qua  */
+                if($product_instock >= $qua){ /*** $product_instock > $qua  */
 
                     foreach($rep_rec_lists as $rrl){
                         $instock = $instock + $rrl->qua_for_ord; 
@@ -181,7 +181,6 @@ try{
             $query->bindParam(':qua_pay', $qua_pay, PDO::PARAM_INT);
             $query->bindParam(':ord_list_id', $rec_ord_list_id, PDO::PARAM_INT);
             $query->execute();
-        //     /**  order_list st = 1 */
             
         }
 

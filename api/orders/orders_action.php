@@ -156,7 +156,7 @@ try{
                     $product_instock = $product_instock + $rep_r->qua_for_ord;
                 }
 
-                // if($product_instock > $qua){ /*** $product_instock > $qua  */
+                if($product_instock >= $qua){ /*** $product_instock > $qua  */
 
                     foreach($rep_rec_lists as $rrl){
                         $instock = $instock + $rrl->qua_for_ord; 
@@ -253,7 +253,7 @@ try{
     
                     } /**foreach */
 
-                // }/*** $product_instock > $qua  */
+                }/*** $product_instock >= $qua  */
 
                 
             } /** Qua > 0 */

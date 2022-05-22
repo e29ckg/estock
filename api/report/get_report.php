@@ -40,7 +40,7 @@ try{
         $sql = "SELECT rec_lists.rec_date, rec_lists.pro_id, rec_lists.unit_name, rec_lists.qua_for_ord, rec_lists.price_one, products.pro_name, products.cat_name, rec_lists.updated_at 
                 FROM rec_lists INNER JOIN products ON rec_lists.pro_id = products.pro_id 
                 WHERE products.cat_name = '$rc->cat_name' AND rec_lists.qua_for_ord > 0 AND rec_lists.st = 1 AND rec_lists.updated_at < '$date_end'
-                ORDER BY products.pro_name ASC;";
+                ORDER BY products.pro_name, rec_lists.price_one ASC;";
         $query = $dbcon->prepare($sql);
         $query->execute();
         $result_rec_lists = $query->fetchAll(PDO::FETCH_OBJ);
@@ -48,16 +48,14 @@ try{
         
         $pro_id_for_no_old = '';
         $pro_id_for_no_new = '';
+        $price_old = 0;
+        $price_new = 0;
+        $count_qua = 0;
         foreach($result_rec_lists as $rl){
-            $pro_id_for_no_new = $rl->pro_id;
-            // if($pro_id_for_no_new == $pro_id_for_no_old){
-            //     $no = '';
-            // }else{
-                $no = $i++;
-                
-            // }
-            $pro_id_for_no_old = $pro_id_for_no_new;
-
+            $no = $i++;
+            $price_all = $price_all + ($rl->qua_for_ord * $rl->price_one);
+            
+            
             $price = $rl->qua_for_ord * (float)$rl->price_one;
             array_push($lists,array(
                 "no" => $no,
@@ -71,7 +69,6 @@ try{
                 "price" => $price,
                 "updated_at" => $rl->updated_at,
             ));   
-            $price_all = $price_all + $price;
         }
         array_push($datas,array(
             "cat_name" => $rc->cat_name,
