@@ -29,7 +29,7 @@
               <div class="row">
                 <div class="col-12">
                   <h4><i class="fas fa-globe"></i> ใบเบิก
-                    <small class="float-right">Date:  {{order.ord_date}}</small>
+                    <small class="float-right">Date:  {{date_thai(order.ord_date)}}</small>
                   </h4>
                 </div>
               </div>
@@ -50,7 +50,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-12 table-responsive">
+              <div class="col-12 ">
                 <table class="table table-striped">
                   <thead>
                     <tr class="text-center">
@@ -128,6 +128,33 @@
 
           </div>
         </div>
+
+        <div class="row text-center mt-5 w-100">
+          <!-- <div class="col-12"> -->
+            <div class="float-left col-6">
+            ................................................................................................................ผู้เบิก<br><br>
+            <!-- ({{order.ord_own}}) -->
+            </div>
+            <div class="float-right col-6">
+            ...............................................................................................................ผู้อนุมัติ<br><br>
+            <!-- ({{order.ord_own}}) -->
+            </div>
+            
+          <!-- </div> -->
+        <!-- </div> -->
+      </div>
+      <div class="row mt-5 w-100">
+        <!-- <div class="col-12"> -->
+          <div class="float-left text-center col-6">
+          .....................................................................................................................ผู้จ่าย<br>
+          
+          </div>
+          <div class="float-right text-center col-6">
+          .....................................................................................................................ผู้รับของ<br>
+          </div>
+  
+        <!-- </div> -->
+
       </div>
     </section>
     <!-- {{ord_print}} -->
@@ -160,7 +187,14 @@
       // window.print()
     },
     methods: {      
-      
+      date_thai(day){
+        var monthNamesThai = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤษจิกายน","ธันวาคม"];
+        var dayNames = ["วันอาทิตย์ที่","วันจันทร์ที่","วันอังคารที่","วันพุทธที่","วันพฤหัสบดีที่","วันศุกร์ที่","วันเสาร์ที่"];
+        var monthNamesEng = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var dayNamesEng = ['Sunday','Monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        var d = new Date(day);
+        return d.getDate() + ' ' + monthNamesThai[d.getMonth()] + "  " + (d.getFullYear() + 543)
+      },
       },
   }).mount('#appOrder');
 </script>
