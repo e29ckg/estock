@@ -8,20 +8,20 @@ try{
     $sql = "TRUNCATE TABLE stock;";
     $query = $dbcon->prepare($sql);
     $query->execute();
-    
+
     /*ดึงข้อมูลทั้งหมด*/
     // rec
     $sql = "SELECT * FROM recs ORDER BY rec_date,rec_id ASC;";
     $query = $dbcon->prepare($sql);
     $query->execute();
-    $res_ords = $query->fetchAll(PDO::FETCH_OBJ);
+    $res_recs = $query->fetchAll(PDO::FETCH_OBJ);
 
     $data = array();
     $into_stock =array();
     // rec
-    foreach($res_ords as $res_o){
-        $rec_id = $res_o->rec_id;
-        $rec_date = $res_o->rec_date;
+    foreach($res_recs as $res_r){
+        $rec_id = $res_r->rec_id;
+        $rec_date = $res_r->rec_date;
         
         //rec_lists
         $sql = "SELECT * FROM rec_lists WHERE rec_id=$rec_id;";

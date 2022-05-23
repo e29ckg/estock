@@ -67,7 +67,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <tr v-for="data,index in datas">
                      
                       <td>{{data.rec_id}}</td>
-                      <td>{{data.rec_date}}</td>
+                      <td :data-date="data.rec_date">{{date_thai(data.rec_date)}}</td>
                       <td >{{data.str_name}}</td>
                       <td class="text-right">{{formatCurrency(data.price_total)}}</td>
                       <td>
@@ -682,6 +682,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
           return number.toFixed(2).replace(/./g, function(c, i, a) {
               return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
           });
+        },
+        date_thai(day){
+          var monthNamesThai = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤษจิกายน","ธันวาคม"];
+          var dayNames = ["วันอาทิตย์ที่","วันจันทร์ที่","วันอังคารที่","วันพุทธที่","วันพฤหัสบดีที่","วันศุกร์ที่","วันเสาร์ที่"];
+          var monthNamesEng = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+          var dayNamesEng = ['Sunday','Monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          var d = new Date(day);
+          return d.getDate() + ' ' + monthNamesThai[d.getMonth()] + "  " + (d.getFullYear() + 543)
         },
         
         test(num){

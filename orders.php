@@ -55,8 +55,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <table class="table table-bordered">
                   <thead>
                     <tr>
-                      <th>วันที่เบิก</th>
                       <th>code</th>
+                      <th>วันที่เบิก</th>
                       <th>ผู้เบิก</th>
                       <th width="10%">สถานะ</th>
                       <th width="10%"></th>
@@ -64,8 +64,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
-                      <td>{{data.ord_date}}</td>
                       <td>{{data.ord_id}}</td>
+                      <td :data-date="data.ord_date">{{date_thai(data.ord_date)}}</td>
                       <td>{{data.ord_own}}</td>
                       <td>
                         <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">รอตรวจสอบ</button>
@@ -737,7 +737,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
           });
         },
-        
+        date_thai(day){
+          var monthNamesThai = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤษจิกายน","ธันวาคม"];
+          var dayNames = ["วันอาทิตย์ที่","วันจันทร์ที่","วันอังคารที่","วันพุทธที่","วันพฤหัสบดีที่","วันศุกร์ที่","วันเสาร์ที่"];
+          var monthNamesEng = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+          var dayNamesEng = ['Sunday','Monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          var d = new Date(day);
+          return d.getDate() + ' ' + monthNamesThai[d.getMonth()] + "  " + (d.getFullYear() + 543)
+        },
         test(num){
           console.log(num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'))
         }

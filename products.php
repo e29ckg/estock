@@ -279,7 +279,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody>
                     <tr v-for="prst in pro_stock">
-                      <td>{{prst.created_at}}</td>
+                      <td :data-date="prst.created_at">{{date_thai(prst.created_at)}}</td>
                       <td>{{prst.pro_name}}</td>
                       <td>{{prst.rec_ord_id}}</td>
                       <td class="text-center">{{prst.unit_name}}</td>
@@ -425,7 +425,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },
       b_product_strock(pro_id){
-        var jwt = localStorage.getItem("jwt");
         axios.post(this.url_base + '/estock/api/products/get_product_stock.php',{pro_id:pro_id})
             .then(response => {
                 // console.log(response.data);
@@ -575,12 +574,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
           this.get_products()
           // console.log('blur', e.target.placeholder)
         },
-        getYM(dat){
-            let MyDate = new Date(dat);
-            let MyDateString;
-            // MyDate.setDate(MyDate.getDate() + 20);
-            MyDateString = MyDate.getFullYear() + '-' + ("0" + (MyDate.getMonth()+1)).slice(-2)
-            return ("0" + MyDate.getDate()).slice(-2)+ '-' + ("0" + (MyDate.getMonth()+1)).slice(-2) + '-' + (MyDate.getFullYear() + 543)
+        date_thai(day){
+          var monthNamesThai = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤษจิกายน","ธันวาคม"];
+          var dayNames = ["วันอาทิตย์ที่","วันจันทร์ที่","วันอังคารที่","วันพุทธที่","วันพฤหัสบดีที่","วันศุกร์ที่","วันเสาร์ที่"];
+          var monthNamesEng = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+          var dayNamesEng = ['Sunday','Monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          var d = new Date(day);
+          return d.getDate() + ' ' + monthNamesThai[d.getMonth()] + "  " + (d.getFullYear() + 543)
         },
         formatCurrency(number) {
           number = parseFloat(number);
