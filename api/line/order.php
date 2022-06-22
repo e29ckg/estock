@@ -20,11 +20,13 @@ include "./config.php";
 	$sMessage = "☀️ มีรายการเบิก 🛒\n";
 	$sMessage .= "🧑ผู้เบิก : ". $fullname . "\n";
 
-	$i=1;
+	$i=0;
 	foreach($carts as $c){
-		$sMessage .= $i."." . $c->pro_name . " (".$c->qua." ".$c->unit_name.")"."\n";
 		$i++;
+		$sMessage .= $i."." . $c->pro_name . " (".$c->qua." ".$c->unit_name.")"."\n \n";
 	}
+
+	$sMessage .= "รวม ". $i . " รายการ";
 	
 	$chOne = curl_init(); 
 	curl_setopt( $chOne, CURLOPT_URL, "https://notify-api.line.me/api/notify"); 
