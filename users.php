@@ -74,6 +74,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.phone}}</td>
                       <td>
                         <!-- {{data.st}} -->
+                        {{data.role}}
                         <span v-if="data.st == 10" class="badge badge-primary">ปกติ</span>
                         <span v-else class="badge badge-danger">ระงับ</span>
                       </td>
