@@ -34,7 +34,8 @@ try{
     $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
     $data_auth = $decoded->data;
     
-    $ord_own = $data_auth->fullname;    
+    // $ord_own = $data_auth->fullname;    
+    $ord_own = $Ord->ord_own;    
     
     if($Ord->action == 'insert'){
         $dbcon->beginTransaction();
