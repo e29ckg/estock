@@ -23,10 +23,10 @@ include "./config.php";
 	$i=0;
 	foreach($carts as $c){
 		$i++;
-		$sMessage .= $i."." . $c->pro_name . " (".$c->qua." ".$c->unit_name.")"."\n \n";
+		$sMessage .= $i."." . $c->pro_name . " (".$c->qua." ".$c->unit_name.")"."\n";
 	}
 
-	$sMessage .= "รวม ". $i . " รายการ";
+	$sMessage .= "\n รวม ". $i . " รายการ";
 	
 	$chOne = curl_init(); 
 	curl_setopt( $chOne, CURLOPT_URL, "https://notify-api.line.me/api/notify"); 
