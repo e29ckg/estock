@@ -51,12 +51,14 @@ try{
         $price_old = 0;
         $price_new = 0;
         $count_qua = 0;
+        $price_total = 0;
         foreach($result_rec_lists as $rl){
             $no = $i++;
             $price_all = $price_all + ($rl->qua_for_ord * $rl->price_one);
             
             
             $price = $rl->qua_for_ord * (float)$rl->price_one;
+            $price_total +=  $price; 
             array_push($lists,array(
                 "no" => $no,
                 "rec_date" => $rl->rec_date,
@@ -72,6 +74,7 @@ try{
         }
         array_push($datas,array(
             "cat_name" => $rc->cat_name,
+            "price_total" => $price_total,
             "lists" => $lists
         ));
 

@@ -86,12 +86,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td class="text-right">{{formatCurrency(dl.price_one)}}</td>
                       <td class="text-right">{{formatCurrency(dl.price)}}</td>
                     </tr>
+                    <tr v-if=" data.lists != ''"> 
+                      <td colspan="5" class="text-right">รวม</td>
+                      <td class="text-right bg-warning">
+                        {{formatCurrency(data.price_total)}}
+                      </td>
+                    </tr>
                   
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="5" class="text-right">รวม</td>
-                      <td class="text-right bg-gray">{{formatCurrency(price_all)}}</td>
+                      <td colspan="5" class="text-right bg-danger">รวมทั้งหมด</td>
+                      <td class="text-right bg-danger">{{formatCurrency(price_all)}}</td>
                     </tr>
                   </tfoot>
                 </table>
