@@ -9,21 +9,13 @@ header("Content-Type: application/json; charset=utf-8");
 include "../dbconfig.php";
 
 $data = json_decode(file_get_contents("php://input"));
-// $product = $data;
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'message' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
 try{
     /*ดึงข้อมูลทั้งหมด*/
     $sql = "SELECT * FROM `catalogs` WHERE cat_id = $data->cat_id LIMIT 0,1;";
     $query = $dbcon->prepare($sql);
     $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
+    $result = $query->fetch(PDO::FETCH_OBJ);
     $datas = array();
 
     http_response_code(200);

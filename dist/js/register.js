@@ -10,7 +10,7 @@ document.getElementById("form").addEventListener("submit", function(event){
         
       if(username != '' && email != '' && fullname != '' && password == password2){
         const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", url_base + "/estock/api/auth/register.php");
+        xhttp.open("POST", "./api/auth/register.php");
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.send(JSON.stringify({
           "username": username,

@@ -1,118 +1,97 @@
 <?php
-include_once "../dbconfig.php";
-require "../auth/vendor/autoload.php";
-use \Firebase\JWT\JWT;
-
-header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+require_once "../dbconfig.php";
+require_once "../auth/verify_jwt.php";
 
-date_default_timezone_set("Asia/Bangkok");
+$pro_id   = $_POST['pro_id'] ?? null;
+$pro_name = $_POST['pro_name'] ?? null;
+$pro_detail = $_POST['pro_detail'] ?? null;
+$cat_id   = $_POST['cat_id'] ?? null;
+$unit_id  = $_POST['unit_id'] ?? null;
+$locat    = $_POST['locat'] ?? null;
+$lower    = $_POST['lower'] ?? 0;
+$min      = $_POST['min'] ?? 0;
+$st       = $_POST['st'] ?? 1;
+$action   = $_POST['action'] ?? 'insert';
 
-$jwt = null;
+// จัดการไฟล์รูป
+$imgName = null;
+if (!empty($_FILES['img']['name'])) {
+    $targetDir = "../../uploads/";
+    if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
 
-$data = json_decode(file_get_contents("php://input"));
-$product = $data->product[0];
-
-$authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-
-$arr = explode(" ", $authHeader);
- 
-
-try{
-    $jwt = $arr[1];
-    $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
-    $data = $decoded->data;
-
-    if($product->action == 'insert'){
-        $sql = "SELECT pro_name FROM `products` WHERE pro_name = :pro_name";
-        $query = $dbcon->prepare($sql);
-        $query->bindParam(':pro_name',$product->pro_name, PDO::PARAM_STR);
-        $query->execute();
-        if($query->rowCount() > 0){
-            // echo "เพิ่มข้อมูลเรียบร้อย ok";
-            http_response_code(200);
-            echo json_encode(array('status' => false, 'message' => 'ชื่อสินค้านี้มีในระบบแล้ว', 'responseJSON' => $query->fetchAll(PDO::FETCH_OBJ)));
-            exit;
-        }
-
-        $sql = "INSERT INTO products(pro_name, pro_detail, cat_name, unit_name, locat, lower, min, st, own) 
-                              VALUE(:pro_name, :pro_detail, :cat_name, :unit_name, :locat, :lower, :min, :st, :own);";        
-        $query = $dbcon->prepare($sql);
-        $query->bindParam(':pro_name',$product->pro_name, PDO::PARAM_STR);
-        $query->bindParam(':pro_detail',$product->pro_detail, PDO::PARAM_STR);
-        $query->bindParam(':cat_name',$product->cat_name, PDO::PARAM_STR);
-        $query->bindParam(':unit_name',$product->unit_name, PDO::PARAM_STR);
-        $query->bindParam(':locat',$product->locat, PDO::PARAM_STR);
-        $query->bindParam(':lower',$product->lower, PDO::PARAM_INT);
-        $query->bindParam(':min',$product->min, PDO::PARAM_INT);
-        $query->bindParam(':st',$product->st, PDO::PARAM_INT);
-        $query->bindParam(':own',$data->fullname, PDO::PARAM_STR);
-        $query->execute();
-        if($query->rowCount() > 0){
-            // echo "เพิ่มข้อมูลเรียบร้อย ok";
-            http_response_code(200);
-            echo json_encode(array('status' => true, 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $data));
-        }else{
-            // echo "มีบางอย่างผิดพลาด";
-            http_response_code(200);
-            echo json_encode(array('status' => false, 'message' => 'มีบางอย่างผิดพลาด', 'responseJSON' => $data));
-        }
+    // ✅ ตรวจสอบขนาดไฟล์ไม่เกิน 2 MB
+    if ($_FILES['img']['size'] > 2 * 1024 * 1024) {
+        echo json_encode([
+            "status" => false,
+            "message" => "ไฟล์มีขนาดเกิน 2 MB"
+        ]);
         exit;
     }
-    if($product->action == 'update'){
-        $sql = "UPDATE products SET pro_name =:pro_name, pro_detail =:pro_detail, cat_name =:cat_name, unit_name =:unit_name, locat =:locat, lower =:lower,
-        min=:min, st =:st, own =:own WHERE pro_id = :pro_id ";        
-        $query = $dbcon->prepare($sql);
-        $query->bindParam(':pro_name',$product->pro_name, PDO::PARAM_STR);
-        $query->bindParam(':pro_detail',$product->pro_detail, PDO::PARAM_STR);
-        $query->bindParam(':cat_name',$product->cat_name, PDO::PARAM_STR);
-        $query->bindParam(':unit_name',$product->unit_name, PDO::PARAM_STR);
-        $query->bindParam(':locat',$product->locat, PDO::PARAM_STR);
-        $query->bindParam(':lower',$product->lower, PDO::PARAM_INT);
-        $query->bindParam(':min',$product->min, PDO::PARAM_INT);
-        $query->bindParam(':st',$product->st, PDO::PARAM_INT);
-        $query->bindParam(':own',$data->fullname, PDO::PARAM_STR);
-        $query->bindParam(':pro_id',$product->pro_id, PDO::PARAM_INT);
-        $query->execute();
-        if($query->rowCount() > 0){
-            // echo "เพิ่มข้อมูลเรียบร้อย ok";
-            http_response_code(200);
-            echo json_encode(array('status' => true, 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $product));
-        }else{
-            // echo "มีบางอย่างผิดพลาด";
-            http_response_code(200);
-            echo json_encode(array('status' => false, 'message' => 'ไม่มีการปรับปรุง', 'responseJSON' => $product));
-        }
+
+    $imgName = time() . "_" . basename($_FILES["img"]["name"]);
+    $targetFile = $targetDir . $imgName;
+
+    if (!move_uploaded_file($_FILES["img"]["tmp_name"], $targetFile)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Upload failed"
+        ]);
         exit;
     }
-    if($product->action == 'delete'){
-        $upload_path = '../../uploads/'; // set upload folder path 
-        
-        $sql = "SELECT img FROM products WHERE pro_id=$product->pro_id";
-        $query = $dbcon->prepare($sql);
-        $query->execute();
-        $result = $query->fetchAll(PDO::FETCH_OBJ);
-        if($result){
-            $pro_img = $result[0]->img;
-            if($pro_img != '' && file_exists($upload_path .  $pro_img)){
-                unlink($upload_path . $pro_img);
-            }
-        }
-    
-        $sql = "DELETE FROM products WHERE pro_id = $product->pro_id";
-        $dbcon->exec($sql);
-        http_response_code(200);
-        echo json_encode(array('status' => true, 'message' => 'Record deleted successfully'));  
-        exit;
-    }    
-
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
+try {
+    if ($action === 'insert') {
+        $sql = "INSERT INTO products 
+                (pro_name, pro_detail, cat_id, unit_id, locat, `lower`, `min`, st, img, created_at, updated_at)
+                VALUES 
+                (:pro_name, :pro_detail, :cat_id, :unit_id, :locat, :lower, :min, :st, :img, NOW(), NOW())";
+        $stmt = $dbcon->prepare($sql);
+        $stmt->execute([
+            ":pro_name" => $pro_name,
+            ":pro_detail" => $pro_detail,
+            ":cat_id" => $cat_id,
+            ":unit_id" => $unit_id,
+            ":locat" => $locat,
+            ":lower" => $lower,
+            ":min" => $min,
+            ":st" => $st,
+            ":img" => $imgName
+        ]);
+        echo json_encode(["status" => true, "message" => "เพิ่มสินค้าเรียบร้อยแล้ว"]);
 
+    } elseif ($action === 'update') {
+        $sql = "UPDATE products SET 
+                    pro_name=:pro_name,
+                    pro_detail=:pro_detail,
+                    cat_id=:cat_id,
+                    unit_id=:unit_id,
+                    locat=:locat,
+                    `lower`=:lower,
+                    `min`=:min,
+                    st=:st,
+                    updated_at=NOW()";
+        if ($imgName) $sql .= ", img=:img";
+        $sql .= " WHERE pro_id=:pro_id";
+
+        $stmt = $dbcon->prepare($sql);
+        $params = [
+            ":pro_id" => $pro_id,
+            ":pro_name" => $pro_name,
+            ":pro_detail" => $pro_detail,
+            ":cat_id" => $cat_id,
+            ":unit_id" => $unit_id,
+            ":locat" => $locat,
+            ":lower" => $lower,
+            ":min" => $min,
+            ":st" => $st
+        ];
+        if ($imgName) $params[":img"] = $imgName;
+        $stmt->execute($params);
+
+        echo json_encode(["status" => true, "message" => "แก้ไขสินค้าเรียบร้อยแล้ว"]);
+    }
+} catch (PDOException $e) {
+    echo json_encode(["status" => false, "message" => $e->getMessage()]);
+}

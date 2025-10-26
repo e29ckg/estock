@@ -1,0 +1,213 @@
+-- Users
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    fullname VARCHAR(150) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(150),
+    dep VARCHAR(100),
+    phone VARCHAR(50),
+    role ENUM('admin','member') DEFAULT 'member',
+    st TINYINT(1) DEFAULT 1,
+    refresh_token VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Catalogs
+CREATE TABLE catalogs (
+  cat_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  cat_name VARCHAR(250) NOT NULL,
+  cat_detail VARCHAR(250) DEFAULT NULL,
+  cat_sort INT DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Units
+CREATE TABLE units (
+  unit_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  unit_name VARCHAR(250) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Products
+CREATE TABLE products (
+  pro_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  pro_name VARCHAR(250) NOT NULL,
+  pro_detail TEXT DEFAULT NULL,
+  cat_id INT UNSIGNED NOT NULL,
+  unit_id INT UNSIGNED NOT NULL,
+  instock INT DEFAULT 0,
+  locat VARCHAR(250) DEFAULT '1',
+  lower INT DEFAULT 1,
+  min INT DEFAULT 1,
+  st TINYINT DEFAULT 0,
+  img VARCHAR(250) DEFAULT NULL,
+  own VARCHAR(250) DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL,
+  CONSTRAINT fk_products_catalogs FOREIGN KEY (cat_id) REFERENCES catalogs(cat_id),
+  CONSTRAINT fk_products_units FOREIGN KEY (unit_id) REFERENCES units(unit_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Orders
+CREATE TABLE orders (
+  order_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  order_own VARCHAR(250) DEFAULT NULL,
+  order_app VARCHAR(250) DEFAULT NULL,
+  order_pay_date DATETIME DEFAULT NULL,
+  order_pay_own VARCHAR(250) DEFAULT NULL,
+  comment VARCHAR(250) DEFAULT NULL,
+  st TINYINT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Order Lists
+CREATE TABLE order_lists (
+  order_list_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  order_id INT UNSIGNED NOT NULL,
+  order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  pro_id INT UNSIGNED NOT NULL,
+  qua INT DEFAULT 0,
+  qua_pay INT DEFAULT 0,
+  st TINYINT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL,
+  UNIQUE KEY uniq_order_product (order_id, pro_id),
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+  FOREIGN KEY (pro_id) REFERENCES products(pro_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Store
+CREATE TABLE store (
+  str_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  str_name VARCHAR(250) NOT NULL,
+  str_detail VARCHAR(250) DEFAULT NULL,
+  str_phone VARCHAR(50) DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Recs (ใบรับสินค้า)
+CREATE TABLE recs (
+  rec_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  rec_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  str_id INT UNSIGNED NOT NULL,
+  price_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+  rec_own VARCHAR(100) NOT NULL,
+  rec_app VARCHAR(100) DEFAULT NULL,
+  comment TEXT NULL,
+  st INT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
+  FOREIGN KEY (str_id) REFERENCES store(str_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Rec Lists
+CREATE TABLE rec_lists (
+  rec_list_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  rec_id BIGINT UNSIGNED NOT NULL,
+  rec_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  pro_id INT UNSIGNED NOT NULL,
+  pro_name VARCHAR(255) NOT NULL,
+  unit_name VARCHAR(50) NOT NULL,
+  qua INT UNSIGNED NOT NULL DEFAULT 0,
+  qua_for_ord INT UNSIGNED NOT NULL DEFAULT 0,
+  price_one DECIMAL(12,2) NOT NULL DEFAULT 0,
+  price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  rec_own VARCHAR(100) NOT NULL,
+  rec_app VARCHAR(250) DEFAULT NULL,
+  st INT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME DEFAULT NULL,
+  FOREIGN KEY (rec_id) REFERENCES recs(rec_id) ON DELETE CASCADE,
+  FOREIGN KEY (pro_id) REFERENCES products(pro_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Stock
+CREATE TABLE stock (
+  stck_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  pro_id INT UNSIGNED NOT NULL,
+  to_do_date DATETIME NOT NULL,
+  unit_name VARCHAR(100) DEFAULT NULL,
+  price_one DECIMAL(10,2) DEFAULT NULL,
+  bf INT NOT NULL,
+  stck_in INT DEFAULT NULL,
+  stck_out INT DEFAULT NULL,
+  bal INT NOT NULL,
+  ref_type ENUM('rec','order','adjust','transfer') NOT NULL,
+  ref_id BIGINT NOT NULL,
+  comment VARCHAR(250) DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at DATETIME NULL DEFAULT NULL,
+  FOREIGN KEY (pro_id) REFERENCES products(pro_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Requisitions (เบิกของ)
+CREATE TABLE requisitions (
+    req_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    req_date DATETIME NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE requisition_items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    req_id INT NOT NULL,
+    pro_id INT NOT NULL,
+    qty INT NOT NULL,
+    unit_name VARCHAR(50),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (req_id) REFERENCES requisitions(req_id)
+);
+
+
+INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `fullname`, `dep`, `phone`, `st`, `created_at`, `updated_at`) VALUES
+(1, 'admin', '$2y$10$SxYdH4RDY0TkgjrnZyTnNOhQmCxSmyb/psjTklDAqym8gukpb.YCS', 'admin@example.com', 'admin', 'administartor', '-', '0123456789', 10, '2022-05-17 13:55:40', '2022-05-20 14:18:40');
+
+INSERT INTO `catalogs` (`cat_id`, `cat_name`, `cat_detail`, `cat_sort`) VALUES
+(1, 'วัสดุสำนักงาน', NULL, 1),
+(2, 'วัสดุคอมพิวเตอร์', NULL, 2),
+(3, 'วัสดุไฟฟ้า', NULL, 3),
+(4, 'วัสดุงานบ้านงานครัว', NULL, 4);
+
+
+INSERT INTO `units` (`unit_id`, `unit_name`) VALUES
+(1, 'รีม'),
+(2, 'ใบ'),
+(3, 'กล่อง'),
+(4, 'อัน'),
+(5, 'ม้วน'),
+(6, 'ซอง'),
+(7, 'แท่ง'),
+(8, 'ตลับ'),
+(9, 'ด้าม'),
+(10, 'คู่'),
+(11, 'เล่ม'),
+(12, 'ขวด'),
+(13, 'ก้อน'),
+(14, 'ไม้'),
+(15, 'แผ่น'),
+(16, 'เครื่อง'),
+(17, 'แถว'),
+(18, 'แพ็ค'),
+(19, 'แฟ้ม'),
+(20, 'ผืน');
+

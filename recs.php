@@ -76,7 +76,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id)">รอการตรวจสอบ</button>
                       </td>
                       <td>                        
-                        <button class="btn btn-block btn-warning btn-xs" @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >Update</button>  
+                        <button class="btn btn-block btn-warning btn-xs" @click.prevent="b_Recs_update(data.rec_id)"v-if="data.st == 0" >แก้ไข</button>  
                         <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Recs(data.rec_id)" v-if="data.st == 0">Delete</button>  
                         <button class="btn btn-block btn-primary btn-xs" v-if="data.st == 1" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.rec_id,data.str_id)">รายละเอียด</button>
                         <button class="btn btn-block btn-success btn-xs" v-if="data.st == 1" @click="print_rec(data.rec_id)">พิมพ์</button>
@@ -109,7 +109,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                 <label>เลือกชื่อร้าน</label>
-                <select class="form-control" v-model="Recs[0].str_id" required>
+                <select class="form-control" v-model="Recs.str_id" required>
                   <option v-for="str in stores" :value="str.str_id">{{str.str_name}}</option>                    
                 </select>
                 <!-- {{stores}} -->
@@ -118,7 +118,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>วันที่รับ</label>
-                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Recs[0].rec_date" required>
+                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Recs.rec_date" required>
                 </div>
               </div>
             </div>   
@@ -126,7 +126,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>รายละเอียด</label>
-                  <input type="text" class="form-control" v-model="Recs[0].comment" required>
+                  <input type="text" class="form-control" v-model="Recs.comment" required>
                 </div>
               </div>
             </div> 
@@ -161,12 +161,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <input type="text" class="form-control text-center" v-model="rls.unit_name" placeholder="หน่วยนับ" disabled>
                   </td>
                   <td>
-                    <input type="number" class="form-control text-center" v-model="rls.qua" @keyup="keyup_qua(index)" @change="keyup_qua(index)" placeholder="จำนวน" v-if="rls.pro_name">
-                    <input type="number" class="form-control text-center" v-model="rls.qua"  placeholder="จำนวน" v-else disabled>
+                    <input type="number" min="0" class="form-control text-center" v-model="rls.qua" @keyup="keyup_qua(index)" @change="keyup_qua(index)" placeholder="จำนวน" v-if="rls.pro_name">
+                    <input type="number" min="0" class="form-control text-center" v-model="rls.qua"  placeholder="จำนวน" v-else disabled>
                   </td>
                   <td> 
-                    <input type="number" class="form-control text-right" v-model="rls.price_one" @keyup="keyup_price(index)"  @change="keyup_qua(index)" placeholder="ราตาต่อหน่วย" v-if="rls.pro_name">
-                    <input type="number" class="form-control text-right" v-model="rls.price_one" placeholder="ราตาต่อหน่วย" v-else disabled>
+                    <input type="number" min="0" class="form-control text-right" v-model="rls.price_one" @keyup="keyup_price(index)"  @change="keyup_qua(index)" placeholder="ราตาต่อหน่วย" v-if="rls.pro_name">
+                    <input type="number" min="0" class="form-control text-right" v-model="rls.price_one" placeholder="ราตาต่อหน่วย" v-else disabled>
                   </td>
                   <td>
                     <!-- <input type="text" class="form-control text-right" v-model="rls.price" placeholder="ราคารวม" disabled> -->
@@ -185,7 +185,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </td>
                   <td class="bg-green text-right">
                     <h5>
-                      {{formatCurrency(Recs[0].price_total)}}
+                      {{formatCurrency(Recs.price_total)}}
                     </h5>
                   </td>
                   <td></td>
@@ -193,16 +193,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </tr>            
               </tfoot>
             </table>
-            <!-- {{Rec_lists}} -->
-
             
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Recs_close()">Close</button>
             <button type="submit" class="btn btn-primary" @click.prevent="b_Recs_save()">Save changes</button>     
           </div>
-          </form>
-            <!-- {{Recs}} -->            
+          </form>        
         </div>
       </div>
     </div>
@@ -275,7 +272,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-12">
               <h4>
                 <i class="fas fa-globe"></i> ใบรับของเข้า.
-                <small class="float-right">Date: {{Recs[0].rec_date}}</small>
+                <small class="float-right">Date: {{Recs.rec_date}}</small>
               </h4>
               </div>
             </div>
@@ -283,7 +280,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-4 invoice-col">
                 From
                 <address>
-                  <strong>{{Recs[0].str_name}}</strong><br>
+                  <strong>{{Recs.str_name}}</strong><br>
                 </address>
             </div>
 
@@ -295,8 +292,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
 
             <div class="col-sm-4 invoice-col">
-              <b>CODE #{{Recs[0].rec_id}}</b><br>
-              <b>ผู้บันทึก:</b> {{Recs[0].rec_own}}
+              <b>CODE #{{Recs.rec_id}}</b><br>
+              <b>ผู้บันทึก:</b> {{Recs.rec_own}}
             </div>
           </div>
 
@@ -333,7 +330,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="row no-print">
             <div class="col-12">
               <button type="button" class="btn btn-secondary" data-dismiss="modal"  >Close</button>
-              <button type="button" class="btn btn-success float-right"  v-if="Recs[0].st == 0" @click="b_active()"><i class="far fa-credit-card"></i>
+              <button type="button" class="btn btn-success float-right"  v-if="Recs.st == 0" @click="b_active()"><i class="far fa-credit-card"></i>
                 อนุมัติ
               </button>            
             </div>
@@ -362,22 +359,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
     data() {
       return {
         url_base:'',
-        jwt:'',
         datas:'',
         q:'',
         message: 'Hello Vue!',
-        stores:'',
-        products:'',
-        Recs:[{
+        stores:[],
+        products:[],
+        Recs:{
           rec_id:'',
           rec_own:'',          
           rec_app:'',          
           rec_date:'',          
           str_id:'',          
-          price_total:'',          
+          price_total:0,          
           comment:'',          
           action:'insert'        
-        }],
+        },
         Rec_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}],
         Rec_lists_price_all:0,
         select_pro_index:''
@@ -385,87 +381,137 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-      this.jwt = localStorage.getItem("jwt")
+      this.url_base = '.';
       this.get_Recs()
       this.get_Stores()
       this.get_Products()
     },
     methods: {     
-      print_rec(rec_id){
-        axios.post(this.url_base + 'api/recs/rec_print.php',{rec_id:rec_id})
-            .then(response => {
-                if (response.data.status) {
-                  var print_rec = JSON.stringify(response.data);    
-                  localStorage.setItem("print_rec",print_rec);
-                  window.open(this.url_base + 'recs-report','_blank')
-
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-
-      }, 
-      get_Recs(){
-        axios.post(this.url_base + 'api/recs/get_recs.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.datas = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+      print_rec(rec_id) {
+        window.open(`./recs-report.php?rec_id=${rec_id}`, '_blank');
       },
-      get_Stores(){
-        axios.post(this.url_base + 'api/store/get_stores.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.stores = response.data.respJSON; 
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
+      
+      get_Recs() {
+        const jwt = getJWT();
+        axios.get(this.url_base + '/api/recs/get_recs.php', {
+          headers: { "Authorization": `Bearer ${jwt}` }
+        })
+        .then(response => {
+          console.log("API get_recs response:", response.data);
+
+          if (response.data.status) {
+            this.datas = response.data.respJSON;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message || "ไม่สามารถโหลดข้อมูล Receipts ได้",
+              showConfirmButton: false,
+              timer: 1500
             });
+          }
+        })
+        .catch(error => {
+          console.error("Error get_recs:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
+      
+      get_Stores() {
+        const token = getJWT();
+
+        axios.get(this.url_base + '/api/store/get_stores.php', {
+          headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(response => {
+          console.log("API get_stores response:", response.data);
+
+          if (response.data.status) {
+            this.stores = response.data.respJSON;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message || "ไม่สามารถโหลดข้อมูลร้านค้าได้",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error get_stores:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
+      },
+      
       get_Store(str_id){
-        axios.post(this.url_base + 'api/store/get_store.php',{str_id:str_id})
+        axios.post(this.url_base + '/api/store/get_store.php',{str_id:str_id})
             .then(response => {
                 if (response.data.status) {
                   // console.log(response.data.respJSON)
-                    this.Recs[0].str_name = response.data.respJSON[0].str_name; 
+                    this.Recs.str_name = response.data.respJSON[0].str_name; 
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       },
-      get_Products(){
-        axios.post(this.url_base + 'api/products/get_products.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.products = response.data.respJSON;  
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
+      get_Products() {
+        const token = getJWT();
+
+        axios.get(this.url_base + '/api/products/get_products.php', {
+          headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(response => {
+          console.log("API get_products response:", response.data);
+
+          if (response.data.status) {
+            this.products = response.data.respJSON;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message || "ไม่สามารถโหลดข้อมูลสินค้าได้",
+              showConfirmButton: false,
+              timer: 1500
             });
+          }
+        })
+        .catch(error => {
+          console.error("Error get_products:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
+      
       get_rec(rec_id){
-        axios.post(this.url_base + 'api/recs/get_rec.php',{rec_id:rec_id})
+        const token = getJWT();
+        axios.post(this.url_base + '/api/recs/get_rec.php',{rec_id:rec_id},{headers: { "Authorization": `Bearer ${token}` }})
             .then(response => {
                 if (response.data.status) {
                   this.Recs = response.data.respJSON;
-                  this.Recs[0].action = 'update';              
+                  this.Recs.action = 'update';              
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       },
+      
       get_rec_list(rec_id){
-        axios.post(this.url_base + 'api/recs/get_rec_list.php',{rec_id:rec_id})
+        const token = getJWT();
+        axios.post(this.url_base + '/api/recs/get_rec_list.php',{rec_id:rec_id},{headers: { "Authorization": `Bearer ${token}` }})
             .then(response => {
                 if (response.data.status) {
                   this.Rec_lists = response.data.respJSON;  
@@ -476,33 +522,38 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
+      
       b_Recs_insert(){
         this.b_Recs_close();
       },  
+      
       b_Recs_update(rec_id){
         this.$refs['m_show'].click();
         this.get_rec(rec_id)
         this.get_rec_list(rec_id)
       },
+      
       async b_Check(rec_id,str_id){
         await this.get_rec(rec_id)
         await this.get_rec_list(rec_id)
-        await this.get_Store(str_id)
-        console.log(str_id)
       },
+
       b_active(){
         Swal.fire({
           title: 'Are you sure?',
-          text: "You won't be able to revert this!",
+          text: "ต้องการอนุมัติ...!",
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
           confirmButtonText: 'Yes, it!'
         }).then((result) => {
-          if (result.isConfirmed) {            
-            this.Recs[0].action='active'
-            axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
+          if (result.isConfirmed) {   
+            const token = getJWT();      
+            this.Recs.action='active'
+            axios.post(this.url_base + '/api/recs/recs_action.php',
+              {Recs:this.Recs, Rec_lists:this.Rec_lists},
+              {headers: {"Authorization" : `Bearer ${token}`}})
               .then(response => {
                   if (response.data.status == 'success'){
                     Swal.fire({
@@ -530,104 +581,143 @@ scratch. This page gets rid of all links and provides the needed markup only.
         });        
         }, 
 
-      b_Recs_save(){
-        if(this.Recs[0].str_id != '' && this.Recs[0].rec_date != '' && this.Rec_lists[0].pro_name != ''){
-          axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs, Rec_lists:this.Rec_lists},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
-              .then(response => {
-                  if (response.data.status == 'success') {
-                    Swal.fire({
-                      icon: response.data.status,
-                      title: response.data.message,
-                      showConfirmButton: false,
-                      timer: 1500
-                    });
-                    this.$refs['m_close'].click();
-                    this.get_Recs();  
-                    this.Recs = [{rec_id:'', rec_own:'', rec_app:'', str_id:'', action:'insert'}]
-                    this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]
-                  }else{
-                    Swal.fire({
-                      icon: response.data.status,
-                      title: response.data.message,
-                      showConfirmButton: false,
-                      timer: 1500
-                    })
-                  }
-              })
-              .catch(function (error) {
-                  console.log(error);
-              });
-        }else{
-          Swal.fire({
-                      icon: 'error',
-                      title: 'กรุณาตรวจสอบการป้อนข้อมูล',
-                      showConfirmButton: false,
-                      timer: 1500
-                    });
+      b_Recs_save() {
+        // ✅ ตรวจสอบข้อมูลก่อน
+        if (
+          !this.Recs.str_id?.toString().trim() ||
+          !this.Recs.rec_date?.toString().trim() ||
+          !this.Rec_lists.length ||
+          !this.Rec_lists[0].pro_name?.toString().trim()
+        ) {
+          return Swal.fire({
+            icon: 'error',
+            title: 'กรุณาตรวจสอบการป้อนข้อมูล',
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
+        const token = getJWT();
+        axios.post(
+          this.url_base + '/api/recs/recs_action.php',
+          { Recs: this.Recs, Rec_lists: this.Rec_lists },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then(response => {
+          const { status, message } = response.data;
 
+          Swal.fire({
+            icon: status === 'success' ? 'success' : 'error',
+            title: message,
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          if (status === 'success') {
+            this.$refs.m_close.click();
+            this.get_Recs();
+            this.resetRecs();
+          }
+        })
+        .catch(error => {
+          console.error("Error saving Recs:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ API',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
-      destroy_Recs(rec_id){
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  this.Recs[0].action = 'delete';  
-                  this.Recs[0].rec_id = rec_id;  
-                  axios.post(this.url_base + 'api/recs/recs_action.php',{Recs:this.Recs},{ headers: {"Authorization" : `Bearer ${this.jwt}`}})
-                    .then(response => {
-                        if (response.data.status == 'success') {
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                          this.get_Recs(); 
-                             
-                        }else{
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });                    
+
+      // ✅ ฟังก์ชัน reset ค่า
+    resetRecs() {
+      this.Recs = {
+          rec_id: '',
+          rec_own: '',
+          rec_app: '',
+          str_id: '',
+          rec_date: '',
+          action: 'insert'
+        };
+
+      this.Rec_lists = [{
+          pro_id: '',
+          pro_name: '',
+          unit_name: '',
+          qua: '',
+          price_one: '',
+          price: 0
+        }];
+    },
+     
+      destroy_Recs(rec_id) {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const token = getJWT();
+              const payload = { Recs: { action: 'delete', rec_id } };
+              axios.post(this.url_base + '/api/recs/recs_action.php', payload, {
+                headers: { "Authorization": `Bearer ${token}` }
+              })
+              .then(response => {
+                const { status, message } = response.data;
+
+                Swal.fire({
+                  icon: status === 'success' ? 'success' : 'error',
+                  title: message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+
+                if (status === 'success') {
+                  this.get_Recs();
                 }
-              });            
+              })
+              .catch(error => {
+                console.error("Delete error:", error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ API',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              });
+            }
+          });
         },
+        
         b_Recs_close(){
-          this.Recs = [{rec_id:'',rec_own:'',rec_app:'', rec_date:'',str_id:'',price_total:0, comment:'',action:'insert'}]  
+          this.Recs = {rec_id:'',rec_own:'',rec_app:'', rec_date:'',str_id:'',price_total:0, comment:'',action:'insert'}  
           this.Rec_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0}]   
         },
         b_rls_plus(){
           this.Rec_lists.push({pro_id:'', pro_name:'', unit_name:'', qua:'', price_one:'', price:0})
         },
+
         b_rls_del(index){
           this.Rec_lists.pop()
           this.count_price_total()
           // console.log(index)
         } ,
+
         b_pro_show(index){
           // console.log(index)
           this.q = ''
           this.get_Products()
           this.select_pro_index = index
         },
+        
         ch_search_pro(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(this.url_base + 'api/products/product_search.php',{q:this.q})
+            axios.post(this.url_base + '/api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.products = response.data.respJSON;                    
@@ -640,9 +730,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
             this.get_Products()
           }
         },
+        
         reset_search(){
           this.q = ''
         },
+        
         handleBlurSearch(e) {
           this.get_Products()
           // console.log('blur', e.target.placeholder)
@@ -664,9 +756,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           this.count_price_total()
         },
         count_price_total(){    
-          this.Recs[0].price_total = 0      
+          this.Recs.price_total = 0      
           for (let i = 0; i < this.Rec_lists.length; i++) {
-            this.Recs[0].price_total = Number(this.Recs[0].price_total) + Number(this.Rec_lists[i].price)
+            this.Recs.price_total = Number(this.Recs.price_total) + Number(this.Rec_lists[i].price)
             // console.log(this.Rec_lists.length + ' ' + parseInt(this.Rec_lists[i].price))
           }
         },
@@ -677,7 +769,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             MyDateString = MyDate.getFullYear() + '-' + ("0" + (MyDate.getMonth()+1)).slice(-2)
             return ("0" + MyDate.getDate()).slice(-2)+ '-' + ("0" + (MyDate.getMonth()+1)).slice(-2) + '-' + (MyDate.getFullYear() + 543)
         },
-        formatCurrency(number) {
+        formatCurrency(number = 0) {
           number = parseFloat(number);
           return number.toFixed(2).replace(/./g, function(c, i, a) {
               return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;

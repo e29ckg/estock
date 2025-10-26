@@ -64,18 +64,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody >
                     <tr v-for="data,index in datas">
-                      <td>{{data.ord_id}}</td>
-                      <td :data-date="data.ord_date">{{date_thai(data.ord_date)}}</td>
-                      <td>{{data.ord_own}}</td>
+                      <td>{{data.order_id}}</td>
+                      <td :data-date="data.order_date">{{date_thai(data.order_date)}}</td>
+                      <td>{{data.order_own}}</td>
                       <td>
-                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.ord_id)">รอตรวจสอบ</button>
+                        <button class="btn btn-block btn-danger btn-xs" v-if="data.st == 0" data-toggle="modal" data-target="#exampleModal3" @click="b_Check(data.order_id)">รอตรวจสอบ</button>
                         <span v-if="data.st == 1" class="badge bg-primary">อนุมัติแล้ว</span>
                       </td>
                       <td>
-                        <button class="btn btn-block btn-primary btn-xs" data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.ord_id)">รายละเอียด</button>                      
-                        <button class="btn btn btn-block btn-warning btn-xs" @click.prevent="b_Order_update(data.ord_id)" v-if="data.st == 0" >Update</button>  
-                        <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Order(data.ord_id)" v-if="data.st == 0">Delete</button>  
-                        <button class="btn btn-block btn-success btn-xs" @click.prevent="order_print(data.ord_id)" >พิมพ์</button>  
+                        <button class="btn btn-block btn-primary btn-xs" data-toggle="modal" data-target="#exampleModal4" v-if="data.st == 1" @click="b_Check(data.order_id)">รายละเอียด</button>                      
+                        <button class="btn btn btn-block btn-warning btn-xs" @click.prevent="b_Order_update(data.order_id)" v-if="data.st == 0" >Update</button>  
+                        <button class="btn btn-block btn-danger btn-xs" @click.prevent="destroy_Order(data.order_id)" v-if="data.st == 0">Delete</button>  
+                        <button class="btn btn-block btn-success btn-xs" @click.prevent="order_print(data.order_id)" >พิมพ์</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -94,7 +94,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- <form @submit.prevent="b_Order_save()">             -->
         <div class="modal-content">         
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">ผู้เบิก : {{Ord[0].ord_own}}</h5>
+            <h5 class="modal-title" id="exampleModalLabel">ผู้เบิก : {{Ord.order_own}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click.prevent="b_Order_close()">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -104,9 +104,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>ผู้เบิก</label>
-                  <!-- <input type="text" name="ord_own" id="ord_own" class="form-control" v-model="Ord[0].ord_own"> -->
-                  <select v-model="Ord[0].ord_own" class="form-control" aria-label="Default select example" required>
-                    <option v-for="u in users" :value="u.fullname">{{u.fullname}}</option>
+                  <!-- <input type="text" name="order_own" id="order_own" class="form-control" v-model="Ord.order_own"> -->
+                  <select v-model="Ord.user_id" class="form-control" aria-label="Default select example" required>
+                    <option v-for="u in users" :value="u.user_id">{{u.fullname}}</option>
                   </select>
                   
                 </div>
@@ -114,7 +114,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-6">
                 <div class="form-group">
                   <label>วันที่เบิก</label>
-                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord[0].ord_date" required>
+                  <input type="date" name="datepicker" id="datepicker" class="form-control" v-model="Ord.order_date" required>
                 </div>
               </div>
             </div>  
@@ -179,7 +179,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             
           </div>
           <div class="modal-footer">
-            {{Ord[0].ord_own}} 
+            {{Ord.order_own}} 
             <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click.prevent="b_Order_close()">Close</button>
             <button type="submit" class="btn btn-primary" @click.prevent="b_Order_save()">Save changes</button>     
           </div>
@@ -256,7 +256,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <div class="col-12">
                   <h4>
                     <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
-                    <small class="float-right">Date: {{Ord[0].ord_date}}</small>
+                    <small class="float-right">Date: {{Ord.order_date}}</small>
                   </h4>
                   </div>
                 </div>
@@ -264,7 +264,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <div class="col-sm-4 invoice-col">
                     ผู้เบิก
                     <address>
-                      <strong>{{Ord[0].ord_own}}</strong><br>
+                      <strong>{{Ord.order_own}}</strong><br>
                     </address>
                 </div>
 
@@ -276,7 +276,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
 
                 <div class="col-sm-4 invoice-col">
-                  <b>CODE #{{Ord[0].ord_id}}</b><br>
+                  <b>CODE #{{Ord.order_id}}</b><br>
                 </div>
               </div>
 
@@ -316,7 +316,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="row no-print">
                 <div class="col-12">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="m3_close_click" >Close</button>                  
-                  <button  type="button" class="btn btn-success float-right "  v-if="Ord[0].st == 0" @click="b_active()">
+                  <button  type="button" class="btn btn-success float-right "  v-if="Ord.st == 0" @click="b_active()">
                     <i class="far fa-credit-card"></i>
                     อนุมัติการเบิก
                   </button>            
@@ -348,7 +348,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="col-12">
                   <h4>
                     <i class="fas fa-globe"></i> ใบเบิกวัสดุ.
-                    <small class="float-right">Date: {{Ord[0].ord_date}}</small>
+                    <small class="float-right">Date: {{Ord.order_date}}</small>
                   </h4>
                 </div>
               </div>
@@ -356,7 +356,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="col-sm-4 invoice-col">
                   ผู้เบิก
                   <address>
-                    <strong>{{Ord[0].ord_own}}</strong><br>
+                    <strong>{{Ord.order_own}}</strong><br>
                   </address>
                 </div>
 
@@ -368,7 +368,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
 
                 <div class="col-sm-4 invoice-col">
-                  <b>CODE #{{Ord[0].ord_id}}</b><br>
+                  <b>CODE #{{Ord.order_id}}</b><br>
                 </div>
               </div>
 
@@ -421,10 +421,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <?php include "./layouts/footer.php";?>
 </div>
 <?php include "./layouts/footer2.php";?>
-<script>
 
-</script>
 <script>
+  requireAuth()
+  const token = getJWT();
   Vue.createApp({
     data() {
       return {
@@ -434,7 +434,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         message: 'Hello Vue!',
         stores:'',
         products:'',
-        Ord:[{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}],
+        Ord:{order_id:'', user_id:'', order_own:'',ord_app:'', order_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'},
         Ord_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:''}],
         select_pro_index:'',
         users:'',
@@ -443,72 +443,84 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
+      this.url_base ='.' ;
       this.get_Orders()
-      this.get_Products()
+      //this.get_Products()
       this.get_users()
     },
     methods: { 
-      order_print(ord_id){
-        axios.post(this.url_base + 'api/orders/orders_print.php',{ord_id:ord_id})
-            .then(response => {
-                if (response.data.status) {
-                    ord_print = JSON.stringify(response.data)   
-                    localStorage.setItem("ord_print",ord_print)
-                    window.open("orders-print.php",'_blank')      
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+      order_print(order_id){
+         window.open("orders-print.php?order_id=" + order_id, "_blank");
+
       },    
-      get_Orders(){
-        axios.post(this.url_base + 'api/orders/get_orders.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.datas = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+      get_Orders() {
+        axios.get("./api/orders/orders_list.php", {
+           headers: { Authorization: `Bearer ${token}` }
+           })
+          .then(res => {
+            this.datas = res.data.orders || [];
+          })
+          .catch(err => this.handleAuthError(err));
       },
-      get_users(){
-        axios.post(this.url_base + 'api/users/get_users.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.users = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+
+      get_users() {
+        axios.post(
+          this.url_base + '/api/users/get_users.php',
+          {}, // ไม่มี body → ส่งเป็น object ว่าง
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
+        .then(response => {
+          if (response.data.status && response.data.respJSON) {
+            this.users = response.data.respJSON;
+          } else {
+            console.warn("No users found or API returned error:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("API error:", error);
+        });
       },
-      get_Products(){
-        axios.post(this.url_base + 'api/orders/get_products.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.products = response.data.respJSON;  
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+      
+      get_Products() {
+        axios.get(this.url_base + '/api/products/get_products.php', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+          if (response.data.status && response.data.respJSON) {
+            this.products = response.data.respJSON;
+          } else {
+            console.warn("API returned no products:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("API error:", error);
+        });
       },
-      get_Order(ord_id){
-        axios.post(this.url_base + 'api/orders/get_order.php',{ord_id:ord_id})
-            .then(response => {
-                if (response.data.status) {
-                  this.Ord = response.data.respJSON;       
-                  this.Ord[0].action = 'update'                   
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+
+      get_Order(order_id) {
+        axios.post(
+          this.url_base + '/api/orders/get_order.php',
+          { order_id: order_id }, 
+          { headers: { Authorization: `Bearer ${token}` }}
+        )
+        .then(response => {
+          if (response.data.status && response.data.respJSON) {
+            this.Ord = {...response.data.respJSON,action : 'update'};
+           
+          } else {
+            console.warn("API returned no order:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("API error:", error);
+        });this.Ord
       },
-      get_Ord_list(ord_id){
-        axios.post(this.url_base + 'api/orders/get_order_list.php',{ord_id:ord_id})
+      get_Ord_list(order_id){
+        axios.post(this.url_base + '/api/orders/get_orders_list.php',
+        {order_id:order_id},
+        { headers: { Authorization: `Bearer ${token}` }})
             .then(response => {
                 if (response.data.status) {
                   this.Ord_lists = response.data.respJSON;    
@@ -521,17 +533,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
       b_Order_insert(){
         this.b_Order_close();
         var user_data = JSON.parse(localStorage.getItem("user_data"));
-        this.Ord[0].ord_own = user_data.fullname
+        this.Ord.order_own = user_data.fullname
         console.log(user_data.fullname)
       },  
-      b_Order_update(ord_id){        
+      b_Order_update(order_id){        
         this.$refs['m_show'].click()
-        this.get_Order(ord_id)
-        this.get_Ord_list(ord_id)
+        this.get_Order(order_id)
+        this.get_Ord_list(order_id)
       },
-      b_Check(ord_id,str_id){
-        this.get_Order(ord_id)
-        this.get_Ord_list(ord_id)
+      b_Check(order_id,str_id){
+        this.get_Order(order_id)
+        this.get_Ord_list(order_id)
       },
       m3_close_click(){
         this.ck_order = 0
@@ -548,12 +560,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               }).then((result) => {
                 if (result.isConfirmed) {
                   var jwt = localStorage.getItem("jwt");
-                  this.Ord[0].action='active'
-                  axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  this.Ord.action='active'
+                  axios.post(this.url_base + '/api/orders/orders_active.php',
+                    {Ord:this.Ord, Ord_lists:this.Ord_lists},
+                    { headers: {"Authorization" : `Bearer ${token}}`}})
                     .then(response => {
-                      if (response.data.status == 'success'){
+                      if (response.data.status){
                         Swal.fire({
-                          icon: response.data.status,
+                          icon: 'success',
                           title: response.data.message,
                           showConfirmButton: false,
                           timer: 1500
@@ -563,7 +577,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         this.$refs['m3_close'].click();                    
                       }else{
                         Swal.fire({
-                          icon: response.data.status,
+                          icon: 'error',
                           title: response.data.message,
                           showConfirmButton: false,
                           timer: 1500
@@ -577,24 +591,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }, 
 
       b_Order_save(){
-        if(this.Ord[0].ord_own != '' && this.Ord[0].rec_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
-          var jwt = localStorage.getItem("jwt");
-          axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord, Ord_lists:this.Ord_lists},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        if(this.Ord.user_ud != '' && this.Ord.order_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
+          
+          axios.post(this.url_base + '/api/orders/orders_action.php',
+            {Ord:this.Ord, Ord_lists:this.Ord_lists},
+            { headers: {"Authorization" : `Bearer ${token}`}})
               .then(response => {
-                  if (response.data.status == 'success') {
+                  if (response.data.status) {
                     Swal.fire({
-                      icon: response.data.status,
+                      icon: 'success',
                       title: response.data.message,
                       showConfirmButton: false,
                       timer: 1500
                     });
                     this.$refs['m_close'].click();
                     this.get_Orders();  
-                    this.Ord = [{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}]
+                    this.Ord = {order_id:'', order_own:'',ord_app:'', order_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}
                     this.Ord_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:''}]
                   }else{
                     Swal.fire({
-                      icon: response.data.status,
+                      icon: 'error',
                       title: response.data.message,
                       showConfirmButton: false,
                       timer: 1500
@@ -614,25 +630,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
         }
 
       },
-      destroy_Order(ord_id){
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+      destroy_Order(order_id){
+            Swal.fire({ 
+                title: `Are you sure?  ${order_id}`,
+                text: "You won't be able to revert this! ",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, delete it!'
               }).then((result) => {
-                if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.Ord[0].action = 'delete';  
-                  this.Ord[0].ord_id = ord_id;  
-                  axios.post(this.url_base + 'api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                if (result.isConfirmed) {                  
+                  this.Ord.action = 'delete';  
+                  this.Ord.order_id = order_id;  
+                  axios.post(this.url_base + '/api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${token}`}})
                     .then(response => {
-                        if (response.data.status == 'success') {
+                        if (response.data.status) {
                           Swal.fire({
-                            icon: response.data.status,
+                            icon: 'success',
                             title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
@@ -641,7 +656,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                              
                         }else{
                           Swal.fire({
-                            icon: response.data.status,
+                            icon: 'error',
                             title: response.data.message,
                             showConfirmButton: false,
                             timer: 1500
@@ -656,7 +671,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });            
         },
         b_Order_close(){
-          this.Ord = [{ord_id:'', ord_own:'',ord_app:'', ord_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}] 
+          this.Ord = {order_id:'', order_own:'',ord_app:'', order_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'}
           this.Ord_lists = [{pro_id:'', pro_name:'', unit_name:'', qua:''}]   
         },
         b_orl_plus(){
@@ -674,7 +689,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         ch_search_pro(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(this.url_base + 'api/products/product_search.php',{q:this.q})
+            axios.post(this.url_base + '/api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.products = response.data.respJSON;                    
@@ -719,9 +734,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           // this.count_price_total()
         },
         count_price_total(){    
-          this.Ord[0].price_total = 0      
+          this.Ord.price_total = 0      
           for (let i = 0; i < this.Ord_lists.length; i++) {
-            this.Ord[0].price_total = Number(this.Ord[0].price_total) + Number(this.Ord_lists[i].price)
+            this.Ord.price_total = Number(this.Ord.price_total) + Number(this.Ord_lists[i].price)
             // console.log(this.Ord_lists.length + ' ' + parseInt(this.Ord_lists[i].price))
           }
         },

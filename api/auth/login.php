@@ -1,7 +1,9 @@
 <?php
-include_once './database.php';
+require '../dbconfig.php';        // ใช้ dbconfig.php
 require './vendor/autoload.php';
+
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -9,113 +11,102 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-date_default_timezone_set("Asia/Bangkok");
-
-
-$email = '';
-$password = '';
-
-$databaseService = new DatabaseService();
-$conn = $databaseService->getConnection();
-
+$tz = getenv('APP_TIMEZONE') ?: 'Asia/Bangkok';
+date_default_timezone_set($tz);
 
 $data = json_decode(file_get_contents("php://input"));
 
-// http_response_code(200);
-//     echo json_encode(array("message" => $data->username."User was successfully registered."));
-//     exit;
+$usernameOrEmail = $data->username ?? '';
+$password        = $data->password ?? '';
 
-$email = $data->username;
-$username = $data->username;
-$password = $data->password;
-
-$table_name = 'users';
 try {
-    $query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? AND st = 10 LIMIT 0,1";
+    $query = "SELECT user_id, fullname, password, role, email 
+              FROM users 
+              WHERE (email = ? OR username = ?) AND st = 10 
+              LIMIT 1";
 
-    $stmt = $conn->prepare( $query );
-    $stmt->bindParam(1, $email, PDO::PARAM_STR);
-    $stmt->bindParam(2, $username, PDO::PARAM_STR);
+    $stmt = $dbcon->prepare($query);
+    $stmt->bindParam(1, $usernameOrEmail, PDO::PARAM_STR);
+    $stmt->bindParam(2, $usernameOrEmail, PDO::PARAM_STR);
     $stmt->execute();
-    $num = $stmt->rowCount();
 
-    if($num > 0){
+    if ($stmt->rowCount() > 0) {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $user_id = $row['user_id'];
-        $fullname = $row['fullname'];
-        $password2 = $row['password'];
-        $role = $row['role'];
-
-        if(password_verify($password, $password2))
-        {
-            // This is your client secret
-            // $key = '__test_secret__';
-            $t = 8 * 3600 ; // 
-            $token_gen = bin2hex(random_bytes(16));
-
-            $query = "UPDATE users SET token=:token WHERE user_id=:user_id";
-
-            $stmt = $conn->prepare( $query );
-            $stmt->bindParam(":token", $token_gen, PDO::PARAM_STR);
-            $stmt->bindParam(":user_id", $user_id,PDO::PARAM_INT);
-            $stmt->execute();
-
-            // $secret_key = "99299929";
-            $issuer_claim = "localhost"; // this can be the servername
+        if (password_verify($password, $row['password'])) {
+            // ✅ ใช้ secret key จาก .env
+            $secret_key     = getenv('JWT_SECRET');
+            $issuer_claim   = "localhost";
             $audience_claim = "E29CKG";
-            $issuedat_claim = time(); // issued at
-            $notbefore_claim = $issuedat_claim + 1; //not before in seconds
-            $expire_claim = $issuedat_claim + $t; // expire time in seconds
-            $token = array(
-                "iss" => $issuer_claim,
-                "aud" => $audience_claim,
-                "iat" => $issuedat_claim,
-                "token" => $token_gen,
-                "user_id" => $user_id,
-                // "nbf" => $notbefore_claim,
-                "exp" => $expire_claim,
-                "data" => array(                
-                    "fullname" => $fullname,
-                    "role" => $role,
-                    "email" => $email
-            ));
-            
-            // $jwt = JWT::encode($token, $secret_key, 'RS256');
-            $jwt = JWT::encode($token, base64_decode(strtr($key, '-_', '+/')), 'HS256');
-            http_response_code(200);
-            echo json_encode(
-                array(
-                    "status" => "success",
-                    "message" => "Successful login.",
-                    "jwt" => $jwt,
-                    "user_data" => json_encode(array(                
-                        "fullname" => $fullname,
-                        "role" => $role,
-                        "email" => $email
-                    )),
-                    "email" => $email,
-                    "expireAt" => $expire_claim
-                ));
-        }else{
+            $issuedat_claim = time();
+
+            // Access Token (อายุสั้น)
+            $expire_claim   = $issuedat_claim + (8 * 3600); // 8 ชั่วโมง
+            $token_payload = [
+                "iss"  => $issuer_claim,
+                "aud"  => $audience_claim,
+                "iat"  => $issuedat_claim,
+                "exp"  => $expire_claim,
+                "data" => [
+                    "user_id"  => $row['user_id'],
+                    "fullname" => $row['fullname'],
+                    "role"     => $row['role'],
+                    "email"    => $row['email']
+                ]
+            ];
+            $jwt = JWT::encode($token_payload, $secret_key, 'HS256');
+
+            // Refresh Token (อายุยาวกว่า)
+            $refresh_expire = $issuedat_claim + (30 * 24 * 3600); // 30 วัน
+            $refresh_payload = [
+                "iss"  => $issuer_claim,
+                "aud"  => $audience_claim,
+                "iat"  => $issuedat_claim,
+                "exp"  => $refresh_expire,
+                "data" => [
+                    "user_id" => $row['user_id']
+                ]
+            ];
+            $refresh_jwt = JWT::encode($refresh_payload, $secret_key, 'HS256');
+
+            // ✅ เก็บ refresh token ลง DB
+            $stmt = $dbcon->prepare("UPDATE users SET refresh_token = :rtoken WHERE user_id = :uid");
+            $stmt->execute([":rtoken" => $refresh_jwt, ":uid" => $row['user_id']]);
 
             http_response_code(200);
-            echo json_encode(array("status"=>"error","message" => "Login failed. Password Incorrect", "password" => $password));
+            echo json_encode([
+                "status"       => "success",
+                "message"      => "Successful login.",
+                "jwt"          => $jwt,
+                "refresh_jwt"  => $refresh_jwt,
+                "user_data"    => [
+                    "user_id"  => $row['user_id'],
+                    "fullname" => $row['fullname'],
+                    "role"     => $row['role'],
+                    "email"    => $row['email']
+                ],
+                "expireAt"     => $expire_claim,
+                "refreshExpAt" => $refresh_expire
+            ]);
+        } else {
+            http_response_code(401);
+            echo json_encode([
+                "status"  => "error",
+                "message" => "Login failed. Incorrect username or password."
+            ]);
         }
-    }else{
-            http_response_code(200);
-            echo json_encode(array("status"=>"error","message" => "Login failed. Username Not Found", "username" => $username));
-        
+    } else {
+        http_response_code(401);
+        echo json_encode([
+            "status"  => "error",
+            "message" => "Login failed. Incorrect username or password."
+        ]);
     }
-}catch (Exception $e){
-
-    http_response_code(401);
-
-    echo json_encode(array(
-        "status"=>"error",
-        "message" => "Access denied.",
-        "error" => $e->getMessage()
-    ));
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        "status"  => "error",
+        "message" => "Internal server error.",
+        "error"   => $e->getMessage()
+    ]);
 }
-
-?>

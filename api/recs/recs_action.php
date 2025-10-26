@@ -1,7 +1,6 @@
 <?php
-include_once "../dbconfig.php";
-require "../auth/vendor/autoload.php";
-use \Firebase\JWT\JWT;
+require_once "../dbconfig.php";
+require_once "../auth/verify_jwt.php"; // ✅ ตรวจสอบ JWT และได้ $userData
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -11,237 +10,232 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 date_default_timezone_set("Asia/Bangkok");
 
-// $key = "__test_secret__";
-$jwt = null;
-// $databaseService = new DatabaseService();
-// $conn = $databaseService->getConnection();
-
 $data = json_decode(file_get_contents("php://input"));
-$Recs = $data->Recs[0];
+$Recs = $data->Recs ?? null;
+$Rec_lists = $data->Rec_lists ?? [];
 
-$password = "password";
+// ✅ ดึงข้อมูลผู้ใช้จาก verify_jwt.php
+$rec_own = $userData['fullname'] ?? 'system';
 
-$rec_own = '';
+// ✅ ถ้าไม่ได้ส่ง ord_date มา → ใช้วันที่ปัจจุบัน
+if (empty($Recs->rec_date)) {
+    $rec_date = date("Y-m-d H:i:s");
+} elseif (is_numeric($Recs->rec_date)) {
+    // ถ้าเป็น timestamp
+    $rec_date = date("Y-m-d H:i:s", (int)$Recs->rec_date);
+} else {
+    // ถ้าเป็น string เช่น "2025-10-19"
+    $rec_date = $Recs->rec_date . " 00:00:00";
+}
 
-$authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-
-$arr = explode(" ", $authHeader);
-
-// http_response_code(200);
-// echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $Recs->str_id ));
-// die; 
-
-try{
-    $jwt = $arr[1];
-    $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
-    $data_auth = $decoded->data;
-    
-    $rec_own = $data_auth->fullname;    
-    
-    if($Recs->action == 'insert'){
+try {
+    // ---------------- INSERT ----------------
+    if ($Recs->action === 'insert') {
         $dbcon->beginTransaction();
-        $rec_id = time();
 
-        
-        $sql = "INSERT INTO recs(rec_id, rec_date, str_id, price_total, rec_own, comment) VALUE(:rec_id, :rec_date, :str_id, :price_total, :rec_own, :comment);";        
+        // ✅ ไม่ต้องกำหนด rec_id เอง ให้ AUTO_INCREMENT ทำงาน
+        $sql = "INSERT INTO recs(rec_date, str_id, price_total, rec_own, comment, created_at, updated_at) 
+                VALUES(:rec_date, :str_id, :price_total, :rec_own, :comment, NOW(), NOW())";
         $query = $dbcon->prepare($sql);
-        $query->bindParam(':rec_id', $rec_id,PDO::PARAM_INT);
-        $query->bindParam(':rec_date', $Recs->rec_date);
-        $query->bindParam(':str_id',$Recs->str_id, PDO::PARAM_INT);
-        $query->bindParam(':price_total',$Recs->price_total, PDO::PARAM_STR);
-        $query->bindParam(':rec_own',$rec_own, PDO::PARAM_STR);
-        $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
-        $query->execute();  
-        
-        $Rec_lists = $data->Rec_lists;
-        foreach($Rec_lists as $rls){
-            if($rls->pro_id != ''){
-                $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own) VALUE(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own);";        
-                $query = $dbcon->prepare($sql);
-                $query->bindParam(':rec_id', $rec_id, PDO::PARAM_INT);
-                $query->bindParam(':rec_date', $Recs->rec_date);
-                $query->bindParam(':pro_id', $rls->pro_id, PDO::PARAM_INT);
-                $query->bindParam(':pro_name', $rls->pro_name, PDO::PARAM_STR);
-                $query->bindParam(':unit_name', $rls->unit_name, PDO::PARAM_STR);
-                $query->bindParam(':qua', $rls->qua, PDO::PARAM_INT);                
-                $query->bindParam(':qua_for_ord', $rls->qua, PDO::PARAM_INT);
-                $query->bindParam(':price_one', $rls->price_one, PDO::PARAM_STR);
-                $query->bindParam(':price', $rls->price, PDO::PARAM_STR);
-                $query->bindParam(':rec_own', $rec_own, PDO::PARAM_STR);
-                $query->execute();  
+        $query->execute([
+            ':rec_date' => $rec_date,
+            ':str_id' => $Recs->str_id,
+            ':price_total' => $Recs->price_total,
+            ':rec_own' => $rec_own,
+            ':comment' => $Recs->comment
+        ]);
+
+        // ✅ ดึง rec_id ที่เพิ่ง insert
+        $rec_id = $dbcon->lastInsertId();
+
+        // ✅ Insert รายการสินค้า
+        $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own, created_at, updated_at) 
+                VALUES(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own, NOW(), NOW())";
+        $query = $dbcon->prepare($sql);
+
+        foreach ($Rec_lists as $rls) {
+            if (!empty($rls->pro_id)) {
+                $query->execute([
+                    ':rec_id' => $rec_id,
+                    ':rec_date' => $rec_date,
+                    ':pro_id' => $rls->pro_id,
+                    ':pro_name' => $rls->pro_name,
+                    ':unit_name' => $rls->unit_name,
+                    ':qua' => $rls->qua,
+                    ':qua_for_ord' => $rls->qua,
+                    ':price_one' => $rls->price_one,
+                    ':price' => $rls->price,
+                    ':rec_own' => $rec_own
+                ]);
             }
         }
-            // echo "เพิ่มข้อมูลเรียบร้อย ok";
-        http_response_code(200);
-        echo json_encode(array('status' => 'success', 'message' => 'เพิ่มข้อมูลเรียบร้อย ok', 'responseJSON' => $Rec_lists));
 
         $dbcon->commit();
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'เพิ่มข้อมูลเรียบร้อย',
+            'rec_id' => $rec_id
+        ]);
         exit;
-        
     }
 
-    if($Recs->action == 'update'){
+    // ---------------- UPDATE ----------------
+    if ($Recs->action === 'update') {
         $dbcon->beginTransaction();
-        
-        $sql = "UPDATE recs SET rec_date=:rec_date, str_id=:str_id, price_total=:price_total, comment=:comment, rec_own=:rec_own WHERE rec_id = :rec_id ;"; 
+
+        // ✅ อัปเดตหัวเอกสาร
+        $sql = "UPDATE recs 
+                SET rec_date=:rec_date, str_id=:str_id, price_total=:price_total, comment=:comment, updated_at=NOW()
+                WHERE rec_id=:rec_id AND deleted_at IS NULL";
         $query = $dbcon->prepare($sql);
-        $query->bindParam(':rec_date', $Recs->rec_date);
-        $query->bindParam(':str_id',$Recs->str_id, PDO::PARAM_INT);
-        $query->bindParam(':price_total',$Recs->price_total, PDO::PARAM_STR);
-        $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
-        $query->bindParam(':rec_own',$rec_own, PDO::PARAM_STR);
-        $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_STR);
-        $query->execute();  
-        
-        $i = 0;
-        $sql = "DELETE FROM rec_lists WHERE rec_id = $Recs->rec_id";
-        $dbcon->exec($sql);
-        $Rec_lists = $data->Rec_lists;
-        foreach($Rec_lists as $rls){
-            if($rls->pro_id != ''){
-                
-                    $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own) VALUE(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own);";        
-                    $query = $dbcon->prepare($sql);
-                    $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_INT);
-                    $query->bindParam(':rec_date', $Recs->rec_date, PDO::PARAM_INT);
-                    $query->bindParam(':pro_id', $rls->pro_id, PDO::PARAM_INT);
-                    $query->bindParam(':pro_name', $rls->pro_name, PDO::PARAM_STR);
-                    $query->bindParam(':unit_name', $rls->unit_name, PDO::PARAM_STR);
-                    $query->bindParam(':qua', $rls->qua, PDO::PARAM_INT);
-                    $query->bindParam(':qua_for_ord', $rls->qua, PDO::PARAM_INT);
-                    $query->bindParam(':price_one', $rls->price_one, PDO::PARAM_STR);
-                    $query->bindParam(':price', $rls->price, PDO::PARAM_STR);
-                    $query->bindParam(':rec_own', $rec_own, PDO::PARAM_STR);
-                    $query->execute();  
-                
+        $query->execute([
+            ':rec_date' => $Recs->rec_date,
+            ':str_id' => $Recs->str_id,
+            ':price_total' => $Recs->price_total,
+            ':comment' => $Recs->comment,
+            ':rec_id' => $Recs->rec_id
+        ]);
+
+        // ✅ ลบ rec_lists เก่าออกก่อน (soft delete หรือ hard delete ตามต้องการ)
+        $sql = "DELETE FROM rec_lists WHERE rec_id=:rec_id";
+        $query = $dbcon->prepare($sql);
+        $query->execute([':rec_id' => $Recs->rec_id]);
+
+        // ✅ เพิ่ม rec_lists ใหม่
+        $sql = "INSERT INTO rec_lists(rec_id, rec_date, pro_id, pro_name, unit_name, qua, qua_for_ord, price_one, price, rec_own, created_at, updated_at) 
+                VALUES(:rec_id, :rec_date, :pro_id, :pro_name, :unit_name, :qua, :qua_for_ord, :price_one, :price, :rec_own, NOW(), NOW())";
+        $query = $dbcon->prepare($sql);
+
+        foreach ($Rec_lists as $rls) {
+            if (!empty($rls->pro_id)) {
+                $query->execute([
+                    ':rec_id' => $Recs->rec_id,
+                    ':rec_date' => $Recs->rec_date,
+                    ':pro_id' => $rls->pro_id,
+                    ':pro_name' => $rls->pro_name,
+                    ':unit_name' => $rls->unit_name,
+                    ':qua' => $rls->qua,
+                    ':qua_for_ord' => $rls->qua,
+                    ':price_one' => $rls->price_one,
+                    ':price' => $rls->price,
+                    ':rec_own' => $rec_own
+                ]);
             }
-            $i++ ;
-        }        
-        // echo "เพิ่มข้อมูลเรียบร้อย ok";
-        http_response_code(200);
-        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $data_auth->fullname));
+        }
+
         $dbcon->commit();
+        echo json_encode(['status' => 'success', 'message' => 'แก้ไขข้อมูลเรียบร้อย', 'rec_id' => $Recs->rec_id]);
         exit;
     }
 
-    if($Recs->action == 'active'){
+    // ---------------- DELETE (Hard Delete) ----------------
+    if ($Recs->action === 'delete') {
         $dbcon->beginTransaction();
-        
-        $sql = "UPDATE recs SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id ;"; 
+
+        // ✅ ลบ rec_lists ก่อน (เพราะมี FK ไปที่ recs)
+        $sql = "DELETE FROM rec_lists WHERE rec_id = :rec_id";
         $query = $dbcon->prepare($sql);
-        $query->bindParam(':rec_app',$rec_own, PDO::PARAM_STR);
-        $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_STR);
-        $query->execute();  
-        
-        // $i = 0;
+        $query->execute([':rec_id' => $Recs->rec_id]);
+
+        // ✅ ลบ recs
+        $sql = "DELETE FROM recs WHERE rec_id = :rec_id";
+        $query = $dbcon->prepare($sql);
+        $query->execute([':rec_id' => $Recs->rec_id]);
+
+        $dbcon->commit();
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'ลบข้อมูลเรียบร้อย (hard delete)',
+            'rec_id' => $Recs->rec_id
+        ]);
+        exit;
+    }
+
+    if ($Recs->action == 'active') {
+        $dbcon->beginTransaction();
+
+        // ✅ อัปเดตหัวเอกสาร
+        $sql = "UPDATE recs SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id";
+        $query = $dbcon->prepare($sql);
+        $query->execute([
+            ':rec_app' => $rec_own,
+            ':rec_id'  => $Recs->rec_id
+        ]);
+
         $Rec_lists = $data->Rec_lists;
-        foreach($Rec_lists as $rls){            
-            $pro_id = (integer)$rls->pro_id;
 
-            $sql = "UPDATE rec_lists SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id ;"; 
-            $query = $dbcon->prepare($sql);           
-            $query->bindParam(':rec_app', $rec_own, PDO::PARAM_STR);
-            $query->bindParam(':rec_id', $Recs->rec_id, PDO::PARAM_INT);
-            $query->execute(); 
-            
+        foreach ($Rec_lists as $rls) {
+            $pro_id = (int)$rls->pro_id;
 
-            /** save stock newrrc ดึงข้อมูลสอนค้าในสตอก created_at last  
-            /**
-             *  stck_id INT(13) AUTO_INCREMENT PRIMARY KEY,
-             *   pro_id INT(13) NOT NULL,
-             * unit_name
-             * price_one VARCHAR(100) NULL,
-            *    bf INT(10) NOT NULL,
-            *    stck_in INT(10) NULL,
-            *    stck_out INT(10) NULL,
-            *    bal INT(10) NOT NULL,
-            *    rec_ord_id INT(10) NULL,
-            *    rec_ord_list_id INT(10) NULL,
-            *    comment VARCHAR(250) NULL,
-             * 
-             */
-            $sql = "SELECT * FROM `stock` WHERE pro_id =:pro_id ORDER BY stck_id DESC LIMIT 0,1;";
+            // ✅ อัปเดตรายการ (ครั้งเดียวพอ ไม่ต้องวนซ้ำ)
+            $sql = "UPDATE rec_lists SET st=1, rec_app=:rec_app WHERE rec_id = :rec_id";
             $query = $dbcon->prepare($sql);
-            $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
-            $query->execute();
-            $result = $query->fetchAll(PDO::FETCH_OBJ);
+            $query->execute([
+                ':rec_app' => $rec_own,
+                ':rec_id'  => $Recs->rec_id
+            ]);
 
-            /** ckeck row */
-            if(count($result) == 0){
+            // ✅ ดึง stock ล่าสุด
+            $sql = "SELECT bal FROM stock WHERE pro_id = :pro_id ORDER BY stck_id DESC LIMIT 1";
+            $query = $dbcon->prepare($sql);
+            $query->execute([':pro_id' => $pro_id]);
+            $lastStock = $query->fetch(PDO::FETCH_OBJ);
+
+            if ($lastStock) {
+                $bf = $lastStock->bal;
+                $stck_in = $rls->qua;
+                $stck_out = 0;
+                $bal = $lastStock->bal + $rls->qua;
+            } else {
                 $bf = 0;
                 $stck_in = $rls->qua;
                 $stck_out = 0;
-                $bal = $rls->qua;                
-            }else{
-                $bf = $result[0]->bal;
-                $stck_in = $rls->qua;
-                $stck_out = 0;
-                $bal = $result[0]->bal + $rls->qua;
+                $bal = $rls->qua;
             }
 
-            $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
-            $query = $dbcon->prepare($sql); 
-            $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
-            $query->bindParam(':unit_name',$rls->unit_name, PDO::PARAM_STR);
-            $query->bindParam(':price_one',$rls->price_one, PDO::PARAM_STR);
-            $query->bindParam(':bf',$bf);
-            $query->bindParam(':stck_in',$stck_in, PDO::PARAM_INT);
-            $query->bindParam(':stck_out',$stck_out);
-            $query->bindParam(':bal',$bal, PDO::PARAM_INT);
-            $query->bindParam(':rec_ord_id',$rls->rec_id, PDO::PARAM_INT);
-            $query->bindParam(':rec_ord_list_id',$rls->rec_list_id, PDO::PARAM_INT);
-            $query->bindParam(':comment',$Recs->comment, PDO::PARAM_STR);
-            $query->execute();
-
-            /** set products->insock */
-            $sql = "SELECT * FROM `products` WHERE pro_id =:pro_id LIMIT 0,1;";
+            // ✅ บันทึก stock ใหม่
+            $sql = "INSERT INTO stock(pro_id, to_do_date, unit_name, price_one, bf, stck_in, stck_out, bal, ref_type, ref_id, comment) 
+                    VALUES(:pro_id, :to_do_date, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :ref_type, :ref_id, :comment)";
             $query = $dbcon->prepare($sql);
-            $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
-            $query->execute();
-            $result = $query->fetchAll(PDO::FETCH_OBJ);
+            $query->execute([
+                ':pro_id'        => $pro_id,
+                ':to_do_date'    => $Recs->rec_date,
+                ':unit_name'     => $rls->unit_name,
+                ':price_one'     => $rls->price_one,
+                ':bf'            => $bf,
+                ':stck_in'       => $stck_in,
+                ':stck_out'      => $stck_out,
+                ':bal'           => $bal,
+                ':ref_type'      => "rec",
+                ':ref_id'       => $Recs->rec_id,
+                ':comment'       => $Recs->comment
+            ]);
 
-            if(count($result) > 0){
+            // ✅ อัปเดต instock ของสินค้า
+            $sql = "UPDATE products SET instock = :instock WHERE pro_id = :pro_id";
+            $query = $dbcon->prepare($sql);
+            $query->execute([
+                ':instock' => $bal,
+                ':pro_id'  => $pro_id
+            ]);
+        }
 
-
-                $instock = $bal;
-                $sql = "UPDATE products SET instock=:instock WHERE pro_id =:pro_id;";
-                $query = $dbcon->prepare($sql);
-                $query->bindParam(':instock',$instock, PDO::PARAM_INT);
-                $query->bindParam(':pro_id',$rls->pro_id, PDO::PARAM_INT);
-                $query->execute();
-            }
-            
-        //     $i++ ;
-        }        
-        http_response_code(200);
-        echo json_encode(array('status' => 'success', 'message' => 'บันทึกข้อมูลเรียบร้อย ok', 'responseJSON' => $result));
         $dbcon->commit();
+        http_response_code(200);
+        echo json_encode([
+            'status'  => 'success',
+            'message' => 'บันทึกข้อมูลเรียบร้อย ok'
+        ]);
         exit;
-    }
-
-    if($Recs->action == 'delete'){    
-        $dbcon->beginTransaction();
-        $sql = "DELETE FROM recs WHERE rec_id = $Recs->rec_id";
-        $dbcon->exec($sql);
-
-        $sql = "DELETE FROM rec_lists WHERE rec_id = $Recs->rec_id";
-        $dbcon->exec($sql);
-
-        $dbcon->commit();
-        http_response_code(200);
-        echo json_encode(array('status' => 'success', 'message' => 'Record deleted successfully'));  
-        
-    }    
-
-}catch(PDOException $e){
-    if ($dbcon->inTransaction()) {
-        $dbcon->rollback();
-        // If we got here our two data updates are not in the database
-    }
-
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => 'error', 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
 }
 
+    echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
 
+} catch (Exception $e) {
+    if ($dbcon->inTransaction()) {
+        $dbcon->rollBack();
+    }
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+}

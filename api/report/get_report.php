@@ -7,93 +7,102 @@ header("Content-Type: application/json; charset=utf-8");
 include "../dbconfig.php";
 
 $data = json_decode(file_get_contents("php://input"));
-$year = $data->year;
-$year = (int)$year - 543;
+$year = (int)($data->year ?? date("Y")) - 543; // รับปี พ.ศ. แล้วแปลงเป็น ค.ศ.
 
-// $year_1 = $year - 1;
-// $date_start = $year_1 ."/10/01";;
-// $date_start = date_create($date_start);
-
-$date_end = $year ."/09/30";
-// $date_end = date_create($date_end);
+$date_end = $year . "/09/30";
 $date_end = date("Y-m-d", strtotime($date_end));
-/** ปีงบประมาณ 2565 เรื่ม 1 ตุลาคม 2564 ถึง 30 กันยายน 2565  */
-// $date_start = date("Y-m-d");
-// $date_end = date("Y-m-d H:i:s");
+
 $year_thai = $year + 543;
 $text_head = "ณ วันที่ 30 กันยายน $year_thai ประจำปีงบประมาณ $year_thai ";
 
+try {
+    // ✅ Query เดียว + GROUP BY
+    $sql = "SELECT 
+                c.cat_name,
+                p.pro_id,
+                p.pro_name,
+                r.unit_name,
+                SUM(r.qua_for_ord) AS qua_for_ord,
+                r.price_one,
+                MIN(r.rec_date) AS rec_date,
+                MAX(r.updated_at) AS updated_at,
+                (SUM(r.qua_for_ord) * r.price_one) AS price
+            FROM catalogs c
+            JOIN products p ON p.cat_id = c.cat_id
+            JOIN rec_lists r ON r.pro_id = p.pro_id
+            WHERE r.qua_for_ord > 0
+              AND r.st = 1
+              AND r.rec_date < :date_end
+            GROUP BY c.cat_name, p.pro_id, p.pro_name, r.unit_name, r.price_one
+            ORDER BY c.cat_sort ASC, p.pro_name ASC, r.price_one ASC";
 
-try{
-    $datas = array();
+    $stmt = $dbcon->prepare($sql);
+    $stmt->execute([':date_end' => $date_end]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM catalogs ORDER BY cat_sort ASC;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result_cat = $query->fetchAll(PDO::FETCH_OBJ);
-    $i=1;
-    $no = 0;
-    $price_all = 0;
-    foreach($result_cat as $rc){
+    $datas = [];
+$price_all = 0;
 
-        $sql = "SELECT rec_lists.rec_date, rec_lists.pro_id, rec_lists.unit_name, rec_lists.qua_for_ord, rec_lists.price_one, products.pro_name, products.cat_name, rec_lists.updated_at 
-                FROM rec_lists INNER JOIN products ON rec_lists.pro_id = products.pro_id 
-                WHERE products.cat_name = '$rc->cat_name' AND rec_lists.qua_for_ord > 0 AND rec_lists.st = 1 AND rec_lists.updated_at < '$date_end'
-                ORDER BY products.pro_name, rec_lists.price_one ASC;";
-        $query = $dbcon->prepare($sql);
-        $query->execute();
-        $result_rec_lists = $query->fetchAll(PDO::FETCH_OBJ);
-        $lists = array();
-        
-        $pro_id_for_no_old = '';
-        $pro_id_for_no_new = '';
-        $price_old = 0;
-        $price_new = 0;
-        $count_qua = 0;
-        $price_total = 0;
-        foreach($result_rec_lists as $rl){
-            $no = $i++;
-            $price_all = $price_all + ($rl->qua_for_ord * $rl->price_one);
-            
-            
-            $price = $rl->qua_for_ord * (float)$rl->price_one;
-            $price_total +=  $price; 
-            array_push($lists,array(
-                "no" => $no,
-                "rec_date" => $rl->rec_date,
-                "pro_id" => $rl->pro_id,
-                "pro_name" => $rl->pro_name,
-                "cat_name" => $rl->cat_name,
-                "unit_name" => $rl->unit_name,
-                "qua_for_ord" => $rl->qua_for_ord,
-                "price_one" => $rl->price_one,
-                "price" => $price,
-                "updated_at" => $rl->updated_at,
-            ));   
-        }
-        array_push($datas,array(
-            "cat_name" => $rc->cat_name,
-            "price_total" => $price_total,
-            "lists" => $lists
-        ));
+// ✅ map เก็บลำดับต่อหมวด
+$seqMap = [];       // [cat_name][pro_id] => seq
+$seqCounter = [];   // [cat_name] => running number
 
+foreach ($rows as $row) {
+    $cat = $row['cat_name'];
+    if (!isset($datas[$cat])) {
+        $datas[$cat] = [
+            "cat_name"     => $cat,
+            "price_total"  => 0,
+            "count_items"  => 0,
+            "lists"        => []
+        ];
+        $seqMap[$cat] = [];
+        $seqCounter[$cat] = 1; // reset counter เมื่อเจอหมวดใหม่
     }
-    
-    
-    http_response_code(200);
-    echo json_encode(array(
-        'status' => true, 
-        'massege' =>  'Ok', 
-        'respJSON' => $datas,
-        'price_all' => $price_all,
-        'year' => $year,
-        'text_head' => $text_head,
-        'date_end' => $date_end,
-    ));
 
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
+    // ✅ ถ้า pro_id ยังไม่เคยเจอ → กำหนดลำดับใหม่
+    if (!isset($seqMap[$cat][$row['pro_id']])) {
+        $seqMap[$cat][$row['pro_id']] = $seqCounter[$cat]++;
+        $seq = $seqMap[$cat][$row['pro_id']];
+    } else {
+        // ✅ ถ้าเจอ pro_id เดิม → ไม่ต้องแสดงเลข
+        $seq = "";
+    }
+
+    $datas[$cat]["lists"][] = [
+        "seq"        => $seq,
+        "rec_date"   => $row['rec_date'],
+        "pro_id"     => $row['pro_id'],
+        "pro_name"   => $row['pro_name'],
+        "unit_name"  => $row['unit_name'],
+        "qua_for_ord"=> $row['qua_for_ord'],
+        "price_one"  => $row['price_one'],
+        "price"      => $row['price'],
+        "updated_at" => $row['updated_at']
+    ];
+
+    $datas[$cat]["price_total"] += $row['price'];
+    $datas[$cat]["count_items"] += 1;
+    $price_all += $row['price'];
+}
+
+$datas = array_values($datas);
+
+    http_response_code(200);
+    echo json_encode([
+        "status"     => true,
+        "message"    => "Ok",
+        "respJSON"   => $datas,
+        "price_all"  => $price_all,
+        "year"       => $year,
+        "text_head"  => $text_head,
+        "date_end"   => $date_end
+    ]);
+
+} catch (PDOException $e) {
     http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode([
+        "status"  => false,
+        "message" => "เกิดข้อผิดพลาด.." . $e->getMessage()
+    ]);
 }

@@ -5,35 +5,45 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
+require_once "../auth/verify_jwt.php";
 
 $data = json_decode(file_get_contents("php://input"));
-// $product = $data;
+$pro_id = $data->pro_id ?? null;
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'message' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT stock.*, products.pro_name,products.unit_name FROM `stock` LEFT JOIN products ON products.pro_id = stock.pro_id  WHERE stock.pro_id = $data->pro_id ORDER BY stock.stck_id ASC LIMIT 0,100;";
+if (!$pro_id) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => false,
+        'message' => 'Missing pro_id'
+    ]);
+    exit;
+}
+
+try {
+    $sql = "SELECT s.*, p.pro_name, u.unit_name
+            FROM stock s
+            LEFT JOIN products p ON p.pro_id = s.pro_id
+            LEFT JOIN units u ON p.unit_id = u.unit_id
+            WHERE s.pro_id = :pro_id
+            ORDER BY s.stck_id ASC
+            LIMIT 0,100";
+
     $query = $dbcon->prepare($sql);
+    $query->bindParam(":pro_id", $pro_id, PDO::PARAM_INT);
     $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+    $result = $query->fetchAll(PDO::FETCH_ASSOC);
 
     http_response_code(200);
-    echo json_encode(array(
-        'status' => 'success', 
-        'message' =>  'Ok', 
-        'respJSON' =>  $result, 
-        // 'respJSON' => $datas
-    ));
+    echo json_encode([
+        'status' => true,
+        'message' => 'Ok',
+        'respJSON' => $result
+    ]);
 
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => false,
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
 }

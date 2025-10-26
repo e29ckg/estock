@@ -1,70 +1,71 @@
 <?php
-include_once './database.php';
+require '../dbconfig.php';        // ใช้ dbconfig.php ที่สร้าง $dbcon
 
-header("Access-Control-Allow-Origin: * ");
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$fullname = '';
-$email = '';
-$password = '';
-$conn = null;
+try {
+    $data = json_decode(file_get_contents("php://input"));
 
-$databaseService = new DatabaseService();
-$conn = $databaseService->getConnection();
+    // ✅ ตรวจสอบ input
+    if (empty($data->fullname) || empty($data->email) || empty($data->username) || empty($data->password)) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "กรุณากรอกข้อมูลให้ครบถ้วน"]);
+        exit;
+    }
 
-$data = json_decode(file_get_contents("php://input"));
+    $fullname = trim($data->fullname);
+    $email    = trim($data->email);
+    $username = trim($data->username);
+    $password = $data->password;
 
-$fullname = $data->fullname;
-$email = $data->email;
-$password = $data->password;
-$username = $data->username;
+    // ✅ ตรวจสอบ email format
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "รูปแบบอีเมลไม่ถูกต้อง"]);
+        exit;
+    }
 
-$table_name = 'Users';
+    // ✅ ตรวจสอบว่ามี email หรือ username ซ้ำหรือไม่
+    $query = "SELECT user_id FROM users WHERE email = :email OR username = :username LIMIT 1";
+    $stmt = $dbcon->prepare($query);
+    $stmt->execute([':email' => $email, ':username' => $username]);
 
+    if ($stmt->rowCount() > 0) {
+        http_response_code(409); // Conflict
+        echo json_encode(["status" => "error", "message" => "Username หรือ E-Mail มีอยู่ในระบบแล้ว"]);
+        exit;
+    }
 
-$query = "SELECT user_id, fullname, password, role FROM " . $table_name . " WHERE email = ? OR username = ? LIMIT 0,1";
+    // ✅ เข้ารหัส password
+    $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-$stmt = $conn->prepare( $query );
-$stmt->bindParam(1, $email);
-$stmt->bindParam(2, $username);
-$stmt->execute();
-$num = $stmt->rowCount();
+    // ✅ Insert user
+    $query = "INSERT INTO users
+                (fullname, email, username, password, st, created_at) 
+              VALUES 
+                (:fullname, :email, :username, :password, 10, NOW())";
+    $stmt = $dbcon->prepare($query);
 
-if($num > 0){
-    http_response_code(200);
-    echo json_encode(array("message" => "Username OR E-Mail มีอยู่ในระบบแล้ว."));
-    exit;
+    $success = $stmt->execute([
+        ':fullname' => $fullname,
+        ':email'    => $email,
+        ':username' => $username,
+        ':password' => $password_hash
+    ]);
+
+    if ($success) {
+        http_response_code(201); // Created
+        echo json_encode(["status" => true, "message" => "สมัครสมาชิกสำเร็จ"]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["status" => false, "message" => "ไม่สามารถสมัครสมาชิกได้"]);
+    }
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["status" => false, "message" => "Server error: " . $e->getMessage()]);
 }
-
-$query = "INSERT INTO " . $table_name . "
-                SET fullname = :fullname,
-                    email = :email,
-                    username = :username,
-                    password = :password,
-                    st = 0";
-
-$stmt = $conn->prepare($query);
-
-$stmt->bindParam(':fullname', $fullname);
-$stmt->bindParam(':email', $email);
-$stmt->bindParam(':username', $username);
-
-$password_hash = password_hash($password, PASSWORD_BCRYPT);
-
-$stmt->bindParam(':password', $password_hash);
-
-
-if($stmt->execute()){
-
-    http_response_code(200);
-    echo json_encode(array("status" => "ok","message" => "User was successfully registered."));
-}
-else{
-    http_response_code(400);
-
-    echo json_encode(array("status" => "error","message" => "Unable to register the user."));
-}
-?>

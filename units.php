@@ -67,8 +67,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.unit_name}}
                       </td>
                       <td>
-                        <button @click="b_unit_update(data.unit_id)" >Update</button>  
-                        <button @click="destroy_unit(data.unit_id)">Delete</button>  
+                        <button class="btn btn-warning" @click="b_unit_update(data.unit_id)" >Update</button>  
+                        <button class="btn btn-danger mx-2" @click="destroy_unit(data.unit_id)">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -98,7 +98,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>ชื่อหน่วยนับ</label>
-                  <input type="text" class="form-control" v-model="unit[0].unit_name" required>
+                  <input type="text" class="form-control" v-model="unit.unit_name" required>
                 </div>
               </div>
             </div>   
@@ -130,11 +130,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
         url_base:'',
         datas:'',
         message: 'Hello Vue!',
-        unit:[{
+        unit:{
           unit_id:'',
           unit_name:'',          
           action:'insert'        
-        }],
+        },
         
       }
     },
@@ -144,7 +144,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     methods: {      
       get_Units(){
-        axios.post(this.url_base + '/estock/api/units/read_units_all.php')
+        axios.post('./api/units/read_units_all.php')
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -160,12 +160,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_unit_update(unit_id){
         this.$refs.m_show.click();
-        axios.post(this.url_base + '/estock/api/units/get_unit.php',{unit_id:unit_id})
+        axios.post('./api/units/get_unit.php',{unit_id:unit_id})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
-                    this.unit = response.data.respJSON;
-                    this.unit[0].action = 'update'; 
+                    this.unit = {...response.data.respJSON,action : 'update'}; 
                     console.log(this.unit);                   
                 }
             })
@@ -174,8 +173,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },  
       b_unit_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        const token = getJWT();
+        axios.post('/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -187,11 +186,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   });
                   this.$refs['m_close'].click();
                   this.get_Units();  
-                  this.unit = [{
-                              unit_id:'',
-                              unit_name:'',
-                              action:'insert'        
-                            }];     
+                  this.unit = {unit_id:'', unit_name:'', action:'insert'};     
                 }else{
                   Swal.fire({
                     icon: 'error',
@@ -216,10 +211,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 confirmButtonText: 'Yes, delete it!'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.unit[0].action = 'delete';  
-                  this.unit[0].unit_id = unit_id;  
-                  axios.post(this.url_base + '/estock/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  const token = getJWT();
+                  this.unit.action = 'delete';  
+                  this.unit.unit_id = unit_id;  
+                  axios.post('/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {
@@ -248,11 +243,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });            
         },
         b_unit_close(){
-          this.unit = [{
+          this.unit = {
                               unit_id:'',
                               unit_name:'',
                               action:'insert'        
-                            }];     
+                            };     
         }        
       },
   }).mount('#appUnits');

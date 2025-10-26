@@ -1,23 +1,31 @@
 <?php
 date_default_timezone_set("Asia/Bangkok");
 
-$servername = "localhost";
-$username = "root";
-$userpass = "";
-$dbname = "estock";
-$key = "8cea895549b19eb150b451a6ad6061a5";
+// 🔑 JWT secret key (ควรเก็บใน .env)
+$key = getenv('JWT_SECRET');
 
-try{
-    $dbcon = new PDO("mysql:host=$servername;dbname=$dbname", $username, $userpass);
-    // set the PDO error mode to exception
-    $dbcon->exec("set names utf8");
-    $dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// ✅ โหลดค่าจาก environment variables (Docker Compose / .env)
+$db_host = getenv('DB_HOST') ?: 'db';              // service name ของ MySQL ใน docker-compose
+$db_name = getenv('MYSQL_DATABASE') ?: 'estock';
+$db_user = getenv('MYSQL_USER') ?: 'myuser';
+$db_pass = getenv('MYSQL_PASSWORD') ?: 'mypass';
 
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'massege' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+$dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
+
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // โยน exception เมื่อ error
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // fetch เป็น associative array
+    PDO::ATTR_EMULATE_PREPARES   => false,                  // ใช้ native prepared statements
+];
+
+try {
+    $dbcon = new PDO($dsn, $db_user, $db_pass, $options);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'status'  => false,
+        'message' => 'Database connection failed',
+        'error'   => $e->getMessage()
+    ]);
     exit;
 }
-
-

@@ -1,40 +1,37 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-// header("'Access-Control-Allow-Credentials', 'true'");
-// header('Content-Type: application/javascript');
-header("Content-Type: application/json; charset=utf-8");
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../dbconfig.php";
+require_once "../auth/verify_jwt.php";
 
-include "../dbconfig.php";
+try {
+    $sql = "SELECT 
+                r.rec_id,
+                r.rec_own,
+                r.rec_app,
+                r.rec_date,
+                r.str_id,
+                s.str_name,              -- ✅ เพิ่มชื่อร้าน
+                r.price_total,
+                r.comment,
+                r.st,
+                r.created_at,
+                r.updated_at
+            FROM recs r
+            INNER JOIN store s ON r.str_id = s.str_id   -- ✅ join กับตาราง store
+            WHERE r.deleted_at IS NULL                  -- ✅ ถ้ามี soft delete
+            ORDER BY r.rec_id DESC;";
+    $stmt = $dbcon->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM catalog ORDER BY created_at DESC";
-    $sql = "SELECT recs.*, store.str_name  FROM recs LEFT JOIN store ON recs.str_id = store.str_id ORDER BY recs.rec_id DESC;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    // $data = array();
-
-    // foreach($result as $res){
-    //     array_push($data,array(
-    //         "unit_id" => $res->unit_id,
-    //         "unit_name" => $res->unit_name
-    //     ));
-    // }
-    http_response_code(200);
-    echo json_encode(array(
-        'status' => true, 
-        'message' =>  'Ok', 
-        'respJSON' =>  $result, 
-        // 'respJSON' => $data
-    ));
-
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode([
+        "status" => true,
+        "respJSON" => $result
+    ]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        "status" => false,
+        "message" => "Database error: " . $e->getMessage()
+    ]);
 }
-
-

@@ -1,48 +1,55 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-// header("'Access-Control-Allow-Credentials', 'true'");
-// header('Content-Type: application/javascript');
-header("Content-Type: application/json; charset=utf-8");
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../dbconfig.php";
+require_once "../auth/verify_jwt.php";
 
-include "../dbconfig.php";
+$input = json_decode(file_get_contents("php://input"), true);
+$pro_id = $input['pro_id'] ?? null;
 
-$data = json_decode(file_get_contents("php://input"));
-// $product = $data;
+if (!$pro_id) {
+    echo json_encode(["status" => false, "message" => "Missing pro_id"]);
+    exit;
+}
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'message' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    // $sql = "SELECT * FROM products ORDER BY created_at DESC";
-    $sql = "SELECT * FROM `products` WHERE pro_id = $data->pro_id LIMIT 0,1;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+try {
+    $sql = "SELECT 
+            p.pro_id,
+            p.pro_name,
+            p.pro_detail,
+            p.cat_id,
+            c.cat_name,
+            p.unit_id,
+            u.unit_name,
+            p.instock,
+            p.locat,
+            p.lower,
+            p.min,
+            p.st,
+            p.img,
+            p.own,
+            p.created_at,
+            p.updated_at
+        FROM products p
+        INNER JOIN catalogs c ON p.cat_id = c.cat_id
+        INNER JOIN units u ON p.unit_id = u.unit_id
+        WHERE p.pro_id = :pro_id
+        LIMIT 1";
 
-    // foreach($result as $res){
-    //     array_push($datas,array(
-    //         "cat_id" => $res->cat_id,
-    //         "cat_name" => $res->cat_name
-    //     ));
-    // }
-    http_response_code(200);
-    echo json_encode(array(
-        'status' => true, 
-        'message' =>  'Ok', 
-        'respJSON' =>  $result, 
-        // 'respJSON' => $datas
-    ));
+    $stmt = $dbcon->prepare($sql);
+    $stmt->bindParam(":pro_id", $pro_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    if ($row) {
+        echo json_encode(["status" => true, "respJSON" => [$row]]);
+    } else {
+        echo json_encode(["status" => false, "message" => "Product not found"]);
+    }
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        "status" => false,
+        "message" => "Database error",
+        "error" => $e->getMessage()
+    ]);
 }

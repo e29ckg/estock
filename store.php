@@ -62,7 +62,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     </tr>
                   </thead>
                   <tbody >
-                    <tr v-for="data,index in datas">
+                    <tr v-for="data,index in stores">
                      
                       <td>{{data.str_id}}</td>
                       <td>
@@ -74,7 +74,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td>{{data.str_phone}}</td>
                       <td>
                         <button class="btn btn-warning" @click="b_store_update(data.str_id)" >Update</button>  
-                        <!-- <button @click="destroy_store(data.str_id)">Delete</button>   -->
+                        <button class="btn btn-danger mx-2" @click="destroy_store(data.str_id)">Delete</button>
                       </td>
                     </tr>
                   </tbody>
@@ -103,7 +103,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>ชื่อ</label>
-                  <input type="text" class="form-control" v-model="store[0].str_id" required>
+                  <input type="text" class="form-control" v-model="store.str_id" required>
                 </div>
               </div>
             </div>    -->
@@ -111,7 +111,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>ชื่อร้านค้า</label>
-                  <input type="text" class="form-control" v-model="store[0].str_name" required>
+                  <input type="text" class="form-control" v-model="store.str_name" required>
                 </div>
               </div>
             </div>   
@@ -119,7 +119,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>รายละเอียด</label>
-                  <input type="e-mail" class="form-control" v-model="store[0].str_detail" required>
+                  <input type="e-mail" class="form-control" v-model="store.str_detail" required>
                 </div>
               </div>
             </div>   
@@ -127,7 +127,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>โทรศัพท์</label>
-                  <input type="text" class="form-control" v-model="store[0].str_phone" >
+                  <input type="text" class="form-control" v-model="store.str_phone" >
                 </div>
               </div>
             </div>    
@@ -152,140 +152,190 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
-  
-
+  requireAuth(); 
   Vue.createApp({
     data() {
-      return {
-        url_base:'',
-        datas:'',
-        message: 'Hello Vue!',
-        store:[{
-          str_id:'',
-          str_name:'',          
-          str_detail:'',          
-          str_phone:'',          
-          action:'insert'        
-        }],
-        
+     return {
+        store: {
+          str_id: '',
+          str_name: '',
+          str_detail: '',
+          str_phone: '',
+          action: 'insert'
+        },
+        stores: [] // เก็บรายการร้านค้า
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
-      this.get_Store();
+      this.url_base = window.location.protocol + '//' + window.location.host ;
+      this.get_Stores();
     },
     methods: {      
-      get_Store(){
-        axios.post(this.url_base + 'api/store/get_stores.php')
-            .then(response => {
-                if (response.data.status) {
-                    this.datas = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
+      get_Stores() {
+        const token = getJWT();
+        axios.get(this.url_base + '/api/store/get_stores.php', {
+          headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(response => {
+          console.log("API response:", response.data);
+
+          if (response.data.status) {
+            this.stores = response.data.respJSON;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message || "ไม่สามารถโหลดข้อมูลร้านค้าได้",
+              showConfirmButton: false,
+              timer: 1500
             });
+          }
+        })
+        .catch(error => {
+          console.error("Error loading stores:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
       b_store_insert(){
         this.b_store_close();
       },  
-      b_store_update(str_id){
-        this.$refs.m_show.click();
-        axios.post(this.url_base + 'api/store/get_store.php',{str_id:str_id})
-            .then(response => {
-                if (response.data.status) {
-                  this.store = response.data.respJSON;
-                  this.store[0].action = 'update';              
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },  
-      b_store_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-            .then(response => {
-                if (response.data.status == 'success') {
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  this.$refs['m_close'].click();
-                  this.get_Store();  
-                  this.store = [{
-                              str_id:'',
-                              str_name:'',
-                              str_detail:'',
-                              str_phone:'',
-                              action:'insert'        
-                            }];     
-                }else{
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  })
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
-      destroy_store(str_id){
+    b_store_update(str_id) {
+      this.$refs.m_show.click(); // เปิด modal
+      const token = getJWT();
+      axios.post(this.url_base + '/api/store/get_store.php', { str_id: str_id }, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+      .then(response => {
+        if (response.data.status) {
+          // ✅ ให้ API ส่ง object เดียวมา จะได้ไม่ต้องใช้ [0]
+          this.store = response.data.respJSON;
+          this.store.action = 'update';
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: response.data.message || "ไม่พบข้อมูลร้านค้า",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      })
+      .catch(error => {
+        console.error("Error get_store:", error);
+        Swal.fire({
+          icon: 'error',
+          title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      });
+    } , 
+    b_store_save() {
+      const token = getJWT();
+        axios.post(this.url_base + '/api/store/store_action.php',
+          { store: this.store },   // ส่ง object store ไป
+          { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(response => {
+          console.log("Store save response:", response.data);
+
+          if (response.data.status) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.store[0].action = 'delete';  
-                  this.store[0].str_id = str_id;  
-                  axios.post(this.url_base + 'api/store/store_action.php',{store:this.store},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-                    .then(response => {
-                        if (response.data.status == 'success') {
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                          this.get_Store(); 
-                             
-                        }else{
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    
-                }
-              });            
-        },
-        b_store_close(){
-          this.store = [{
-                              str_id:'',
-                              str_name:'',
-                              str_detail:'',
-                              str_phone:'',
-                              action:'insert'        
-                            }];     
-        }        
+              icon: 'success',
+              title: response.data.message,
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.get_Stores();   // โหลดข้อมูลร้านค้าใหม่
+            this.$refs.m_close.click(); // ปิด modal
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error saving store:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ API',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
+
+      // ลบร้านค้า (soft delete)
+      destroy_store(str_id) {
+        Swal.fire({
+          title: 'คุณแน่ใจหรือไม่?',
+          text: "คุณต้องการปิดการใช้งานร้านค้านี้",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'ใช่, ปิดการใช้งาน!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const payload = {
+              store: {
+                action: 'delete',
+                str_id: str_id
+              }
+            };
+            const token = getJWT();
+            axios.post(this.url_base + '/api/store/store_action.php', payload, {
+              headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(response => {
+              console.log("Delete store response:", response.data);
+
+              if (response.data.status) {
+                Swal.fire({
+                  icon: 'success',
+                  title: response.data.message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                this.get_Stores(); // โหลดข้อมูลใหม่
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: response.data.message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            })
+            .catch(error => {
+              console.error("Error deleting store:", error);
+              Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ API',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            });
+          }
+        });
+      },
+      
+      b_store_close(){
+        this.store = {
+              str_id:'',
+              str_name:'',
+              str_detail:'',
+              str_phone:'',
+              action:'insert'        
+            };     
+          }        
+        },
   }).mount('#appStore');
 </script>
 </body>

@@ -98,7 +98,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="col-sm-12">
                 <div class="form-group">
                   <label>ชื่อประเภทสินค้า</label>
-                  <input type="text" class="form-control" v-model="catalog[0].cat_name" required>
+                  <input type="text" class="form-control" v-model="catalog.cat_name" required>
                 </div>
               </div>
             </div>   
@@ -131,11 +131,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
         url_base:'',
         datas:'',
         message: 'Hello Vue!',
-        catalog:[{
+        catalog:{
           cat_id:'',
           cat_name:'',          
           action:'insert'        
-        }],        
+        },        
       }
     },
     mounted(){
@@ -144,7 +144,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     methods: {      
       get_catalogs(){
-        axios.post(this.url_base + '/estock/api/catalogs/read_catalogs_all.php')
+        const token = getJWT();
+        axios.post('api/catalogs/read_catalogs_all.php',{},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -161,12 +162,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_catalog_update(cat_id){
         this.$refs.m_show.click();
-        axios.post(this.url_base + '/estock/api/catalogs/get_catalog.php',{cat_id:cat_id})
+        const token = getJWT();
+        axios.post('api/catalogs/get_catalog.php',{cat_id:cat_id},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
                     this.catalog = response.data.respJSON;
-                    this.catalog[0].action = 'update'; 
+                    this.catalog.action = 'update'; 
                     console.log(this.catalog);                   
                 }
             })
@@ -175,8 +177,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       },  
       b_catalog_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+       const token = getJWT();
+        axios.post('api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -189,11 +191,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   });
                   this.$refs['m_close'].click();
                   this.get_catalogs();  
-                  this.catalog = [{
+                  this.catalog = {
                               cat_id:'',
                               cat_name:'',
                               action:'insert'        
-                            }];     
+                            };     
                 }else{
                   Swal.fire({
                     // position: 'top-end',
@@ -219,10 +221,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 confirmButtonText: 'Yes, delete it!'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.catalog[0].action = 'delete';  
-                  this.catalog[0].cat_id = cat_id;  
-                  axios.post(this.url_base + '/estock/api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+                  const token = getJWT();
+                  this.catalog.action = 'delete';  
+                  this.catalog.cat_id = cat_id;  
+                  axios.post('api/catalogs/catalog_save.php',{catalog:this.catalog},{ headers: {"Authorization" : `Bearer ${token}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {
@@ -253,11 +255,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
               });            
         },
         b_catalog_close(){
-          this.catalog = [{
-                              cat_id:'',
-                              cat_name:'',
-                              action:'insert'        
-                            }];     
+          this.catalog = {
+            cat_id:'',
+            cat_name:'',
+            action:'insert'        
+          };     
         }        
       },
   }).mount('#appCatalogs');

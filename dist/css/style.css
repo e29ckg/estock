@@ -1,0 +1,27 @@
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #f7f7fb;
+  margin: 0;
+  padding: 0;
+}
+.login-container {
+  max-width: 380px;
+  margin: 10vh auto;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 24px;
+}
+h2 { margin: 0 0 16px; }
+.form-group { margin-bottom: 14px; }
+.form-group-inline { margin: 8px 0 16px; }
+label { display: block; font-size: 14px; color: #333; margin-bottom: 6px; }
+input[type="email"], input[type="password"] {
+  width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;
+}
+button {
+  width: 100%; padding: 10px 14px; border: none; border-radius: 8px;
+  background: #2563eb; color: #fff; font-weight: 600; cursor: pointer;
+}
+button:hover { background: #1d4ed8; }
+.error { color: #b91c1c; margin-top: 12px; font-size: 14px; }

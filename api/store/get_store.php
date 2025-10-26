@@ -1,39 +1,32 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-header("Content-Type: application/json; charset=utf-8");
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../auth/verify_jwt.php";
+require_once "../dbconfig.php";
 
-include "../dbconfig.php";
+$input = json_decode(file_get_contents("php://input"), true);
+$str_id = $input['str_id'] ?? null;
 
-$data = json_decode(file_get_contents("php://input"));
-// $product = $data;
+if (!$str_id) {
+    echo json_encode(["status" => false, "message" => "Missing store id"]);
+    exit;
+}
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'message' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM `store` WHERE str_id = $data->str_id LIMIT 0,1;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+try {
+    $sql = "SELECT str_id, str_name, str_detail, str_phone, created_at, updated_at
+            FROM store
+            WHERE str_id = :str_id AND deleted_at IS NULL
+            LIMIT 1";
+    $stmt = $dbcon->prepare($sql);
+    $stmt->bindParam(':str_id', $str_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $store = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    http_response_code(200);
-    echo json_encode(array(
-        'status' => true, 
-        'message' =>  'Ok', 
-        'respJSON' =>  $result, 
-        // 'respJSON' => $datas
-    ));
-
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    if ($store) {
+        echo json_encode(["status" => true, "respJSON" => $store]);
+    } else {
+        echo json_encode(["status" => false, "message" => "ไม่พบข้อมูลร้านค้า"]);
+    }
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(["status" => false, "message" => "Database error: " . $e->getMessage()]);
 }

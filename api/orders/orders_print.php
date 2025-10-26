@@ -6,62 +6,88 @@ header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
 
-$data = json_decode(file_get_contents("php://input"));
-// $product = $data;
+// ✅ รองรับทั้ง GET และ POST
+$order_id = $_GET['order_id'] ?? null;
+if (!$order_id) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $order_id = $data['order_id'] ?? null;
+}
 
-// http_response_code(200);
-//     echo json_encode(array(
-//         'status' => true, 
-//         'message' =>  'Ok', 
-//         'respJSON' => $data->pro_id
-//     ));
-//     exit;
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT ords.*, users.dep, users.phone, users.email FROM `ords` 
-            INNER JOIN users ON ords.ord_own = users.fullname
-            WHERE ords.ord_id = $data->ord_id ;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result_order = $query->fetchAll(PDO::FETCH_OBJ);
+if (!$order_id) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Missing order_id'
+    ]);
+    exit;
+}
 
-    $sql = "SELECT * FROM `ord_lists` WHERE ord_id = $data->ord_id ;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $datas = array();
+try {
+    // ✅ ดึงข้อมูล order header + ข้อมูลผู้ใช้
+    $sql = "SELECT o.*,u.fullname, u.dep, u.phone, u.email 
+            FROM orders o
+            INNER JOIN users u ON o.user_id = u.user_id
+            WHERE o.order_id = :order_id";
+    $stmt = $dbcon->prepare($sql);
+    $stmt->execute([':order_id' => $order_id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    foreach($result as $rs){
-        $sql = "SELECT img FROM `products` WHERE pro_id = $rs->pro_id LIMIT 0,1;";
-        $query = $dbcon->prepare($sql);
-        $query->execute();
-        $resp_product = $query->fetchAll(PDO::FETCH_OBJ);
-        $resp_product[0]->img ? $img = $resp_product[0]->img : $img = 'none.png';
+    if (!$order) {
+        http_response_code(404);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Order not found'
+        ]);
+        exit;
+    }
+
+    // ✅ ดึงรายการสินค้า พร้อมหน่วยนับจาก units
+    $sql = "SELECT 
+                l.order_list_id, 
+                l.order_id, 
+                l.pro_id, 
+                p.pro_name, 
+                u.unit_name,
+                l.qua, 
+                l.qua_pay,
+                COALESCE(p.img, 'none.png') AS img
+            FROM order_lists l
+            LEFT JOIN products p ON l.pro_id = p.pro_id
+            LEFT JOIN units u ON p.unit_id = u.unit_id
+            WHERE l.order_id = :order_id";
+    $stmt = $dbcon->prepare($sql);
+    $stmt->execute([':order_id' => $order_id]);
+    $order_lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // ✅ คำนวณ summary
+    $count_items = count($order_lists);
+    $sum_qua = 0;
+    $sum_qua_pay = 0;
+    $sum_price = 0;
+    foreach ($order_lists as $item) {
+        $sum_qua += (int)$item['qua'];
+        $sum_qua_pay += (int)$item['qua_pay'];
         
-        
-        array_push($datas,array(
-            'ord_list_id' => $rs->ord_list_id,
-            'ord_id' => $rs->ord_id,
-            'pro_id' => $rs->pro_id,
-            'pro_name' => $rs->pro_name,
-            'img' => $img,
-            'unit_name' => $rs->unit_name,
-            'qua' => $rs->qua,
-            'qua_pay' => $rs->qua_pay,
-        ));
     }
 
     http_response_code(200);
-    echo json_encode(array(
-        'status' => 'success', 
-        'message' => 'Ok', 
-        // 'respJSON' =>  $result, 
-        'order_lists' => $datas,
-        'order' => $result_order,
-    ));
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Ok',
+        'order' => $order,
+        'order_lists' => $order_lists,
+        'summary' => [
+            'count_items' => $count_items,
+            'sum_qua' => $sum_qua,
+            'sum_qua_pay' => $sum_qua_pay,
+            'sum_price' => $sum_price
+        ]
+    ]);
 
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
 }

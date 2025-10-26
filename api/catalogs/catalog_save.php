@@ -1,7 +1,7 @@
 <?php
 include_once "../dbconfig.php";
-require "../auth/vendor/autoload.php";
-use \Firebase\JWT\JWT;
+require_once "../auth/checkAuth.php";
+checkAuth($userData, ['admin']);
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -10,26 +10,13 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 date_default_timezone_set("Asia/Bangkok");
-
-$key = "__test_secret__";
-$jwt = null;
-// $databaseService = new DatabaseService();
-// $conn = $databaseService->getConnection();
-
 $data = json_decode(file_get_contents("php://input"));
-$catalog = $data->catalog[0];
+$catalog = $data->catalog ?? null;
 
-$authHeader = $_SERVER['HTTP_AUTHORIZATION'];
 
-$arr = explode(" ", $authHeader);
 
-// http_response_code(200);
-// echo json_encode(array('status' => true, 'message' => 'เพิ่มข้อมูลเรียบร้อย', 'responseJSON' => $cat_id ));
-// exit;           
+      
 try{
-    $jwt = $arr[1];
-    $decoded = JWT::decode($jwt, base64_decode(strtr($key, '-_', '+/')), ['HS256']); 
-    $data = $decoded->data;
 
     if($catalog->action == 'insert'){
         $sql = "SELECT cat_name FROM `catalogs` WHERE cat_name = :cat_name";

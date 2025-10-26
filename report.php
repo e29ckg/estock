@@ -79,7 +79,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td colspan="6" class="bg-gray"> {{data.cat_name}} </td>
                     </tr>
                     <tr class="text-center" v-for="dl,index in data.lists">
-                      <td>{{dl.no}}</td>
+                      <td>{{dl.seq}}</td>
                       <td class="text-left">{{dl.pro_name}}</td>
                       <td>{{dl.unit_name}}</td>
                       <td>{{formatCurrency0(dl.qua_for_ord)}}</td>
@@ -107,8 +107,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>          
         </div>
       </div>
-    </div>
-    
+    </div> 
    
     
 
@@ -135,7 +134,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
+      this.url_base = window.location.protocol + '//' + window.location.host;
       this.set_sel_year()
       this.get_Report();
     },
@@ -149,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         this.year = d.getFullYear() + 543
       },  
       get_Report(){
-        axios.post(this.url_base + 'api/report/get_report.php',{year:this.year})
+        axios.post(this.url_base + '/api/report/get_report.php',{year:this.year})
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;       

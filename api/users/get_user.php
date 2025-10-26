@@ -5,6 +5,7 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 header("Content-Type: application/json; charset=utf-8");
 
 include "../dbconfig.php";
+require_once "../auth/verify_jwt.php";
 
 $data = json_decode(file_get_contents("php://input"));
 // $product = $data;

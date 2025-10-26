@@ -67,7 +67,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                       </div>
                     </div>
-
                   </div>  
                 </div>        
 
@@ -88,10 +87,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td class="text-center">{{index +1 }}</td>
                       <td class="text-center">
                         <!-- {{data.img}} -->
-                        <a @click="b_pro_img(data.pro_id,index)"  data-toggle="modal" data-target="#myModal">
+                        <a @click="b_product_update(data.pro_id)" >
                           <img v-if="data.img" :src="'./uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
                           <img v-else src="./uploads/none.png" alt="No-pic" class="float-left" height="60" >
-                        </a>                        
+                        </a> 
                       </td>
                       <td class="text-left">
                         {{data.pro_name}}
@@ -121,132 +120,111 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </div>
     </div>
     
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+      <div class="modal-dialog">
         <div class="modal-content">
           <form @submit.prevent="b_product_save()">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_product_code()">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">  
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>ชื่อสินค้า</label>
-                  <input type="text" class="form-control" v-model="product[0].pro_name" required>
-                </div>
-              </div>
+            <div class="modal-header">
+              <h5 class="modal-title">แก้ไขสินค้า</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_product_close()">
+                      <span aria-hidden="true">&times;</span>
+              </button>
+              
             </div>
 
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>ประเภทสินค้า</label>
-                  <select class="form-control" v-model="product[0].cat_name" required>
-                    <option v-for="sc in sel_cats" :value="sc.cat_name">{{sc.cat_name}}</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>หน่วยนับ</label>
-                  <select class="form-control" v-model="product[0].unit_name" required>
-                    <option v-for="sn in sel_units" :value="sn.unit_name">{{sn.unit_name}}</option>                    
-                  </select>
-                </div>
-              </div>
-            </div>
+            <div class="modal-body">
+              <div class="form-group text-center">
+                <!-- แสดงรูป -->
+                <img :src="previewImage" 
+                    class="img-thumbnail" 
+                    style="width:150px; height:150px; cursor:pointer;" 
+                    @click="$refs.fileInput.click()">
 
-                <div class="form-group ">
-                    <label>สถานทีเก็บ</label>
-                    <textarea class="form-control" rows="3" placeholder="สถานที่..." v-model="product[0].locat"></textarea>
+                <!-- input file ซ่อน -->
+                <input type="file" 
+                      ref="fileInput" 
+                      style="display:none" 
+                      accept="image/*" 
+                      @change="onFileChange">
+              </div>
+
+              <!-- ชื่อสินค้า -->
+              <div class="form-group mb-3">
+                <label>ชื่อสินค้า</label>
+                <input type="text" class="form-control" v-model="product.pro_name" required>
+              </div>
+
+              <!-- ประเภทสินค้า + หน่วย -->
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
+                    <label>ประเภทสินค้า</label>
+                    <select class="form-control" v-model="product.cat_id" required>
+                      <option v-for="sc in sel_cats" :value="sc.cat_id">{{ sc.cat_name }}</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="form-group ">
-                    <label>รายละเอียด</label>
-                    <textarea class="form-control" rows="3" placeholder="รายละเอียด" v-model="product[0].pro_detail"></textarea>
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
+                    <label>หน่วยนับ</label>
+                    <select class="form-control" v-model="product.unit_id" required>
+                      <option v-for="sn in sel_units" :value="sn.unit_id">{{ sn.unit_name }}</option>
+                    </select>
+                  </div>
                 </div>
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="form-group">
+              </div>
+
+              <!-- สถานที่เก็บ -->
+              <div class="form-group mb-3">
+                <label>สถานที่เก็บ</label>
+                <textarea class="form-control" rows="2" v-model="product.locat"></textarea>
+              </div>
+
+              <!-- รายละเอียด -->
+              <div class="form-group mb-3">
+                <label>รายละเอียด</label>
+                <textarea class="form-control" rows="2" v-model="product.pro_detail"></textarea>
+              </div>
+
+              <!-- lower / min -->
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
                     <label>สั่งซื้อเมื่อต่ำกว่า</label>
-                    <input type="number" class="form-control" v-model="product[0].lower">
+                    <input type="number" class="form-control" v-model="product.lower">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
+                    <label>จำนวนที่ให้เบิกขั้นต่ำ</label>
+                    <input type="number" class="form-control" v-model="product.min">
+                  </div>
                 </div>
               </div>
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>จำนวนที่ให้เบิกขั้นต่ำ</label>
-                  <input type="number" class="form-control" v-model="product[0].min">
-                </div>
+
+              <!-- สถานะ -->
+              <div class="form-group mb-3">
+                <label>
+                  สถานะ
+                  <span v-if="product.st == 1" class="badge bg-primary">ปกติ</span>
+                  <span v-else class="badge bg-danger">ระงับ</span>
+                </label>
+                <select class="form-control" v-model="product.st" required>
+                  <option value="1">ใช้งาน</option>
+                  <option value="0">ไม่ใช้งาน</option>
+                </select>
               </div>
             </div>
-            <div class="form-group">
-              <label>
-                สถานะ 
-                <span v-if="product[0].st == 1" class="badge bg-primary">ปกติ</span>
-                <span v-else class="badge bg-danger">ระงับ</span>
-              </label>
-    
-              <select class="form-control" v-model="product[0].st" required>
-                <option value="1">ใช้งาน</option>
-                <option value="0">ไม่ใช้งาน</option>
-              </select>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="b_product_close()">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
             </div>
-            
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_product_code()">Close</button>
-            <button type="submit" class="btn btn-primary" >Save changes</button>
-          </div>
-                
           </form>
         </div>
       </div>
     </div>
-    
-
-    <!-- Modal -->
-    <div  class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{pro_img.title}}</h5>
-            <button ref="m_img_upload" type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-          <div class="row mb-3" >
-            <div class="col-sm-12" >
-              <img class="img-fluid" :src="'./uploads/'+ pro_img.img" alt="Photo" v-if="pro_img.img">
-            </div>
-          </div>
-                              
-            <form @submit="onUpload">
-            <!-- <input type="file" name="file" id="file" @change="previewFiles"> -->
-              <input type="hidden" name="pro_id" :value="pro_img.id">
-              <div class="input-group">
-                <div class="custom-file">
-                  <input type="file" class="custom-file-input" id="file" name="file" @change="onChangeInput()" ref="myFiles" :value="pro_img.val">
-                  <label class="custom-file-label" for="exampleInputFile" >{{pro_img.label}}</label>
-                </div>
-                <div class="input-group-append">
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
+        
 
     <!-- Modal Detail -->
     <div  class="modal fade" id="myModalDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -279,9 +257,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   </thead>
                   <tbody>
                     <tr v-for="prst in pro_stock">
-                      <td :data-date="prst.created_at">{{date_thai(prst.created_at)}}</td>
+                      <td :data-date="prst.created_at">{{date_thai(prst.to_do_date)}}</td>
                       <td>{{prst.pro_name}}</td>
-                      <td>{{prst.rec_ord_id}}</td>
+                      <td>{{prst.rec_order_id}}</td>
                       <td class="text-center">{{prst.unit_name}}</td>
                       <td class="text-right">{{formatCurrency(prst.price_one)}}</td>
                       <td class="text-center">{{formatCurrency0(prst.bf)}}</td>
@@ -311,269 +289,274 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
+
   Vue.createApp({
     data() {
       return {
-        url_base:'',
-        datas:'',
+        url_base: '.', // ตั้งค่า base path
+        datas: [],        // ข้อมูลที่แสดงในตาราง (filtered)
+        all_datas: [],    // เก็บข้อมูลต้นฉบับทั้งหมด
+        q: '',             // คำค้นหา
         message: 'Hello Vue!',
-        product:[{pro_id:'', pro_name:'', pro_detail:'', cat_name:'', unit_name:'', locat:'',lower:1,min:1,st:'1',img:'',action:'insert'}],
-        sel_cats:'',
-        sel_units:'',
-        pro_img:{
-          id:'',
-          title:'',
-          label:'Choose file',
-          img:'',
-          val:''
+        product: this.defaultProduct(),
+        sel_cats: [],
+        sel_units: [],
+        pro_img: {
+          id: '',
+          title: '',
+          label: 'Choose file',
+          img: '',
+          val: ''
         },
-        q:'',
-        pro_stock:''
+        pro_stock: '',
+        previewImage: './uploads/none.png', // รูป default
+
       }
     },
     mounted(){
-      this.get_products();
       this.url_base = window.location.protocol + '//' + window.location.host;
+      this.get_products();
+      this.get_cats();
+      this.get_units();
     },
-    methods: {      
-      get_products(){
-        axios.post(this.url_base + '/estock/api/products/get_products.php')
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.datas = response.data.respJSON;
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+    methods: {     
+      defaultProduct() {
+        return {
+          pro_id: '',
+          pro_name: '',
+          pro_detail: '',
+          cat_id: '',     // ใช้ id แทน name จะ save ง่ายกว่า
+          unit_id: '',
+          locat: '',
+          lower: 1,
+          min: 1,
+          st: '1',
+          img: '',
+          action: 'insert'
+        }
       },
-      get_cats(){
-        axios.post(this.url_base + '/estock/api/products/get_cats.php')
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.sel_cats = response.data.respJSON;
-                    console.log(this.datas);                   
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+ 
+      get_products() {
+        const token = getJWT(); // ดึง JWT จาก localStorage/sessionStorage
+
+        axios.get('./api/products/get_products.php', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          if (response.data.status) {
+            this.all_datas = response.data.respJSON;
+            this.datas = this.all_datas; // เริ่มต้นแสดงทั้งหมด
+          } else {
+            console.warn("API returned error:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("Error loading products:", error);
+          this.handleAuthError(error); // ฟังก์ชันที่คุณเขียนไว้ เช่น clear token + redirect
+        });
       },
-      get_units(){
-        axios.post(this.url_base + '/estock/api/products/get_units.php')
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.sel_units = response.data.respJSON;
-                    console.log(this.sel_units);                   
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+      get_cats() {
+        const token = getJWT();
+
+        axios.get(this.url_base + '/api/products/get_cats.php', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+          if (response.data.status) {
+            this.sel_cats = response.data.respJSON;
+            console.log(this.sel_cats);
+          } else {
+            console.warn("get_cats error:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("get_cats failed:", error);
+          this.handleAuthError(error);
+        });
+      },
+
+      get_units() {
+        const token = getJWT();
+
+        axios.get(this.url_base + '/api/products/get_units.php', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+          if (response.data.status) {
+            this.sel_units = response.data.respJSON;
+            console.log(this.sel_units);
+          } else {
+            console.warn("get_units error:", response.data.message);
+          }
+        })
+        .catch(error => {
+          console.error("get_units failed:", error);
+          this.handleAuthError(error);
+        });
+      },
+
+      b_product_close(){
+        this.product = this.defaultProduct();
+        this.$refs.m_close.click();
       },
       b_product_insert(){
-        this.b_product_code();
-        this.get_cats();
-        this.get_units();
+        //this.product = this.defaultProduct();
+        //this.get_cats();
+        //this.get_units();
       },  
-      b_product_update(pro_id){
-        this.$refs.m_show.click();
-        axios.post(this.url_base + '/estock/api/products/get_product.php',{pro_id:pro_id})
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.product = response.data.respJSON;
-                    this.product[0].action = 'update'; 
-                    console.log(this.product);                   
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },  
-      b_product_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : 'Bearer ' + jwt}})
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status ) {
-                  Swal.fire({
-                    // position: 'top-end',
-                    icon: 'success',
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  this.$refs['m_close'].click();
-                  this.get_products();  
-                  this.product = [{pro_id:'',pro_name:'',pro_detail:'',cat_name:'',nit_name:'',locat:'',lower:1,min:1,st:'1',action:'insert' }];     
-                }else{
-                  Swal.fire({
-                    // position: 'top-end',
-                    icon: 'error',
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  })
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
-      b_product_strock(pro_id){
-        axios.post(this.url_base + '/estock/api/products/get_product_stock.php',{pro_id:pro_id})
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status == 'success' ) {                  
-                  this.pro_stock = response.data.respJSON   
-                }else{
-                  Swal.fire({
-                    icon: 'error',
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  })
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
-      destroy_pro(pro_id){
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.product[0].action = 'delete';  
-                  this.product[0].pro_id = pro_id;  
-                  axios.post(this.url_base + '/estock/api/products/product_save.php',{product:this.product},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-                    .then(response => {
-                        // console.log(response.data);
-                        if (response.data.status ) {
-                          Swal.fire({
-                            // position: 'top-end',
-                            icon: 'success',
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                          this.get_products(); 
-                             
-                        }else{
-                          Swal.fire({
-                            // position: 'top-end',
-                            icon: 'error',
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    
-                }
-              });            
-        },
-        b_product_code(){
-          this.product = [{pro_id:'', pro_name:'', pro_detail:'', cat_name:'', unit_name:'', locat:'', lower:1, min:1, st:'1', action:'insert'}];     
-        },
-        b_pro_img(pro_id,index){
-          this.pro_img.id = pro_id;
-          this.pro_img.img = this.datas[index].img;
-          this.pro_img.title = this.datas[index].pro_id + ' ' + this.datas[index].pro_name;          
-        },
-        onChangeInput(event){
-          this.onUpload()
-        },
-        onUpload(){
-          var image = this.$refs.myFiles.files
-          // console.log(this.$refs.myFiles.files[0].name);
-          if (image.length > 0) {
-            if(image[0].type == 'image/jpeg' || image[0].type =='image/png') {
-              var formData = new FormData();
-              // var imagefile = document.querySelector('#file');
-              var imagefile = document.querySelector('#file');
-              formData.append("sendimage", image[0]);
-              formData.append("pro_id", this.pro_img.id);
-              axios.post(
-                this.url_base + '/estock/api/products/upload_img.php', 
-                formData, 
-                {headers:{'Content-Type': 'multipart/form-data'}
-              })
-                .then(response => {
-                    if (response.data.status) {
-                      swal.fire({
-                        icon: 'success',
-                        title: response.data.message,
-                        showConfirmButton: true,
-                        timer: 1500
-                      });
-                      this.get_products();
-                      this.pro_img.img = response.data.img;
-                      // this.pro_img.label = '';
-                    }else {
-                        swal.fire({
-                            icon: 'error',
-                            title: response.data.message,
-                            showConfirmButton: true,
-                            timer: 1500
-                        });
-                    }
-                })
-            } else{
-                swal.fire({
-                    icon: 'error',
-                    title: "ไฟล์ที่อัพโหลดต้องเป็นไฟล์ jpeg หรือ png เท่านั้น",
-                    showConfirmButton: true,
-                    timer: 1500
-                });
-              }
-          }
+      b_product_update(pro_id) {
+        const token = getJWT();
 
-        } ,
-        test(){
-          this.$refs.m_img_upload.click();
-        },
-        /** 
-         * ต้นหา
-         */
-        search(){
-          console.log(this.q)
-          if(this.q.length > 0){
-            axios.post(this.url_base + '/estock/api/products/product_search.php',{q:this.q})
-              .then(response => {
-                  if (response.data.status){
-                    this.datas = response.data.respJSON;
-                  }
-              })
-              .catch(function (error) {
-                  console.log(error);
+        axios.post(this.url_base + '/api/products/get_product.php',
+          { pro_id: pro_id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then(response => {
+          console.log("API response:", response.data);
+
+          if (response.data.status && response.data.respJSON.length > 0) {
+            this.product = { ...response.data.respJSON[0], action: 'update' };
+
+            if (this.product.img) {
+              this.previewImage = this.url_base + '/uploads/' + this.product.img;
+            } else {
+              this.previewImage = this.url_base + '/uploads/none.png';
+            }
+
+            this.$refs.m_show.click();
+            console.log("Loaded product:", this.product);
+          } else {
+            console.warn("Product not found or API error");
+          }
+        })
+        .catch(error => {
+          console.error("Error loading product:", error);
+          this.handleAuthError(error);
+        });
+      },
+      onFileChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // ✅ ตรวจสอบว่าเป็นไฟล์รูปภาพ
+  if (!file.type.startsWith("image/")) {
+    Swal.fire({ icon: 'error', title: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น', timer: 1500 });
+    return;
+  }
+
+  // ✅ ตรวจสอบขนาดไฟล์ไม่เกิน 2 MB
+  if (file.size > 2 * 1024 * 1024) {
+    Swal.fire({ icon: 'error', title: 'ไฟล์ต้องมีขนาดไม่เกิน 2 MB', timer: 1500 });
+    return;
+  }
+
+  // ✅ เก็บไฟล์ไว้ใน product.img สำหรับส่งไป backend
+  this.product.img = file;
+
+  // ✅ อ่านไฟล์เป็น DataURL เพื่อแสดง preview
+  const reader = new FileReader();
+  reader.onload = e => {
+    this.previewImage = e.target.result; // ใช้ใน <img :src="previewImage">
+  };
+  reader.readAsDataURL(file);
+},
+
+       // ฟังก์ชันบันทึก (upload ไป backend)
+      b_product_save() {
+        const token = getJWT();
+        let formData = new FormData();
+
+        // แนบข้อมูลสินค้า
+        formData.append("pro_id", this.product.pro_id);
+        formData.append("pro_name", this.product.pro_name);
+        formData.append("pro_detail", this.product.pro_detail);
+        formData.append("cat_id", this.product.cat_id);
+        formData.append("unit_id", this.product.unit_id);
+        formData.append("locat", this.product.locat);
+        formData.append("lower", this.product.lower);
+        formData.append("min", this.product.min);
+        formData.append("st", this.product.st);
+        formData.append("action", this.product.action);
+
+        // แนบไฟล์รูป (ถ้ามี)
+        if (this.product.img instanceof File) {
+          formData.append("img", this.product.img);
+        }
+
+        axios.post(this.url_base + '/api/products/product_save.php',
+          formData,
+          {
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        )
+        .then(response => {
+          if (response.data.status) {
+            Swal.fire({ icon: 'success', title: response.data.message, timer: 1500 });
+            this.$refs['m_close'].click();
+            this.get_products();
+            this.product = this.defaultProduct(); // reset object
+          } else {
+            Swal.fire({ icon: 'error', title: response.data.message, timer: 1500 });
+          }
+        })
+        .catch(error => {
+          console.error("Save product error:", error);
+        });
+      },
+      b_product_strock(pro_id) {
+        const token = getJWT();
+        axios.post(this.url_base + '/api/products/get_product_stock.php', { pro_id: pro_id },{ headers: { Authorization: `Bearer ${token}` } })
+          .then(response => {
+            console.log("API response:", response.data);
+
+            if (response.data.status) {   // <-- เช็ค boolean แทน 'success'
+              this.pro_stock = response.data.respJSON;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: response.data.message || "ไม่พบข้อมูลสต็อก",
+                showConfirmButton: false,
+                timer: 1500
               });
-          }else{
-            this.get_products()
+            }
+          })
+          .catch(error => {
+            console.error("Error loading stock:", error);
+            Swal.fire({
+              icon: 'error',
+              title: "เกิดข้อผิดพลาดในการโหลดข้อมูล",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          });
+      },
+      test(){
+          this.$refs.m_img_upload.click();
+      },
+      search() {
+        const keyword = this.q.toLowerCase().trim();
+          if (keyword === '') {
+            this.datas = this.all_datas; // ถ้าไม่พิมพ์อะไร แสดงทั้งหมด
+          } else {
+            this.datas = this.all_datas.filter(item => {
+              return (
+                (item.pro_name && item.pro_name.toLowerCase().includes(keyword)) ||
+                (item.cat_name && item.cat_name.toLowerCase().includes(keyword)) ||
+                (item.unit_name && item.unit_name.toLowerCase().includes(keyword)) ||
+                (item.locat && item.locat.toLowerCase().includes(keyword))
+              );
+            });
           }
         },
         reset_search(){
           this.q=''
         },
-        handleBlurSearch(e) {
-          this.q = ''
-          this.get_products()
-          // console.log('blur', e.target.placeholder)
-        },
+        
         date_thai(day){
           var monthNamesThai = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤษจิกายน","ธันวาคม"];
           var dayNames = ["วันอาทิตย์ที่","วันจันทร์ที่","วันอังคารที่","วันพุทธที่","วันพฤหัสบดีที่","วันศุกร์ที่","วันเสาร์ที่"];

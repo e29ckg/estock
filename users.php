@@ -47,9 +47,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <div class="card-header">
                 <h5 class="card-title">Users</h5>
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_user_insert()" ref="m_show">เพิ่มสมาชิก</button>                  
-                  <button class="btn btn-danger" data-toggle="modal" data-target="#users_main_Modal" @click="get_Users_main()" ref="m_user_main_show">เพิ่มสมาชิก(from_main)</button>                  
-                </div>
+                  <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal" @click="b_user_insert()" ref="m_show">เพิ่มสมาชิก</button>  </div>
               </div>
               <div class="card-body">
                 <table class="table table-bordered">
@@ -79,8 +77,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <span v-else class="badge badge-danger">ระงับ</span>
                       </td>
                       <td>
-                        <button @click="b_user_update(data.user_id)" >Update</button>  
-                        <button @click="destroy_user(data.user_id)">Delete</button>  
+                        <button class="btn btn-warning mx-2" @click="b_user_update(data.user_id)" >Update</button>  
+                        <button class="btb btn-danger mx-2" @click="destroy_user(data.user_id)">Delete</button>  
                       </td>
                     </tr>
                   </tbody>
@@ -91,156 +89,103 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </div>          
         </div>
       </div>
+    
     </div>
     
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" data-backdrop="static" data-bs-keyboard="false" tabindex="-1">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <form @submit.prevent="b_user_save()">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_user_close()">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">  
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>ชื่อ</label>
-                  <input type="text" class="form-control" v-model="user[0].fullname" required>
-                </div>
-              </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>username</label>
-                  <input type="text" class="form-control" v-model="user[0].username" required>
-                </div>
-              </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>E-mail</label>
-                  <input type="e-mail" class="form-control" v-model="user[0].email" required>
-                </div>
-              </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>dep</label>
-                  <input type="text" class="form-control" v-model="user[0].dep" >
-                </div>
-              </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-12">
-                <div class="form-group">
-                  <label>phone</label>
-                  <input type="text" class="form-control" v-model="user[0].phone" >
-                </div>
-              </div>
-            </div>   
-            <div class="row">   
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>สถานะ</label>
-                  <select class="form-control" v-model="user[0].st">
-                    <option value=10>ใช้งาน</option>
-                    <option value=0>ระงับการใช้งาน</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div class="form-group">
-                  <label>สิทธิ์</label>
-                  <select class="form-control" v-model="user[0].role">
-                    <option value="admin">ADMIN</option>
-                    <option value="member">MEMBER</option>
-                  </select>
-                </div>
-              </div>
-            </div>   
+            <div class="modal-header">
+              <h5 class="modal-title">จัดการผู้ใช้</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="m_close" @click="b_user_close()"><span aria-hidden="true">&times;</span></button>
+              
+            </div>
 
-            
-            
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="b_user_close()">Close</button>
-            <button type="submit" class="btn btn-primary" >Save changes</button>
-          </div>
-            <!-- {{catatlog}} -->
-            
+            <div class="modal-body">
+              <!-- user_id (ซ่อน) -->
+              <input type="hidden" v-model="user.user_id">
+
+              <!-- ชื่อ -->
+              <div class="form-group mb-3">
+                <label>ชื่อ-นามสกุล</label>
+                <input type="text" class="form-control" v-model="user.fullname" required>
+              </div>
+
+              <!-- username -->
+              <div class="form-group mb-3">
+                <label>Username</label>
+                <input type="text" class="form-control" v-model="user.username" required>
+              </div>
+
+              <!-- password -->
+              <div class="form-group mb-3">
+                <label>Password</label>
+                <input type="password" class="form-control" v-model="user.password" :required="user.action === 'insert'">
+                <small class="form-text text-muted">
+                  {{ user.action === 'update' ? 'ปล่อยว่างถ้าไม่ต้องการเปลี่ยนรหัสผ่าน' : '' }}
+                </small>
+              </div>
+
+              <!-- email -->
+              <div class="form-group mb-3">
+                <label>E-mail</label>
+                <input type="email" class="form-control" v-model="user.email" required>
+              </div>
+
+              <!-- dep -->
+              <div class="form-group mb-3">
+                <label>แผนก (Department)</label>
+                <input type="text" class="form-control" v-model="user.dep">
+              </div>
+
+              <!-- phone -->
+              <div class="form-group mb-3">
+                <label>เบอร์โทร</label>
+                <input type="text" class="form-control" v-model="user.phone">
+              </div>
+
+              <div class="row">
+                <!-- สถานะ -->
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
+                    <label>สถานะ</label>
+                    <select class="form-control" v-model="user.st">
+                      <option value="10">ใช้งาน</option>
+                      <option value="0">ระงับการใช้งาน</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- สิทธิ์ -->
+                <div class="col-sm-6">
+                  <div class="form-group mb-3">
+                    <label>สิทธิ์</label>
+                    <select class="form-control" v-model="user.role">
+                      <option value="admin">ADMIN</option>
+                      <option value="member">MEMBER</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="b_user_close()">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
           </form>
         </div>
       </div>
     </div>
-
-    <!-- Modal m_user_main-->
-    <div class="modal fade" id="users_main_Modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-          
-          <div class="modal-header">
-            <h5 class="modal-title" id="users_main_ModalModalLabel">m_user_main</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ref="close_m_user_main" @click="b_user_close()">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">             
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <td>user_id</td>
-                  <td>username</td>
-                  <td>email</td>
-                  <td>fullname</td>
-                  <td>dep</td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="dm,index in datas_main">
-                  <td>{{dm.user_id}}</td>
-                  <td>
-                    {{dm.username}}
-                  </td>
-                  <td>{{dm.email}}</td>
-                  <td>
-                    {{dm.fullname}}<br>
-                    {{dm.phone}}</td>
-                  <td>{{dm.dep}}</td>
-                  <td><button @click="add_user_for_main(index)">เพิ่มสมาชิก</button></td>
-                </tr>
-                
-              </tbody>
-            </table>
-            
-            <!-- {{datas_main}} -->
-                       
-            
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <!-- <button type="submit" class="btn btn-primary" >Save changes</button> -->
-          </div>
-            <!-- {{catatlog}} -->
-            
-        </div>
-      </div>
-    </div><!-- m_user_main -->
-    
-
-
   </div>
 <!-- END APP -->
   <?php include "./layouts/footer.php";?>
 </div>
 <?php include "./layouts/footer2.php";?>
 <script>
+requireAuth();
   Vue.createApp({
     data() {
       return {
@@ -248,7 +193,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         datas:'',
         datas_main:'',
         message: 'Hello Vue!',
-        user:[{
+        user:{
           user_id:'',
           fullname:'',          
           username:'',          
@@ -258,108 +203,97 @@ scratch. This page gets rid of all links and provides the needed markup only.
           phone:'',          
           st:10,          
           fullname:'',          
-          role:'',          
+          role:'member',          
           action:'insert'        
-        }],
+        },
         
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host + '/estock/';
+      this.url_base = window.location.protocol + '//' + window.location.host ;
       this.get_Users();
     },
-    methods: {      
-      get_Users(){
-        axios.post(this.url_base + 'api/users/get_users.php')
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.datas = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
+    methods: {    
+      defaultUser() {
+        return {
+          user_id:'',
+          fullname:'',          
+          username:'',          
+          password:'',          
+          email:'',          
+          dep:'',          
+          phone:'',          
+          st:10,          
+          fullname:'',          
+          role:'member',          
+          action:'insert' 
+        }
+      },  
+      get_Users() {
+        const token = getJWT();
+        axios.get(this.url_base + '/api/users/get_users.php', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(response => {
+          console.log("API response:", response.data);
+
+          if (response.data.status) {
+            this.datas = response.data.respJSON;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: response.data.message || "ไม่สามารถโหลดข้อมูลผู้ใช้ได้",
+              showConfirmButton: false,
+              timer: 1500
             });
+          }
+        })
+        .catch(error => {
+          console.error("Error loading users:", error);
+          Swal.fire({
+            icon: 'error',
+            title: "เกิดข้อผิดพลาดในการเชื่อมต่อ API",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
       },
-      get_Users_main(){
-        axios.post(this.url_base + 'api/users/get_users_main.php')
-            .then(response => {
-                // console.log(response.data);
-                if (response.data.status) {
-                    this.datas_main = response.data.respJSON;         
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
+     
       b_user_insert(){
         this.b_user_close();
       },  
       b_user_update(user_id){
         this.$refs.m_show.click();
-        axios.post(this.url_base + 'api/users/get_user.php',{user_id:user_id})
+        const token = getJWT();
+        axios.post(this.url_base + '/api/users/get_user.php',{user_id:user_id}, {
+          headers: { Authorization: `Bearer ${token}` } })
             .then(response => {
                 if (response.data.status) {
-                  this.user = response.data.respJSON;
-                  this.user[0].action = 'update';              
+                  this.user = {...response.data.respJSON[0], action:'update'};
                 }
             })
             .catch(function (error) {
                 console.log(error);
             });
       }, 
-      add_user_for_main(index){
-        user = this.datas_main[index]
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + 'api/users/save_users_form_main.php',{user:user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-            .then(response => {
-                if (response.data.status == 'success') {
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  this.get_Users();  
-                }else{
-                  Swal.fire({
-                    icon: response.data.status,
-                    title: response.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  })
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-      },
+      
       b_user_save(){
-        var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        const token = getJWT();
+        axios.post(this.url_base + '/api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
-                if (response.data.status == 'success') {
+                if (response.data.status) {
                   Swal.fire({
-                    icon: response.data.status,
+                    icon: 'success',
                     title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
                   });
                   this.$refs['m_close'].click();
                   this.get_Users();  
-                  this.user = [{
-                              user_id:'',
-                              fullname:'',
-                              username:'',
-                              email:'',
-                              dep:'',
-                              phone:'',
-                              action:'insert'        
-                            }];     
+                  this.user = this.defaultUser();    
                 }else{
                   Swal.fire({
-                    icon: response.data.status,
+                    icon: 'error',
                     title: response.data.message,
                     showConfirmButton: false,
                     timer: 1500
@@ -370,56 +304,62 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 console.log(error);
             });
       },
-      destroy_user(user_id){
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  var jwt = localStorage.getItem("jwt");
-                  this.user[0].action = 'delete';  
-                  this.user[0].user_id = user_id;  
-                  axios.post(this.url_base + 'api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${jwt}`}})
-                    .then(response => {
-                        if (response.data.status == 'success') {
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                          this.get_Users(); 
-                             
-                        }else{
-                          Swal.fire({
-                            icon: response.data.status,
-                            title: response.data.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                          })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                    
-                }
-              });            
-        },
+      destroy_user(user_id) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "คุณต้องการลบผู้ใช้นี้หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // ✅ สร้าง object ใหม่ ไม่แก้ไข this.user โดยตรง
+            const payload = {
+              user: {
+                action: 'delete',
+                user_id: user_id
+              }
+            };
+            const token = getJWT();
+            axios.post(this.url_base + '/api/users/user_action.php', payload, {
+              headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(response => {
+              console.log("Delete response:", response.data);
+
+              if (response.data.status) {
+                Swal.fire({
+                  icon: 'success',
+                  title: response.data.message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                this.get_Users(); // โหลด users ใหม่
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: response.data.message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            })
+            .catch(error => {
+              console.error("Delete error:", error);
+              Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ API',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            });
+          }
+        });
+      },
         b_user_close(){
-          this.user = [{
-                              user_id:'',
-                              username:'',
-                              email:'',
-                              dep:'',
-                              phone:'',
-                              action:'insert'        
-                            }];     
+           this.$refs['m_close'].click();
         }        
       },
   }).mount('#appUsers');
