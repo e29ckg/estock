@@ -22,21 +22,26 @@ try {
 
     // ✅ ใช้ prepared statement ปลอดภัยกว่า
     $sql = "SELECT 
-                ol.order_list_id,
-                ol.order_id,
-                ol.pro_id,
-                p.pro_name,
-                u.unit_name,
-                p.instock,
-                ol.qua,
-                ol.qua_pay,
-                ol.st,
-                ol.created_at,
-                ol.updated_at
-            FROM order_lists ol
-            INNER JOIN products p ON ol.pro_id = p.pro_id
-            INNER JOIN units u ON u.unit_id = p.unit_id
-            WHERE ol.order_id = :order_id;";
+            ol.order_list_id,
+            ol.order_id,
+            ol.pro_id,
+            p.pro_name,
+            u.unit_name,
+            p.instock,
+            ol.qua,
+            ol.qua_pay,
+            ol.st,
+            ol.created_at,
+            ol.updated_at,
+            (
+                SELECT SUM(rl.qua_for_ord)
+                FROM rec_lists rl
+                WHERE rl.pro_id = p.pro_id
+            ) AS qua_for_ord
+        FROM order_lists ol
+        INNER JOIN products p ON ol.pro_id = p.pro_id
+        INNER JOIN units u ON u.unit_id = p.unit_id
+        WHERE ol.order_id = :order_id;";
     $query = $dbcon->prepare(query: $sql);
     $query->bindParam(':order_id', $order_id, PDO::PARAM_INT);
     $query->execute();

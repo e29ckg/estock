@@ -298,10 +298,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <td>{{index + 1 }}</td>
                         <td class="text-left">{{orl.pro_name}}</td>
                         <td>{{orl.unit_name}}</td>
-                        <td>{{formatCurrency0(orl.instock)}}</td>
+                        <td>{{formatCurrency0(orl.qua_for_ord)}}</td>
                         <td>{{formatCurrency0(orl.qua)}}</td>
                         <td>
-                          <button class="btn btn-danger" v-if="Number(orl.qua) > Number(orl.instock) || Number(orl.qua) == 0 ">
+                          <button class="btn btn-danger" v-if="Number(orl.qua) > Number(orl.qua_for_ord) || Number(orl.qua) == 0 ">
                             <i class="fas fa-times"></i>
                           </button>
                           
@@ -423,7 +423,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <?php include "./layouts/footer2.php";?>
 
 <script>
-  requireAuth()
+  //requireAuth()
   const token = getJWT();
   Vue.createApp({
     data() {

@@ -1,45 +1,48 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET,HEAD,OPTIONS,POST,PUT");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-// header("'Access-Control-Allow-Credentials', 'true'");
-// header('Content-Type: application/javascript');
-header("Content-Type: application/json; charset=utf-8");
+header("Content-Type: application/json; charset=UTF-8");
+require_once "../dbconfig.php";
+require_once "../auth/verify_jwt.php"; // ตรวจสอบ JWT
 
-include "../dbconfig.php";
+try {
+    $sql = "SELECT 
+                p.pro_id,
+                p.pro_name,
+                p.pro_detail,
+                c.cat_name,
+                u.unit_name,
+                p.instock,
+                p.locat,
+                p.lower,
+                p.min,
+                p.st,
+                p.img,
+                p.own,
+                p.created_at,
+                p.updated_at,
+                (
+                    SELECT SUM(rl.qua_for_ord)
+                    FROM rec_lists rl
+                    WHERE rl.pro_id = p.pro_id
+                ) AS qua_for_ord
+            FROM products p
+            INNER JOIN catalogs c ON p.cat_id = c.cat_id
+            INNER JOIN units u ON p.unit_id = u.unit_id
+            WHERE p.deleted_at IS NULL AND p.st = 1
+            ORDER BY p.pro_name ASC";
 
-try{
-    /*ดึงข้อมูลทั้งหมด*/
-    $sql = "SELECT * FROM products ORDER BY pro_name ASC";
-    // $sql = "SELECT products.pro_name, products.pro_id, products.instock, products.min, products.img, catalogs.cat_name, units.unit_name FROM products JOIN units ON products.unit_id = units.unit_id JOIN catalogs ON products.cat_id = catalogs.cat_id;";
-    $query = $dbcon->prepare($sql);
-    $query->execute();
-    $result = $query->fetchAll(PDO::FETCH_OBJ);
-    $data = array();
+    $stmt = $dbcon->prepare($sql);
+    $stmt->execute();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach($result as $res){
-        array_push($data,array(
-            "pro_id" => $res->pro_id,
-            "pro_name" => $res->pro_name,
-            "unit_name" => $res->unit_name,
-            "cat_name" => $res->cat_name,
-            "min" => $res->min,
-            "instock" => $res->instock,
-            "img" => $res->img
-        ));
-    }
-    http_response_code(200);
-    echo json_encode(array(
-        'status' => true, 
-        'message' =>  'Ok', 
-        // 'message' =>  $result, 
-        'respJSON' => $data
-    ));
-
-}catch(PDOException $e){
-    echo "Faild to connect to database" . $e->getMessage();
-    http_response_code(400);
-    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+    echo json_encode([
+        "status" => true,
+        "respJSON" => $rows
+    ]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        "status" => false,
+        "message" => "Database error",
+        "error" => $e->getMessage()
+    ]);
 }
-
-

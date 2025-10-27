@@ -1,6 +1,6 @@
 <?php
-require '../dbconfig.php';        // ใช้ dbconfig.php
 require './vendor/autoload.php';
+require '../dbconfig.php';       
 
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
@@ -35,7 +35,7 @@ try {
 
         if (password_verify($password, $row['password'])) {
             // ✅ ใช้ secret key จาก .env
-            $secret_key     = getenv('JWT_SECRET');
+            $secret_key     = $key;
             $issuer_claim   = "localhost";
             $audience_claim = "E29CKG";
             $issuedat_claim = time();

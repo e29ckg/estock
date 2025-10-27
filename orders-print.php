@@ -62,14 +62,14 @@
                   <td class="text-left">{{ ol.pro_name }}</td>
                   <td>{{ ol.unit_name }}</td>
                   <td>{{ ol.qua }}</td>
-                  <td>{{ ol.qua_pay }}</td>
+                  <td>{{ ol.qua_pay > 0 ? ol.qua_pay : ''}}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr class="text-center font-weight-bold">
                   <td colspan="4">รวม</td>
                   <td>{{ summary.sum_qua }}</td>
-                  <td>{{ summary.sum_qua_pay }}</td>
+                  <td>{{ summary.sum_qua_pay > 0 ?  summary.sum_qua_pay : ''}}</td>
                 </tr>
               </tfoot>
             </table>

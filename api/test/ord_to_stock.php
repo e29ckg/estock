@@ -1,0 +1,210 @@
+<?php
+header("Content-Type: application/json; charset=utf-8");
+
+include "../dbconfig.php";
+
+try{
+    /*ดึงข้อมูลทั้งหมด*/
+    // rec
+    $dbcon->beginTransaction();
+
+    $sql = "SELECT * FROM `ords` ORDER BY ord_id ASC;";
+    $query = $dbcon->prepare($sql);;
+    $query->execute();
+    $result_ords = $query->fetchAll(PDO::FETCH_OBJ);
+
+    $into_stock =array();
+    $ord_own = 'administrator';
+    $comment = '';
+
+    foreach($result_ords as $rrs){
+        $sql = "SELECT * FROM `ord_lists` WHERE ord_id = $rrs->ord_id ORDER BY ord_list_id ASC;";
+        $query = $dbcon->prepare($sql);;
+        $query->execute();
+        $Ord_lists = $query->fetchAll(PDO::FETCH_OBJ);
+        
+        foreach($Ord_lists as $ord_l){
+            
+            $qua = $ord_l->qua;         //  3 จำนวนที่ขอเบิก
+            $pro_id = $ord_l->pro_id;   //  1 
+
+            $price_one  = '';           //  หาจาก rec_lists
+            $rec_id     = 0 ;           //  หาจาก rec_lists
+
+            $bf         = 0;
+            $stck_in    = 0;
+            $stck_out   = 0;
+            $bal        = 0;
+
+            $qua_pay    = 0;            // จำนวนที่จ่ายได้
+
+            $unit_name =  $ord_l->unit_name;
+            $rec_ord_id =  $ord_l->ord_id;
+            $rec_ord_list_id = $ord_l->ord_list_id;
+            $comment = $comment;
+
+            if($qua > 0 ){
+        //         /** rec_lists  หาลอดตัด */
+                $sql = "SELECT * FROM `rec_lists` WHERE pro_id =:pro_id AND qua_for_ord > 0 ORDER BY rec_list_id ASC ";
+                $query = $dbcon->prepare($sql);
+                $query->bindParam(':pro_id', $pro_id, PDO::PARAM_INT);
+                $query->execute();
+                $rep_rec_lists = $query->fetchAll(PDO::FETCH_OBJ);
+
+                $instock = 0;
+                $instock_qua = $qua;
+
+                $product_instock = 0;
+                foreach($rep_rec_lists as $rep_r){
+                    $product_instock = $product_instock + $rep_r->qua_for_ord;
+                }
+
+                if($product_instock >= $qua){ /*** $product_instock > $qua  */
+
+                    foreach($rep_rec_lists as $rrl){
+                        $instock = $instock + $rrl->qua_for_ord; 
+    
+                        if($qua > 0){
+    
+                            $rec_list_id = $rrl->rec_list_id;
+                            /** เลือก stock pro_id ล่าสุด */
+                            $sql = "SELECT * FROM stock WHERE pro_id = :pro_id ORDER BY stck_id DESC LIMIT 0,1;"; 
+                            $query = $dbcon->prepare($sql);           
+                            $query->bindParam(':pro_id', $pro_id, PDO::PARAM_INT);
+                            $query->execute(); 
+                            $rep_stck_desc = $query->fetchAll(PDO::FETCH_OBJ);
+        
+                            $bf     = $rep_stck_desc[0]->bal;
+                            $qua_for_ord = $rrl->qua_for_ord;
+                                   // หน้าจำนวนรวมที่สามารถเบิกได้ ใน rec_list 
+        
+                            if($qua_for_ord < $qua  ){                      //  qf 1   3     3 - 1  ออก  1  เหลือ 2
+                                $stck_out   = $rrl->qua_for_ord;            //  1
+                                $qua        = $qua - $rrl->qua_for_ord ;     //  Q = 2   เหลือต้องเบิกอีก 3-1
+        
+                                $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                                $rec_id     = $rrl->rec_id;
+        
+                                $stck_in    = 0;
+                                $stck_out   = $stck_out;
+                                $bal        = $bf - $stck_out;              // 
+                                $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list
+                                
+        
+                            }elseif($qua_for_ord > $qua){                   //  10   Q 8   
+                                $stck_out   =   $qua;                       //  8
+                                $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
+        
+                                $price_one  =   $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                                $rec_id     =   $rrl->rec_id;
+        
+                                $stck_in    =   0;
+                                $stck_out   =   $stck_out;
+                                $bal        =   $bf - $stck_out;             //  2
+                                $qua_for_ord =  $qua_for_ord - $stck_out;   //  2   เหลือ rec_list
+                                
+        
+                            }elseif($qua_for_ord == $qua){                  // 3    3   ออก     3   เหลือ    0
+                                $stck_out   =   $qua;                       //  ออก 3
+                                $qua        =   0;                          //  Q = 0   เหลือต้องเบิกอีก
+        
+                                $price_one  = $rrl->price_one;              //  ราคาของ lot นี้ rec_lists
+                                $rec_id     = $rrl->rec_id;
+        
+                                $stck_in    = 0;
+                                $stck_out   = $stck_out;
+                                $bal        = $bf - $stck_out;;              // 
+                                $qua_for_ord = $qua_for_ord - $stck_out;    //  เหลือ rec_list                            
+        
+                            }
+                            array_push($into_stock,array(
+                            
+                                "pro_id" => $pro_id,
+                                "unit_name" => $unit_name,
+                                "price_one" => $price_one,
+                                "bf" => $bf,
+                                "stck_in" => $stck_in,
+                                "stck_out" => $stck_out,
+                                "bal" => $bal,
+                                "rec_ord_id" => $rec_ord_id,
+                                "rec_ord_list_id" => $rec_ord_list_id,
+                                "comment" => $comment,
+                            ));
+
+                            $qua_pay = $qua_pay + $stck_out;
+                            /** บันทึกรายการ ลง stock */
+                            $sql = "INSERT INTO stock(pro_id, unit_name, price_one, bf, stck_in, stck_out, bal, rec_ord_id, rec_ord_list_id, comment) VALUE (:pro_id, :unit_name, :price_one, :bf, :stck_in, :stck_out, :bal, :rec_ord_id, :rec_ord_list_id, :comment)";
+                            $query = $dbcon->prepare($sql); 
+                            $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
+                            $query->bindParam(':unit_name',$unit_name, PDO::PARAM_STR);
+                            $query->bindParam(':price_one',$price_one, PDO::PARAM_STR);
+                            $query->bindParam(':bf',$bf, PDO::PARAM_INT);
+                            $query->bindParam(':stck_in', $stck_in,PDO::PARAM_INT);
+                            $query->bindParam(':stck_out',$stck_out,PDO::PARAM_INT);
+                            $query->bindParam(':bal',$bal, PDO::PARAM_INT);
+                            $query->bindParam(':rec_ord_id',$rec_ord_id, PDO::PARAM_INT);
+                            $query->bindParam(':rec_ord_list_id',$rec_ord_list_id, PDO::PARAM_INT);
+                            $query->bindParam(':comment',$comment, PDO::PARAM_STR);
+                            $query->execute();
+                            
+                            /** ตัด rec_list ที่หัก */
+                            $sql = "UPDATE rec_lists SET qua_for_ord=:qua_for_ord WHERE rec_list_id = :rec_list_id;"; 
+                            $query = $dbcon->prepare($sql); 
+                            $query->bindParam(':qua_for_ord',$qua_for_ord, PDO::PARAM_INT);
+                            $query->bindParam(':rec_list_id',$rec_list_id, PDO::PARAM_INT);
+                            $query->execute();
+        
+                            $bf = $bal;     //bal -> fb ยอดยกไป รอบต่อไป  
+                        }
+                        
+                        
+                        $instock = $bal;
+                        
+
+                        /**     ปรับ products instock */
+                        $sql = "UPDATE products SET instock=:instock WHERE pro_id = :pro_id;";
+                        $query = $dbcon->prepare($sql); 
+                        $query->bindParam(':instock',$instock, PDO::PARAM_INT);
+                        $query->bindParam(':pro_id',$pro_id, PDO::PARAM_INT);
+                        $query->execute();
+    
+                    } /**foreach */
+
+                }/*** $product_instock > $qua  */
+
+                
+            } /** Qua > 0 */
+            
+            $sql = "UPDATE ord_lists SET st=1, ord_app=:ord_app, qua_pay=:qua_pay WHERE ord_list_id = :ord_list_id ;"; 
+            $query = $dbcon->prepare($sql);           
+            $query->bindParam(':ord_app', $ord_own, PDO::PARAM_STR);
+            $query->bindParam(':qua_pay', $qua_pay, PDO::PARAM_INT);
+            $query->bindParam(':ord_list_id', $rec_ord_list_id, PDO::PARAM_INT);
+            $query->execute();
+        //     /**  order_list st = 1 */
+            
+        }
+
+
+
+
+    }
+         
+        
+        // $i = 0;
+               
+        $dbcon->commit();
+
+    http_response_code(200);
+    echo json_encode(array(
+        'status' => true, 
+        'message' =>  'Ok',
+        'into_stock' =>  $into_stock,
+        'Ord_lists' =>  $Ord_lists,
+    ));
+
+}catch(PDOException $e){
+    echo "Faild to connect to database" . $e->getMessage();
+    http_response_code(400);
+    echo json_encode(array('status' => false, 'message' => 'เกิดข้อผิดพลาด..' . $e->getMessage()));
+}

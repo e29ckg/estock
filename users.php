@@ -210,7 +210,6 @@ requireAuth();
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host ;
       this.get_Users();
     },
     methods: {    
@@ -231,7 +230,7 @@ requireAuth();
       },  
       get_Users() {
         const token = getJWT();
-        axios.get(this.url_base + '/api/users/get_users.php', {
+        axios.get('api/users/get_users.php', {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {
@@ -265,7 +264,7 @@ requireAuth();
       b_user_update(user_id){
         this.$refs.m_show.click();
         const token = getJWT();
-        axios.post(this.url_base + '/api/users/get_user.php',{user_id:user_id}, {
+        axios.post('api/users/get_user.php',{user_id:user_id}, {
           headers: { Authorization: `Bearer ${token}` } })
             .then(response => {
                 if (response.data.status) {
@@ -279,7 +278,7 @@ requireAuth();
       
       b_user_save(){
         const token = getJWT();
-        axios.post(this.url_base + '/api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${token}`}})
+        axios.post('api/users/user_action.php',{user:this.user},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 if (response.data.status) {
                   Swal.fire({
@@ -323,7 +322,7 @@ requireAuth();
               }
             };
             const token = getJWT();
-            axios.post(this.url_base + '/api/users/user_action.php', payload, {
+            axios.post('api/users/user_action.php', payload, {
               headers: { "Authorization": `Bearer ${token}` }
             })
             .then(response => {
@@ -336,7 +335,7 @@ requireAuth();
                   showConfirmButton: false,
                   timer: 1500
                 });
-                this.get_Users(); // โหลด users ใหม่
+                this.get_Users(); 
               } else {
                 Swal.fire({
                   icon: 'error',

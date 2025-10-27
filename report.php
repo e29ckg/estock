@@ -134,7 +134,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }
     },
     mounted(){
-      this.url_base = window.location.protocol + '//' + window.location.host;
       this.set_sel_year()
       this.get_Report();
     },
@@ -148,7 +147,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         this.year = d.getFullYear() + 543
       },  
       get_Report(){
-        axios.post(this.url_base + '/api/report/get_report.php',{year:this.year})
+        axios.post('api/report/get_report.php',{year:this.year})
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;       

@@ -4,7 +4,12 @@ include "../dbconfig.php";
 include "../auth/verify_jwt.php"; // ✅ ตรวจสอบ JWT ก่อน
 
 try {
-    $stmt = $dbcon->prepare("SELECT * FROM orders ORDER BY created_at DESC");
+    $sql = "SELECT od.*, u.fullname order_own
+            FROM orders od
+            INNER JOIN users u ON u.user_id = od.user_id
+            ORDER BY od.order_date DESC;";
+
+    $stmt = $dbcon->prepare($sql);
     $stmt->execute();
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

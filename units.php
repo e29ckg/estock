@@ -144,7 +144,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     methods: {      
       get_Units(){
-        axios.post('./api/units/read_units_all.php')
+        const token = getJWT();
+        axios.post('api/units/read_units_all.php',{},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -158,9 +159,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       b_unit_insert(){
         this.b_unit_close();
       },  
-      b_unit_update(unit_id){
+      b_unit_update(unit_id){        
         this.$refs.m_show.click();
-        axios.post('./api/units/get_unit.php',{unit_id:unit_id})
+        const token = getJWT();
+        axios.post('api/units/get_unit.php',{unit_id:unit_id},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status) {
@@ -174,7 +176,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },  
       b_unit_save(){
         const token = getJWT();
-        axios.post('/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
+        axios.post('api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
             .then(response => {
                 // console.log(response.data);
                 if (response.data.status ) {
@@ -214,7 +216,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   const token = getJWT();
                   this.unit.action = 'delete';  
                   this.unit.unit_id = unit_id;  
-                  axios.post('/api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
+                  axios.post('api/units/unit_save.php',{unit:this.unit},{ headers: {"Authorization" : `Bearer ${token}`}})
                     .then(response => {
                         // console.log(response.data);
                         if (response.data.status ) {
@@ -244,10 +246,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
         },
         b_unit_close(){
           this.unit = {
-                              unit_id:'',
-                              unit_name:'',
-                              action:'insert'        
-                            };     
+            unit_id:'',
+            unit_name:'',
+            action:'insert'        
+          };     
         }        
       },
   }).mount('#appUnits');

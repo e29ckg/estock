@@ -2,13 +2,13 @@
 date_default_timezone_set("Asia/Bangkok");
 
 // 🔑 JWT secret key (ควรเก็บใน .env)
-$key = getenv('JWT_SECRET');
+$key = getenv('JWT_SECRET') ?: 'eE8D5kAg_mG0pGdSOU9nvVNVqKQueGZvojt9SpBLIcc';
 
 // ✅ โหลดค่าจาก environment variables (Docker Compose / .env)
-$db_host = getenv('DB_HOST') ?: 'db';              // service name ของ MySQL ใน docker-compose
+$db_host = getenv('DB_HOST') ?: 'localhost';              // service name ของ MySQL ใน docker-compose
 $db_name = getenv('MYSQL_DATABASE') ?: 'estock';
-$db_user = getenv('MYSQL_USER') ?: 'myuser';
-$db_pass = getenv('MYSQL_PASSWORD') ?: 'mypass';
+$db_user = getenv('MYSQL_USER') ?: 'root';
+$db_pass = getenv('MYSQL_PASSWORD') ?: '';
 
 $dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
 

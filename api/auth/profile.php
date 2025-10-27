@@ -17,7 +17,7 @@ try {
     $role     = $decoded->data->role;
 
     // (Option) ดึงข้อมูลล่าสุดจาก DB เพื่อความถูกต้อง
-    $query = "SELECT user_id, fullname, email, username, role, created_at 
+    $query = "SELECT user_id, fullname, email, username, phone, dep, role, created_at 
               FROM users 
               WHERE user_id = :user_id LIMIT 1";
     $stmt = $dbcon->prepare($query);

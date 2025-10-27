@@ -124,7 +124,7 @@ async function handleLogin(form, submitBtn) {
 }
 
 async function loginRequest(username, password) {
-  const response = await fetch(`${url_base}/api/auth/login.php`, {
+  const response = await fetch(`api/auth/login.php`, {
     method: "POST",
     headers: { "Content-Type": "application/json;charset=UTF-8" },
     body: JSON.stringify({ username, password })

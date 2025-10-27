@@ -67,8 +67,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                           {{data.cat_name}}
                       </td>
                       <td>
-                        <button @click="b_catalog_update(data.cat_id)" >Update</button>  
-                        <button @click="destroy_cat(data.cat_id)">Delete</button>  
+                        <button class="btn btn-warning" @click="b_catalog_update(data.cat_id)" >Update</button>  
+                        <button class="btn btn-danger mx-2" @click="destroy_cat(data.cat_id)">Delete</button>  
                       </td>
                     </tr>
                   </tbody>

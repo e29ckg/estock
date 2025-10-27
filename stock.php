@@ -121,7 +121,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     },
     methods: {   
       show_recs(rec_ord_id){
-        axios.post('/api/recs/rec_print.php',{rec_id:rec_ord_id})
+        axios.post('api/recs/rec_print.php',{rec_id:rec_ord_id})
             .then(response => {
                 if (response.data.status) {
                   var print_rec = JSON.stringify(response.data);    
@@ -135,7 +135,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       } ,  
       show_ords(rec_ord_id){
-        axios.post('./api/orders/orders_print.php',{ord_id:rec_ord_id})
+        axios.post('api/orders/orders_print.php',{ord_id:rec_ord_id})
             .then(response => {
                 if (response.data.status) {
                     ord_print = JSON.stringify(response.data)   
@@ -148,7 +148,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
       } ,  
       get_Stock(){
-        axios.post('./api/stock/get_stocks.php')
+        axios.post('api/stock/get_stocks.php')
             .then(response => {
                 if (response.data.status) {
                     this.datas = response.data.respJSON;         
@@ -163,7 +163,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }, 
       b_stock_save(){
         var jwt = localStorage.getItem("jwt");
-        axios.post(this.url_base + 'api/stock/stock_action.php',{stock:this.stock},{ headers: {"Authorization" : `Bearer ${jwt}`}})
+        axios.post('api/stock/stock_action.php',{stock:this.stock},{ headers: {"Authorization" : `Bearer ${jwt}`}})
             .then(response => {
                 if (response.data.status == 'success') {
                   Swal.fire({

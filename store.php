@@ -173,7 +173,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     methods: {      
       get_Stores() {
         const token = getJWT();
-        axios.get(this.url_base + '/api/store/get_stores.php', {
+        axios.get('api/store/get_stores.php', {
           headers: { "Authorization": `Bearer ${token}` }
         })
         .then(response => {
@@ -206,7 +206,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     b_store_update(str_id) {
       this.$refs.m_show.click(); // เปิด modal
       const token = getJWT();
-      axios.post(this.url_base + '/api/store/get_store.php', { str_id: str_id }, {
+      axios.post('api/store/get_store.php', { str_id: str_id }, {
         headers: { "Authorization": `Bearer ${token}` }
       })
       .then(response => {
@@ -235,8 +235,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     } , 
     b_store_save() {
       const token = getJWT();
-        axios.post(this.url_base + '/api/store/store_action.php',
-          { store: this.store },   // ส่ง object store ไป
+        axios.post('api/store/store_action.php',
+          { store: this.store },   
           { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(response => {
@@ -290,7 +290,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               }
             };
             const token = getJWT();
-            axios.post(this.url_base + '/api/store/store_action.php', payload, {
+            axios.post('api/store/store_action.php', payload, {
               headers: { "Authorization": `Bearer ${token}` }
             })
             .then(response => {

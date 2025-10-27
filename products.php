@@ -88,8 +88,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                       <td class="text-center">
                         <!-- {{data.img}} -->
                         <a @click="b_product_update(data.pro_id)" >
-                          <img v-if="data.img" :src="'./uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
-                          <img v-else src="./uploads/none.png" alt="No-pic" class="float-left" height="60" >
+                          <img v-if="data.img" :src="'uploads/'+ data.img" alt="data.img" class="float-left" height="60" >
+                          <img v-else src="uploads/none.png" alt="No-pic" class="float-left" height="60" >
                         </a> 
                       </td>
                       <td class="text-left">
@@ -309,7 +309,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           val: ''
         },
         pro_stock: '',
-        previewImage: './uploads/none.png', // รูป default
+        previewImage: 'uploads/none.png', // รูป default
 
       }
     },
@@ -339,7 +339,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       get_products() {
         const token = getJWT(); // ดึง JWT จาก localStorage/sessionStorage
 
-        axios.get('./api/products/get_products.php', {
+        axios.get('api/products/get_products.php', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -360,7 +360,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       get_cats() {
         const token = getJWT();
 
-        axios.get(this.url_base + '/api/products/get_cats.php', {
+        axios.get('api/products/get_cats.php', {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {
@@ -380,7 +380,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       get_units() {
         const token = getJWT();
 
-        axios.get(this.url_base + '/api/products/get_units.php', {
+        axios.get('api/products/get_units.php', {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {
@@ -409,7 +409,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       b_product_update(pro_id) {
         const token = getJWT();
 
-        axios.post(this.url_base + '/api/products/get_product.php',
+        axios.post('api/products/get_product.php',
           { pro_id: pro_id },
           { headers: { Authorization: `Bearer ${token}` } }
         )
@@ -420,9 +420,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
             this.product = { ...response.data.respJSON[0], action: 'update' };
 
             if (this.product.img) {
-              this.previewImage = this.url_base + '/uploads/' + this.product.img;
+              this.previewImage = 'uploads/' + this.product.img;
             } else {
-              this.previewImage = this.url_base + '/uploads/none.png';
+              this.previewImage = 'uploads/none.png';
             }
 
             this.$refs.m_show.click();
@@ -485,7 +485,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           formData.append("img", this.product.img);
         }
 
-        axios.post(this.url_base + '/api/products/product_save.php',
+        axios.post('api/products/product_save.php',
           formData,
           {
             headers: {
@@ -510,7 +510,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },
       b_product_strock(pro_id) {
         const token = getJWT();
-        axios.post(this.url_base + '/api/products/get_product_stock.php', { pro_id: pro_id },{ headers: { Authorization: `Bearer ${token}` } })
+        axios.post('api/products/get_product_stock.php', { pro_id: pro_id },{ headers: { Authorization: `Bearer ${token}` } })
           .then(response => {
             console.log("API response:", response.data);
 

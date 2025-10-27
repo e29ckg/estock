@@ -216,7 +216,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
           </div>
 
-          <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock,dp.min)">
+          <div class="col-md-12 col-sm-12 col-12" v-for="dp in products"  @click.prevent="select_pro(dp.pro_id,dp.pro_name,dp.unit_name,dp.instock, dp.qua_for_ord, dp.min)">
             <div class="info-box">
               <!-- <span class="info-box-icon bg-warning"><i class="far fa-copy"></i></span> -->
               <img v-if="dp.img" :src="'./uploads/' + dp.img" alt="data.img" class="float-left" width="60" >
@@ -298,7 +298,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <td>{{index + 1 }}</td>
                         <td class="text-left">{{orl.pro_name}}</td>
                         <td>{{orl.unit_name}}</td>
-                        <td>{{formatCurrency0(orl.instock)}}</td>
+                        <td>{{formatCurrency0(orl.qua_for_ord)}}</td>
                         <td>{{formatCurrency0(orl.qua)}}</td>
                         <td>
                           <button class="btn btn-danger" v-if="Number(orl.qua) > Number(orl.instock) || Number(orl.qua) == 0 ">
@@ -433,7 +433,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         q:'',
         message: 'Hello Vue!',
         stores:'',
-        products:'',
+        products:[],
         Ord:{order_id:'', user_id:'', order_own:'',ord_app:'', order_date:'', ord_pay:'',ord_pay_name:'',comment:'',action:'insert'},
         Ord_lists:[{pro_id:'', pro_name:'', unit_name:'', qua:''}],
         select_pro_index:'',
@@ -454,7 +454,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
       },    
       get_Orders() {
-        axios.get("./api/orders/orders_list.php", {
+        axios.get("api/orders/orders_list.php", {
            headers: { Authorization: `Bearer ${token}` }
            })
           .then(res => {
@@ -465,8 +465,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
       get_users() {
         axios.post(
-          this.url_base + '/api/users/get_users.php',
-          {}, // ไม่มี body → ส่งเป็น object ว่าง
+          'api/users/get_users.php',
+          {}, 
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -484,7 +484,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },
       
       get_Products() {
-        axios.get(this.url_base + '/api/products/get_products.php', {
+        axios.get('api/orders/get_products.php', {
           headers: { Authorization: `Bearer ${token}` }
         })
         .then(response => {
@@ -501,14 +501,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
       get_Order(order_id) {
         axios.post(
-          this.url_base + '/api/orders/get_order.php',
+          'api/orders/get_order.php',
           { order_id: order_id }, 
           { headers: { Authorization: `Bearer ${token}` }}
         )
         .then(response => {
           if (response.data.status && response.data.respJSON) {
-            this.Ord = {...response.data.respJSON,action : 'update'};
-           
+            this.Ord = {...response.data.respJSON,action : 'update'};           
           } else {
             console.warn("API returned no order:", response.data.message);
           }
@@ -518,7 +517,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         });this.Ord
       },
       get_Ord_list(order_id){
-        axios.post(this.url_base + '/api/orders/get_orders_list.php',
+        axios.post('api/orders/get_orders_list.php',
         {order_id:order_id},
         { headers: { Authorization: `Bearer ${token}` }})
             .then(response => {
@@ -532,9 +531,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
       },
       b_Order_insert(){
         this.b_Order_close();
-        var user_data = JSON.parse(localStorage.getItem("user_data"));
-        this.Ord.order_own = user_data.fullname
-        console.log(user_data.fullname)
+        //var user_data = JSON.parse(localStorage.getItem("user_data"));
+        //this.Ord.order_own = user_data.fullname
+        //console.log(user_data.fullname)
       },  
       b_Order_update(order_id){        
         this.$refs['m_show'].click()
@@ -561,7 +560,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 if (result.isConfirmed) {
                   var jwt = localStorage.getItem("jwt");
                   this.Ord.action='active'
-                  axios.post(this.url_base + '/api/orders/orders_active.php',
+                  axios.post('api/orders/orders_active.php',
                     {Ord:this.Ord, Ord_lists:this.Ord_lists},
                     { headers: {"Authorization" : `Bearer ${token}}`}})
                     .then(response => {
@@ -591,9 +590,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
       }, 
 
       b_Order_save(){
-        if(this.Ord.user_ud != '' && this.Ord.order_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
+        if(this.Ord.user_id != '' && this.Ord.order_date != '' && this.Ord_lists[0].pro_name != '' && this.Ord_lists[0].qua != '' ){
           
-          axios.post(this.url_base + '/api/orders/orders_action.php',
+          axios.post('api/orders/orders_action.php',
             {Ord:this.Ord, Ord_lists:this.Ord_lists},
             { headers: {"Authorization" : `Bearer ${token}`}})
               .then(response => {
@@ -643,7 +642,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 if (result.isConfirmed) {                  
                   this.Ord.action = 'delete';  
                   this.Ord.order_id = order_id;  
-                  axios.post(this.url_base + '/api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${token}`}})
+                  axios.post('api/orders/orders_action.php',{Ord:this.Ord},{ headers: {"Authorization" : `Bearer ${token}`}})
                     .then(response => {
                         if (response.data.status) {
                           Swal.fire({
@@ -689,7 +688,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         ch_search_pro(){
           console.log(this.q)
           if(this.q.length > 0){
-            axios.post(this.url_base + '/api/products/product_search.php',{q:this.q})
+            axios.post('api/products/product_search.php',{q:this.q})
               .then(response => {
                   if (response.data.status){
                     this.products = response.data.respJSON;                    
@@ -709,11 +708,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
           this.get_Products()
           // console.log('blur', e.target.placeholder)
         },
-        select_pro(pro_id,pro_name,unit_name,instock,min){
+        select_pro(pro_id,pro_name,unit_name,instock, qua_for_ord, min){
           this.Ord_lists[this.select_pro_index].pro_id = pro_id
           this.Ord_lists[this.select_pro_index].pro_name = pro_name
           this.Ord_lists[this.select_pro_index].unit_name = unit_name
           this.Ord_lists[this.select_pro_index].instock = instock
+          this.Ord_lists[this.select_pro_index].qua_for_ord = qua_for_ord
           this.Ord_lists[this.select_pro_index].min = min
           this.$refs['m2_close'].click();
           this.reset_search()
